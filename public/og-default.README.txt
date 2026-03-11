@@ -1,0 +1,12 @@
+# OG 기본 이미지 placeholder
+# 실제 배포 시 이 파일을 1200×630 PNG로 교체하세요.
+#
+# 권장 사양:
+#   - 크기: 1200 × 630 px
+#   - 형식: PNG 또는 JPG
+#   - 파일명: og-default.jpg (또는 og-default.png)
+#   - .env에서 VITE_DEFAULT_OG_IMAGE=/og-default.jpg 로 참조
+#
+# 빠른 생성 방법:
+#   1. Figma/Canva로 제작 후 이 파일 교체
+#   2. 또는 동적 OG 이미지 사용: /api/og?title=BAIKAL AI Platform&type=default

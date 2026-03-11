@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "supabase": "https://esm.sh/@supabase/supabase-js@2",
+    "xml2js": "https://esm.sh/xml2js@0.6.2"
+  }
+}

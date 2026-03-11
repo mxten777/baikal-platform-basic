@@ -1,0 +1,145 @@
+/* Pretendard 폰트 */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-bg: #080808;
+    --color-surface: #111111;
+    --color-border: rgba(255,255,255,0.08);
+    --color-accent: #3b82f6;
+    --color-accent-dim: rgba(59,130,246,0.15);
+  }
+
+  html {
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-[#080808] text-white;
+  }
+
+  /* 스크롤바 */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+
+  ::selection { background: rgba(59,130,246,0.35); color: #fff; }
+}
+
+@layer components {
+  /* 프리미엄 섹션 레이블 */
+  .section-label {
+    @apply text-xs font-semibold tracking-[0.2em] uppercase text-blue-400/70;
+  }
+
+  /* 프리미엄 그라디언트 텍스트 */
+  .gradient-text {
+    @apply bg-gradient-to-r from-white via-blue-100 to-blue-400 bg-clip-text text-transparent;
+    background-size: 200% auto;
+  }
+
+  /* 글래스 카드 */
+  .glass-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    backdrop-filter: blur(12px);
+    transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .glass-card:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(59,130,246,0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(59,130,246,0.1);
+  }
+
+  /* 그리드 패턴 배경 */
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* prose 스타일 */
+  .prose-content {
+    @apply prose prose-invert max-w-none
+      prose-headings:font-bold
+      prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
+      prose-code:text-blue-300 prose-code:bg-white/5 prose-code:rounded prose-code:px-1
+      prose-pre:bg-zinc-900 prose-pre:border prose-pre:border-white/10;
+  }
+}
+
+@layer utilities {
+  /* 애니메이션 */
+  .animate-fade-up {
+    animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease both;
+  }
+  .animate-delay-100 { animation-delay: 0.1s; }
+  .animate-delay-200 { animation-delay: 0.2s; }
+  .animate-delay-300 { animation-delay: 0.3s; }
+  .animate-delay-400 { animation-delay: 0.4s; }
+  .animate-delay-500 { animation-delay: 0.5s; }
+
+  /* 관리자 폼 인풋 */
+  .admin-input {
+    @apply rounded-lg bg-white/[0.04] border border-white/[0.08] px-3 py-2 text-sm text-white
+           placeholder:text-white/20 focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.06]
+           transition-colors;
+  }
+  .admin-input option {
+    background: #111;
+    color: #fff;
+  }
+
+  /* 호버 언더라인 효과 */
+  .hover-underline {
+    position: relative;
+  }
+  .hover-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: currentColor;
+    transition: width 0.3s ease;
+  }
+  .hover-underline:hover::after { width: 100%; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+/* 스켈레톤 로딩 */
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+

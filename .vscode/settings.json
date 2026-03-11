@@ -1,0 +1,17 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+
+  // Supabase Edge Functions (Deno) — Node TS 서버에서 제외
+  "typescript.preferences.excludeLibrarySymbolsInNavTo": true,
+  "files.exclude": {
+    "supabase/.temp": true
+  },
+  "search.exclude": {
+    "supabase/.temp": true,
+    "dist": true
+  },
+
+  // Deno 파일을 별도 tsconfig로 분리 처리
+  "js/ts.implicitProjectConfig.checkJs": false
+}

@@ -1,0 +1,200 @@
+# =============================================================================
+# GitHub Actions CI/CD
+# .github/workflows/ci.yml
+#
+# 트리거:
+#   - main 브랜치 push → 타입 체크 + 빌드 + Vercel 프로덕션 배포
+#   - develop 브랜치 push → 타입 체크 + 빌드 (Preview 배포)
+#   - PR → 타입 체크 + 빌드
+#
+# 필요한 GitHub Secrets:
+#   SUPABASE_ACCESS_TOKEN   - Supabase CLI 인증 토큰
+#   SUPABASE_PROJECT_ID     - 프로젝트 ID (supabase link 시 사용)
+#   SUPABASE_DB_PASSWORD    - DB 비밀번호 (migrations push 시 사용)
+#   VERCEL_TOKEN            - Vercel 배포 토큰
+#   VERCEL_ORG_ID           - Vercel 조직 ID
+#   VERCEL_PROJECT_ID       - Vercel 프로젝트 ID
+#   VITE_SUPABASE_URL       - Supabase 프로젝트 URL (빌드 시 필요)
+#   VITE_SUPABASE_ANON_KEY  - Supabase anon key (빌드 시 필요)
+# =============================================================================
+
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ===========================================================================
+  # 1. 타입 체크 + 린트 + 빌드
+  # ===========================================================================
+  build:
+    name: Type Check & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript type check
+        run: npx tsc --noEmit
+
+      - name: ESLint
+        run: npm run lint
+        continue-on-error: false
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_SITE_URL: https://www.baikalsys.kr
+          VITE_DEFAULT_OG_IMAGE: /og-default.jpg
+          VITE_GA_ID: ''
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 1
+
+  # ===========================================================================
+  # 2. Supabase DB 마이그레이션 (main 브랜치 push 시만 실행)
+  # ===========================================================================
+  supabase-migrate:
+    name: Supabase DB Migration
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link Supabase project
+        run: supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Run DB migrations
+        run: supabase db push --password ${{ secrets.SUPABASE_DB_PASSWORD }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Deploy Edge Functions
+        run: |
+          supabase functions deploy sync-rss
+          supabase functions deploy sync-youtube
+          supabase functions deploy generate-sitemap
+          supabase functions deploy generate-og-image
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+  # ===========================================================================
+  # 3. Vercel 프로덕션 배포 (main 브랜치 push 시만 실행)
+  # ===========================================================================
+  deploy-production:
+    name: Deploy to Vercel (Production)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [build, supabase-migrate]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    environment:
+      name: production
+      url: https://www.baikalsys.kr
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          working-directory: ./
+
+  # ===========================================================================
+  # 4. Vercel Preview 배포 (develop 브랜치 또는 PR)
+  # ===========================================================================
+  deploy-preview:
+    name: Deploy to Vercel (Preview)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: build
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/develop') ||
+      github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Deploy Preview to Vercel
+        uses: amondnet/vercel-action@v25
+        id: vercel-deploy
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+      - name: Comment Preview URL on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🚀 **Preview 배포 완료**: ${{ steps.vercel-deploy.outputs.preview-url }}`
+            })
