@@ -63,18 +63,33 @@ export default function Header() {
           >
             문의하기
           </Link>
-
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setMenuOpen(v => !v)}
-            className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg"
-            style={{ color: '#ffffff', fontSize: '22px', background: 'rgba(255,255,255,0.12)', border: 'none', flexShrink: 0 }}
-            aria-label="메뉴"
-          >
-            {menuOpen ? '✕' : '☰'}
-          </button>
         </div>
       </div>
+
+      {/* Mobile menu button — fixed to viewport to avoid Samsung flex overflow bug */}
+      <button
+        onClick={() => setMenuOpen(v => !v)}
+        className="md:hidden"
+        style={{
+          position: 'fixed',
+          top: '10px',
+          right: '12px',
+          width: '44px',
+          height: '44px',
+          lineHeight: '44px',
+          textAlign: 'center',
+          borderRadius: '10px',
+          background: 'rgba(20,20,20,0.92)',
+          border: '1px solid rgba(255,255,255,0.18)',
+          color: '#ffffff',
+          fontSize: '20px',
+          zIndex: 999,
+          cursor: 'pointer',
+        }}
+        aria-label="메뉴"
+      >
+        {menuOpen ? '✕' : '☰'}
+      </button>
 
       {/* Mobile Nav */}
       <div className={`md:hidden overflow-hidden transition-all duration-300 ${menuOpen ? 'max-h-96' : 'max-h-0'}`}>
