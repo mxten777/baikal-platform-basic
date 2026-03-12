@@ -4,6 +4,14 @@ import { supabase } from '@/lib/supabase'
 import { Upload, Copy, Trash2, Check, Image as ImageIcon, FileText } from 'lucide-react'
 
 const BUCKET = 'public-media'
+const NAME_MAP_KEY = 'media_name_map'
+
+function getNameMap(): Record<string, string> {
+  try { return JSON.parse(localStorage.getItem(NAME_MAP_KEY) ?? '{}') } catch { return {} }
+}
+function saveNameMap(map: Record<string, string>) {
+  localStorage.setItem(NAME_MAP_KEY, JSON.stringify(map))
+}
 
 const ALLOWED_TYPES = [
   'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
@@ -40,10 +48,10 @@ export default function AdminMedia() {
       sortBy: { column: 'created_at', order: 'desc' },
     })
     if (data) {
+      const nameMap = getNameMap()
       const loaded: UploadedFile[] = data.map(f => {
         const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(f.name)
-        const stripped = f.name.replace(/^\d{13}-/, '')
-        const displayName = (() => { try { return decodeURIComponent(stripped) } catch { return stripped } })()
+        const displayName = nameMap[f.name] ?? f.name
         return {
           name: displayName,
           url: urlData.publicUrl,
@@ -82,6 +90,10 @@ export default function AdminMedia() {
       }
 
       const { data } = supabase.storage.from(BUCKET).getPublicUrl(fileName)
+      // localStorage에 저장키 → 원본 파일명 매핑 저장
+      const nameMap = getNameMap()
+      nameMap[fileName] = file.name
+      saveNameMap(nameMap)
       uploaded.push({
         name: file.name,
         url: data.publicUrl,
@@ -112,6 +124,10 @@ export default function AdminMedia() {
     const storageKey = url.split(`/${BUCKET}/`)[1]?.split('?')[0]
     if (storageKey) {
       await supabase.storage.from(BUCKET).remove([storageKey])
+      // localStorage 매핑도 제거
+      const nameMap = getNameMap()
+      delete nameMap[storageKey]
+      saveNameMap(nameMap)
     }
     setFiles(prev => prev.filter(f => f.url !== url))
   }
