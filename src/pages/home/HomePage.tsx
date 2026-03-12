@@ -75,7 +75,7 @@ export default function HomePage() {
       <SEOHead canonical="/" structuredData={structuredData} />
 
       {/* ===== HERO ===== */}
-      <section className="relative min-h-screen overflow-hidden bg-[#080808] flex flex-col justify-center -mt-16">
+      <section className="relative min-h-screen bg-[#080808] flex flex-col justify-center -mt-16" style={{overflow:'clip'}}>
         {/* 배경 — 그리드 + 글로우 */}
         <div className="absolute inset-0 grid-bg opacity-100" />
         <div className="absolute inset-0 bg-hero-glow" />
@@ -147,7 +147,7 @@ export default function HomePage() {
       </section>
 
       {/* ===== PHILOSOPHY ===== */}
-      <section className="relative py-24 sm:py-32 bg-[#080808] overflow-hidden">
+      <section className="relative py-24 sm:py-32 bg-[#080808]" style={{overflow:'clip'}}>
         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-blue-500/5 blur-[100px] pointer-events-none" />
         <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
@@ -301,7 +301,7 @@ export default function HomePage() {
       </section>
 
       {/* ===== CTA ===== */}
-      <section className="relative py-28 sm:py-40 bg-[#080808] overflow-hidden">
+      <section className="relative py-28 sm:py-40 bg-[#080808]" style={{overflow:'clip'}}>
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
         {/* 중앙 글로우 */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">

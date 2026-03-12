@@ -53,6 +53,12 @@ export default function Header() {
         zIndex: 300,
         cursor: 'pointer',
         WebkitTapHighlightColor: 'transparent',
+        // Samsung 브라우저 compositing layer 버그 대응:
+        // translateZ(0)으로 독립 GPU 레이어 강제 생성 → 조상의 overflow/paint가 영향 못 줌
+        transform: 'translateZ(0)',
+        WebkitTransform: 'translateZ(0)',
+        backfaceVisibility: 'hidden',
+        WebkitBackfaceVisibility: 'hidden',
       }}
       aria-label="메뉴"
     >
