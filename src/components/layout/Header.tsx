@@ -12,77 +12,51 @@ const nav = [
 
 function HamburgerPortalButton({ menuOpen, onToggle }: { menuOpen: boolean; onToggle: () => void }) {
   const [tick, setTick] = useState(0)
-  const [dbg, setDbg] = useState('init')
 
   useEffect(() => {
-    const id = setInterval(() => {
-      setTick(t => {
-        const next = t + 1
-        setDbg(`tick=${next} t=${Date.now() % 100000}`)
-        return next
-      })
-    }, 800)
+    // key={tick}으로 800ms마다 DOM 완전 remount → Samsung Internet GPU layer 재생성
+    const id = setInterval(() => setTick(t => t + 1), 800)
     return () => clearInterval(id)
   }, [])
 
   return createPortal(
-    <>
-      {/* key={tick}: Samsung Internet GPU layer 버그 대응 - 매 800ms DOM 완전 remount → 새 GPU layer 강제 생성 */}
-      <button
-        key={tick}
-        onClick={onToggle}
-        className="hamburger-portal-btn"
-        style={{
-          position: 'fixed',
-          top: '10px',
-          right: '16px',
-          width: '44px',
-          height: '44px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: '10px',
-          background: '#141414',
-          border: '1px solid rgba(255,255,255,0.22)',
-          zIndex: 9999,
-          cursor: 'pointer',
-          WebkitTapHighlightColor: 'transparent',
-        }}
-        aria-label="메뉴"
-      >
-        {menuOpen ? (
-          <svg width="18" height="18" viewBox="0 0 18 18" strokeWidth="2.5" strokeLinecap="round" fill="none"
-            style={{ stroke: '#ffffff', display: 'block' }}>
-            <line x1="2" y1="2" x2="16" y2="16" />
-            <line x1="16" y1="2" x2="2" y2="16" />
-          </svg>
-        ) : (
-          <svg width="20" height="15" viewBox="0 0 20 15" strokeWidth="2.5" strokeLinecap="round" fill="none"
-            style={{ stroke: '#ffffff', display: 'block' }}>
-            <line x1="0" y1="1" x2="20" y2="1" />
-            <line x1="0" y1="7.5" x2="20" y2="7.5" />
-            <line x1="0" y1="14" x2="20" y2="14" />
-          </svg>
-        )}
-      </button>
-      <div style={{
+    <button
+      key={tick}
+      onClick={onToggle}
+      className="hamburger-portal-btn"
+      style={{
         position: 'fixed',
-        bottom: '60px',
-        left: '8px',
-        right: '8px',
-        background: 'rgba(0,0,0,0.85)',
-        color: '#0f0',
-        fontSize: '11px',
-        fontFamily: 'monospace',
-        padding: '6px 8px',
-        borderRadius: '6px',
-        zIndex: 99999,
-        lineHeight: 1.5,
-        wordBreak: 'break-all',
-      }}>
-        BTN: {dbg}
-      </div>
-    </>,
+        top: '10px',
+        right: '16px',
+        width: '44px',
+        height: '44px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: '10px',
+        background: '#141414',
+        border: '1px solid rgba(255,255,255,0.22)',
+        zIndex: 9999,
+        cursor: 'pointer',
+        WebkitTapHighlightColor: 'transparent',
+      }}
+      aria-label="메뉴"
+    >
+      {menuOpen ? (
+        <svg width="18" height="18" viewBox="0 0 18 18" strokeWidth="2.5" strokeLinecap="round" fill="none"
+          style={{ stroke: '#ffffff', display: 'block' }}>
+          <line x1="2" y1="2" x2="16" y2="16" />
+          <line x1="16" y1="2" x2="2" y2="16" />
+        </svg>
+      ) : (
+        <svg width="20" height="15" viewBox="0 0 20 15" strokeWidth="2.5" strokeLinecap="round" fill="none"
+          style={{ stroke: '#ffffff', display: 'block' }}>
+          <line x1="0" y1="1" x2="20" y2="1" />
+          <line x1="0" y1="7.5" x2="20" y2="7.5" />
+          <line x1="0" y1="14" x2="20" y2="14" />
+        </svg>
+      )}
+    </button>,
     document.body
   )
 }
