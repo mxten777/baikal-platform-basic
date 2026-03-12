@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 
 const nav = [
@@ -16,6 +16,8 @@ export default function Header() {
       ? window.matchMedia('(max-width: 767px)').matches
       : false
   )
+  const headerRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 767px)')
@@ -25,15 +27,49 @@ export default function Header() {
     return () => mq.removeEventListener('change', handler)
   }, [])
 
+  // Samsung Internet 강제 고정
+  useEffect(() => {
+    const forceFixed = () => {
+      if (headerRef.current) {
+        const rect = headerRef.current.getBoundingClientRect()
+        if (rect.top !== 0) {
+          headerRef.current.style.top = '0px'
+        }
+      }
+      if (buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect()
+        if (rect.top !== 10) {
+          buttonRef.current.style.top = '10px'
+        }
+      }
+    }
+
+    let rafId: number
+    const scrollHandler = () => {
+      rafId = requestAnimationFrame(forceFixed)
+    }
+
+    window.addEventListener('scroll', scrollHandler, { passive: true })
+    window.addEventListener('touchmove', scrollHandler, { passive: true })
+    
+    return () => {
+      window.removeEventListener('scroll', scrollHandler)
+      window.removeEventListener('touchmove', scrollHandler)
+      if (rafId) cancelAnimationFrame(rafId)
+    }
+  }, [])
+
   return (
     <header
+        ref={headerRef}
         className="fixed top-0 left-0 right-0 z-[9999] border-b border-white/[0.06]"
         style={{
-          background: '#ff0000',
+          background: '#00ff00',
         }}
       >
         {/* 햄버거 버튼 - 항상 렌더링, CSS로 데스크탑 숨김 */}
         <div
+          ref={buttonRef}
           onClick={() => setMenuOpen(v => !v)}
           role="button"
           tabIndex={0}
