@@ -52,23 +52,27 @@ export default function Header() {
         zIndex: 300,
         cursor: 'pointer',
         WebkitTapHighlightColor: 'transparent',
-        transform: 'translateZ(0)',
-        WebkitTransform: 'translateZ(0)',
+        // iPhone Safari: translate3d가 translateZ(0)보다 더 확실하게 GPU layer 강제
+        transform: 'translate3d(0,0,0)',
+        WebkitTransform: 'translate3d(0,0,0)',
         backfaceVisibility: 'hidden',
         WebkitBackfaceVisibility: 'hidden',
-        // Samsung Internet compositing GC 버그 대응:
-        // 미세 무한 애니메이션으로 레이어를 영구 활성 상태로 유지
+        // Samsung Internet: compositing GC 버그 대응 (opacity 무한 루프로 layer 영구 유지)
+        // iPhone Safari: -webkit- 프리픽스 병기로 compositing 초기화 보장
         animation: 'samsung-layer-fix 1s linear infinite',
+        WebkitAnimation: 'samsung-layer-fix 1s linear infinite',
       }}
       aria-label="메뉴"
     >
       {menuOpen ? (
-        <svg width="18" height="18" viewBox="0 0 18 18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="none">
+        <svg width="18" height="18" viewBox="0 0 18 18" strokeWidth="2.5" strokeLinecap="round" fill="none"
+          style={{stroke:'#fff', display:'block', overflow:'visible'}}>
           <line x1="2" y1="2" x2="16" y2="16"/>
           <line x1="16" y1="2" x2="2" y2="16"/>
         </svg>
       ) : (
-        <svg width="20" height="15" viewBox="0 0 20 15" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="none">
+        <svg width="20" height="15" viewBox="0 0 20 15" strokeWidth="2.5" strokeLinecap="round" fill="none"
+          style={{stroke:'#fff', display:'block', overflow:'visible'}}>
           <line x1="0" y1="1" x2="20" y2="1"/>
           <line x1="0" y1="7.5" x2="20" y2="7.5"/>
           <line x1="0" y1="14" x2="20" y2="14"/>
