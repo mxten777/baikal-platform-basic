@@ -92,11 +92,9 @@ export default function Header() {
             <button
               onClick={() => setMenuOpen(v => !v)}
               style={{
-                position: 'absolute',
-                top: '50%',
+                position: 'fixed',
+                top: '10px',
                 right: '16px',
-                transform: 'translateY(-50%)',
-                WebkitTransform: 'translateY(-50%)',
                 width: '60px',
                 height: '44px',
                 borderRadius: '10px',
@@ -107,7 +105,7 @@ export default function Header() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                zIndex: 10,
+                zIndex: 9999,
               }}
               aria-label="메뉴"
             >
