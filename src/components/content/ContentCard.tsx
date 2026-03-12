@@ -21,9 +21,17 @@ const CHANNEL_DOT: Record<string, string> = {
   note: 'bg-green-400',
 }
 
+const LAB_PATH: Partial<Record<string, string>> = {
+  article: 'articles',
+  note: 'notes',
+  experiment: 'experiments',
+  research: 'research',
+}
+
 export default function ContentCard({ content, variant = 'default', className }: ContentCardProps) {
-  const href = content.content_type === 'article' || content.content_type === 'note'
-    ? `/lab/${content.content_type === 'note' ? 'notes' : 'articles'}/${content.slug}`
+  const labPath = LAB_PATH[content.content_type]
+  const href = labPath
+    ? `/lab/${labPath}/${content.slug}`
     : `/content/${content.slug}`
 
   const isExternal = ['rss', 'x_post', 'instagram', 'youtube', 'external_link'].includes(content.content_type)

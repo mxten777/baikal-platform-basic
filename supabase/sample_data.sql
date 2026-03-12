@@ -159,7 +159,8 @@ LangGraph를 사용해 에이전트 상태 머신을 구현했으며
   'active', TRUE,
   ARRAY['Python', 'LangGraph', 'LangChain', 'OpenAI', 'Redis', 'FastAPI'],
   6
-);
+)
+ON CONFLICT (slug) DO NOTHING;
 
 -- =====================
 -- 샘플 콘텐츠 12개
@@ -586,4 +587,5 @@ API 의존성 없이 사용 가능한 점도 장점입니다.',
   'research',
   'published', TRUE,
   NOW() - INTERVAL '10 days'
-);
+)
+ON CONFLICT (slug) DO NOTHING;

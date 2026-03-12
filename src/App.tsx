@@ -86,8 +86,11 @@ export default function App() {
         <Route path="/lab/articles" element={<ArticleListPage />} />
         <Route path="/lab/articles/:slug" element={<ArticleDetailPage />} />
         <Route path="/lab/notes" element={<ArticleListPage />} />
+        <Route path="/lab/notes/:slug" element={<ArticleDetailPage />} />
         <Route path="/lab/experiments" element={<ArticleListPage />} />
+        <Route path="/lab/experiments/:slug" element={<ArticleDetailPage />} />
         <Route path="/lab/research" element={<ArticleListPage />} />
+        <Route path="/lab/research/:slug" element={<ArticleDetailPage />} />
 
         {/* Content Hub */}
         <Route path="/content" element={<ContentHubPage />} />

@@ -78,7 +78,7 @@ export default function AboutPage() {
               </div>
               <h2 className="text-4xl font-black tracking-tight text-white">작지만 강한<br /><span className="text-white/30">전문가 팀</span></h2>
               <p className="mt-6 text-base text-white/35 leading-relaxed">
-                소수지몟 Arthur링의 팁으로 빠르게 실험하고, 배우고, 만들고 공유합니다.
+                소수 인원의 팀으로 빠르게 실험하고, 배우고, 만들고 공유합니다.
                 AI를 직접 만들면서 얻는 실전 경험이 저희의 자산입니다.
               </p>
             </div>

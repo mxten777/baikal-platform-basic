@@ -29,7 +29,7 @@ const SERVICES = [
   {
     icon: '🌐',
     title: 'AI SaaS 플랫폼',
-    desc: '스콴링 가능한 AI 서비스 플랫폼 소프트웨어 개발 및 아키텍쳐 설계.',
+    desc: '스케일링 가능한 AI 서비스 플랫폼 소프트웨어 개발 및 아키텍처 설계.',
     tags: ['React', 'TypeScript', 'Supabase'],
   },
   {
@@ -85,7 +85,7 @@ export default function ServicesPage() {
           {/* CTA */}
           <div className="mt-16 rounded-2xl border border-blue-500/15 bg-blue-500/5 p-10 text-center">
             <h2 className="text-3xl font-black text-white">어떤 도움이 필요하세요?</h2>
-            <p className="mt-3 text-white/35">프로젝트 구체적인 내용을 더함에 무료로 상담드립니다.</p>
+            <p className="mt-3 text-white/35">구체적인 내용을 공유해주시면 무료로 상담드립니다.</p>
             <Link
               to="/contact"
               className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-black hover:bg-blue-50 transition-all"

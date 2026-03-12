@@ -33,13 +33,21 @@ export default function ArticleDetailPage() {
     ...(content.canonical_url ? { mainEntityOfPage: content.canonical_url } : {}),
   }
 
+  const BREADCRUMB: Partial<Record<string, { path: string; label: string }>> = {
+    article:    { path: '/lab/articles',    label: '기술 아티클' },
+    note:       { path: '/lab/notes',       label: '개발 노트'   },
+    experiment: { path: '/lab/experiments', label: '실험 기록'   },
+    research:   { path: '/lab/research',    label: '연구 기록'   },
+  }
+  const breadcrumb = BREADCRUMB[content.content_type] ?? BREADCRUMB['article']!
+
   return (
     <>
       <SEOHead
         title={content.meta_title ?? content.title}
         description={content.meta_desc ?? content.summary ?? undefined}
         ogImage={content.og_image_url ?? content.thumbnail_url ?? undefined}
-        canonical={`/lab/articles/${content.slug}`}
+        canonical={`${breadcrumb.path}/${content.slug}`}
         structuredData={articleSchema}
         type="article"
       />
@@ -49,7 +57,7 @@ export default function ArticleDetailPage() {
         <nav className="mb-10 flex items-center gap-2 text-xs text-white/25">
           <Link to="/" className="hover:text-white/60 transition-colors">홈</Link>
           <span>/</span>
-          <Link to="/lab/articles" className="hover:text-white/60 transition-colors">기술 아티클</Link>
+          <Link to={breadcrumb.path} className="hover:text-white/60 transition-colors">{breadcrumb.label}</Link>
           <span>/</span>
           <span className="text-white/50 truncate max-w-[200px]">{content.title}</span>
         </nav>

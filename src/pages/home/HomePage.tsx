@@ -220,7 +220,7 @@ export default function HomePage() {
               </h2>
             </div>
             <Link
-              to="/contents"
+              to="/content"
               className="hidden sm:flex items-center gap-2 text-sm text-white/30 transition-colors hover:text-white/70"
             >
               전체 보기 <span>→</span>
