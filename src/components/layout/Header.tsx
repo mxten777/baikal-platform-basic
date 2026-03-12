@@ -39,8 +39,9 @@ export default function Header() {
             ? 'bg-[#080808] border-b border-white/[0.06]'
             : 'bg-gradient-to-b from-black/60 to-transparent md:bg-transparent'
         }`}
+        style={{ position: 'fixed' }}
       >
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8" style={{ position: 'relative' }}>
           <Link to="/" className="group flex items-center" style={{ position: 'relative' }}>
             <img
               src="/images/baikal_logo_white.png"
@@ -84,31 +85,36 @@ export default function Header() {
             >
               문의하기
             </Link>
-            <button
-              onClick={() => setMenuOpen(v => !v)}
-              className="flex md:hidden items-center justify-center"
-              style={{
-                width: '60px',
-                height: '44px',
-                borderRadius: '10px',
-                background: '#ff0000',
-                border: '3px solid #00ff00',
-                cursor: 'pointer',
-                WebkitTapHighlightColor: 'transparent',
-                position: 'relative',
-                transform: 'translate3d(0,0,0)',
-                WebkitTransform: 'translate3d(0,0,0)',
-                willChange: 'transform',
-                isolation: 'isolate',
-              }}
-              aria-label="메뉴"
-            >
-              {/* SVG 제거, 텍스트로 테스트 */}
-              <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#fff' }}>
-                {menuOpen ? '✕' : '☰'}
-              </span>
-            </button>
           </div>
+
+          {/* 햄버거 버튼 - absolute positioning (flex 레이아웃에서 분리) */}
+          <button
+            onClick={() => setMenuOpen(v => !v)}
+            className="md:hidden"
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: '16px',
+              transform: 'translateY(-50%)',
+              WebkitTransform: 'translateY(-50%)',
+              width: '60px',
+              height: '44px',
+              borderRadius: '10px',
+              background: '#ff0000',
+              border: '3px solid #00ff00',
+              cursor: 'pointer',
+              WebkitTapHighlightColor: 'transparent',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10,
+            }}
+            aria-label="메뉴"
+          >
+            <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#fff' }}>
+              {menuOpen ? '✕' : '☰'}
+            </span>
+          </button>
         </div>
 
         {isMobile && (
