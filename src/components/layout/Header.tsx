@@ -30,16 +30,12 @@ export default function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8">
 
         {/* Logo */}
-        <Link to="/" className="group flex items-center gap-3">
-          <div className="relative h-7 w-7 overflow-hidden rounded-md bg-blue-500">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-xs font-black text-white tracking-tight">B</span>
-            </div>
-          </div>
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-sm font-bold text-white tracking-widest">BAIKAL</span>
-            <span className="text-xs text-white/30 tracking-widest hidden sm:inline">SYSTEMS</span>
-          </div>
+        <Link to="/" className="group flex items-center">
+          <img
+            src="/images/baikal_logo_white.png"
+            alt="BAIKAL SYSTEMS"
+            className="h-7 w-auto object-contain"
+          />
         </Link>
 
         {/* Desktop Nav */}

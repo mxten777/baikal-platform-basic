@@ -26,13 +26,12 @@ export default function AdminLayout() {
       <aside className="w-64 flex-shrink-0 flex flex-col border-r border-white/[0.06] bg-[#0a0a0a]">
         {/* 로고 */}
         <div className="flex items-center gap-2.5 px-6 py-5 border-b border-white/[0.06]">
-          <div className="h-7 w-7 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0">
-            <span className="text-xs font-black text-white">B</span>
-          </div>
-          <div>
-            <span className="text-sm font-black tracking-tight text-white">BAIKAL</span>
-            <span className="ml-1.5 text-[10px] font-semibold tracking-widest text-white/30 uppercase">Admin</span>
-          </div>
+          <img
+            src="/images/baikal_logo_white.png"
+            alt="BAIKAL SYSTEMS"
+            className="h-6 w-auto object-contain"
+          />
+          <span className="text-[10px] font-semibold tracking-widest text-white/30 uppercase">Admin</span>
         </div>
 
         {/* 네비게이션 */}
