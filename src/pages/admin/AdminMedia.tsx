@@ -42,9 +42,10 @@ export default function AdminMedia() {
     if (data) {
       const loaded: UploadedFile[] = data.map(f => {
         const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(f.name)
-        const displayName = f.name.replace(/^\d{13}-/, '')
+        // 타임스탬프-랜덤값.ext 형태에서 타임스탬프-랜덤값 부분 제거 후 표시
+        const displayName = f.name.replace(/^\d{13}-[a-z0-9]+\./, '') || f.name
         return {
-          name: displayName,
+          name: displayName !== f.name ? displayName : f.name,
           url: urlData.publicUrl,
           size: (f.metadata?.size as number) ?? 0,
           type: (f.metadata?.mimetype as string) ?? 'image/jpeg',
@@ -69,8 +70,8 @@ export default function AdminMedia() {
         setError(`지원하지 않는 파일 형식입니다: ${file.name}`)
         continue
       }
-      const safeName = file.name.replace(/[^a-zA-Z0-9가-힣ㄱ-ㅎ._\- ]/g, '_')
-      const fileName = `${Date.now()}-${safeName}`
+      const ext = file.name.split('.').pop() ?? 'bin'
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
       const { error: uploadError } = await supabase.storage
         .from(BUCKET)
         .upload(fileName, file, { cacheControl: '3600', upsert: false })
