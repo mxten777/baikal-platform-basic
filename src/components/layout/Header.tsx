@@ -1,5 +1,4 @@
 ﻿import { useState, useEffect } from 'react'
-import { createPortal } from 'react-dom'
 import { Link, NavLink } from 'react-router-dom'
 
 const nav = [
@@ -9,74 +8,6 @@ const nav = [
   { to: '/media', label: 'MEDIA' },
   { to: '/about', label: 'ABOUT' },
 ]
-
-function HamburgerPortalButton({ menuOpen, onToggle }: { menuOpen: boolean; onToggle: () => void }) {
-  const [tick, setTick] = useState(0)
-
-  useEffect(() => {
-    const id = setInterval(() => setTick(t => t + 1), 100)
-    return () => clearInterval(id)
-  }, [])
-
-  return createPortal(
-    <>
-      <button
-        key={tick}
-        onClick={onToggle}
-        className="hamburger-portal-btn"
-        style={{
-          position: 'fixed',
-          top: '10px',
-          right: '16px',
-          width: '44px',
-          height: '44px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: '10px',
-          background: '#141414',
-          border: '1px solid rgba(255,255,255,0.22)',
-          zIndex: 9999,
-          cursor: 'pointer',
-          WebkitTapHighlightColor: 'transparent',
-        }}
-        aria-label="메뉴"
-      >
-        {menuOpen ? (
-          <svg width="18" height="18" viewBox="0 0 18 18" strokeWidth="2.5" strokeLinecap="round" fill="none"
-            style={{ stroke: '#ffffff', display: 'block' }}>
-            <line x1="2" y1="2" x2="16" y2="16" />
-            <line x1="16" y1="2" x2="2" y2="16" />
-          </svg>
-      ) : (
-        <svg width="20" height="15" viewBox="0 0 20 15" strokeWidth="2.5" strokeLinecap="round" fill="none"
-          style={{ stroke: '#ffffff', display: 'block' }}>
-          <line x1="0" y1="1" x2="20" y2="1" />
-          <line x1="0" y1="7.5" x2="20" y2="7.5" />
-          <line x1="0" y1="14" x2="20" y2="14" />
-        </svg>
-      )}
-      </button>
-      {/* 디버그: 버튼 우측 상단 바로 아래 */}
-      <div key={`dbg-${tick}`} style={{
-        position: 'fixed',
-        top: '60px',
-        right: '4px',
-        background: 'rgba(0,0,0,0.88)',
-        color: '#0f0',
-        fontSize: '10px',
-        fontFamily: 'monospace',
-        padding: '4px 6px',
-        borderRadius: '6px',
-        zIndex: 99999,
-        lineHeight: 1.4,
-      }}>
-        tick={tick}
-      </div>
-    </>,
-    document.body
-  )
-}
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)
@@ -102,8 +33,7 @@ export default function Header() {
   }, [])
 
   return (
-    <>
-      <header
+    <header
         className={`fixed top-0 left-0 right-0 z-[200] transition-all duration-500 ${
           scrolled
             ? 'bg-[#080808]/90 backdrop-blur-xl border-b border-white/[0.06]'
@@ -142,6 +72,35 @@ export default function Header() {
             >
               문의하기
             </Link>
+            <button
+              onClick={() => setMenuOpen(v => !v)}
+              className="flex md:hidden items-center justify-center"
+              style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '10px',
+                background: '#141414',
+                border: '1px solid rgba(255,255,255,0.22)',
+                cursor: 'pointer',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+              aria-label="메뉴"
+            >
+              {menuOpen ? (
+                <svg width="18" height="18" viewBox="0 0 18 18" strokeWidth="2.5" strokeLinecap="round" fill="none"
+                  style={{ stroke: '#ffffff', display: 'block' }}>
+                  <line x1="2" y1="2" x2="16" y2="16" />
+                  <line x1="16" y1="2" x2="2" y2="16" />
+                </svg>
+              ) : (
+                <svg width="20" height="15" viewBox="0 0 20 15" strokeWidth="2.5" strokeLinecap="round" fill="none"
+                  style={{ stroke: '#ffffff', display: 'block' }}>
+                  <line x1="0" y1="1" x2="20" y2="1" />
+                  <line x1="0" y1="7.5" x2="20" y2="7.5" />
+                  <line x1="0" y1="14" x2="20" y2="14" />
+                </svg>
+              )}
+            </button>
           </div>
         </div>
 
@@ -173,8 +132,5 @@ export default function Header() {
           </div>
         )}
       </header>
-
-      <HamburgerPortalButton menuOpen={menuOpen} onToggle={() => setMenuOpen(v => !v)} />
-    </>
-  )
+    )
 }
