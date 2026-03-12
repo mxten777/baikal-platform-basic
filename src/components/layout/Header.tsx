@@ -29,9 +29,6 @@ export default function Header() {
     <header
         className="fixed top-0 left-0 right-0 z-[9999] border-b border-white/[0.06]"
         style={{
-          WebkitTransform: 'translateZ(0)',
-          transform: 'translateZ(0)',
-          willChange: 'transform',
           background: '#ff0000',
         }}
       >
@@ -53,8 +50,6 @@ export default function Header() {
             border: '1px solid rgba(255,255,255,0.22)',
             cursor: 'pointer',
             WebkitTapHighlightColor: 'transparent',
-            WebkitTransform: 'translateZ(0)',
-            transform: 'translateZ(0)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
