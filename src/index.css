@@ -19,10 +19,16 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    position: relative;
+    overflow-x: hidden;
+    height: 100%;
   }
 
   body {
     @apply bg-[#080808] text-white;
+    position: relative;
+    overflow-x: hidden;
+    min-height: 100%;
   }
 
   /* 스크롤바 */
