@@ -70,8 +70,8 @@ export default function AdminMedia() {
         setError(`지원하지 않는 파일 형식입니다: ${file.name}`)
         continue
       }
-      const encodedName = encodeURIComponent(file.name)
-      const fileName = `${Date.now()}-${encodedName}`
+      const ext = (file.name.split('.').pop() ?? 'bin').replace(/[^a-zA-Z0-9]/g, '')
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
       const { error: uploadError } = await supabase.storage
         .from(BUCKET)
         .upload(fileName, file, { cacheControl: '3600', upsert: false })
