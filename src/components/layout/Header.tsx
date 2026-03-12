@@ -21,10 +21,10 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      className={`fixed top-0 left-0 right-0 z-[200] will-change-transform transition-all duration-500 ${
         scrolled
           ? 'bg-[#080808]/90 backdrop-blur-xl border-b border-white/[0.06]'
-          : 'bg-transparent'
+          : 'bg-gradient-to-b from-black/40 to-transparent md:bg-transparent'
       }`}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8">
@@ -67,7 +67,7 @@ export default function Header() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMenuOpen(v => !v)}
-            className="md:hidden p-2 text-white"
+            className="md:hidden p-2 text-white bg-white/10 rounded-lg"
             aria-label="메뉴"
           >
             {menuOpen ? (
