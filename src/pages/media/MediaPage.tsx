@@ -112,7 +112,7 @@ export default function MediaPage() {
                         loading="lazy"
                       />
                     </div>
-                    <p className="truncate px-3 py-2.5 text-xs text-white/30">{img.name}</p>
+                    <p className="truncate px-3 py-2.5 text-xs text-white/60">{img.name}</p>
                   </a>
                 ))}
               </div>
@@ -133,7 +133,7 @@ export default function MediaPage() {
                     className="group flex flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white/[0.04] border border-white/[0.06] hover:border-red-400/30 transition-colors aspect-video"
                   >
                     <span className="text-4xl">📄</span>
-                    <p className="truncate w-full px-3 text-center text-xs text-white/30 group-hover:text-white/50 transition-colors">{pdf.name}</p>
+                    <p className="truncate w-full px-3 text-center text-xs text-white/60 group-hover:text-white/80 transition-colors">{pdf.name}</p>
                   </a>
                 ))}
               </div>
