@@ -67,8 +67,8 @@ export default function Header() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMenuOpen(v => !v)}
-            className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg"
-            style={{ color: '#ffffff', fontSize: '22px', background: 'rgba(255,255,255,0.12)', border: 'none' }}
+            className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg -mr-2"
+            style={{ color: '#ffffff', fontSize: '22px', background: 'rgba(255,255,255,0.12)', border: 'none', flexShrink: 0 }}
             aria-label="메뉴"
           >
             {menuOpen ? '✕' : '☰'}
