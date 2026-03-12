@@ -12,7 +12,6 @@ const nav = [
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [dbg, setDbg] = useState({ w: 0, ow: 0, dpr: 1 })
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 40)
@@ -20,30 +19,8 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handler)
   }, [])
 
-  useEffect(() => {
-    const update = () => setDbg({ w: window.innerWidth, ow: window.outerWidth, dpr: window.devicePixelRatio })
-    update()
-    window.addEventListener('resize', update)
-    return () => window.removeEventListener('resize', update)
-  }, [])
-
   return (
-    <>
-      {/* 🔴 DEBUG OVERLAY — 나중에 삭제 */}
-      <div style={{
-        position: 'fixed', bottom: 60, left: 8, zIndex: 9999,
-        background: 'rgba(0,0,0,0.85)', color: '#0f0', fontFamily: 'monospace',
-        fontSize: 11, padding: '6px 10px', borderRadius: 6, lineHeight: 1.7,
-        pointerEvents: 'none'
-      }}>
-        <div>innerW: <b>{dbg.w}</b>px</div>
-        <div>outerW: <b>{dbg.ow}</b>px</div>
-        <div>DPR: <b>{dbg.dpr}</b></div>
-        <div>md(≥768): <b style={{color: dbg.w >= 768 ? '#f00' : '#0f0'}}>{dbg.w >= 768 ? 'YES → 버튼 hidden!' : 'NO → 버튼 보임'}</b></div>
-        <div>scrolled: <b>{scrolled ? 'true' : 'false'}</b></div>
-      </div>
-
-      <header
+    <header
       className={`fixed top-0 left-0 right-0 z-[200] transition-all duration-500 ${
         scrolled
           ? 'bg-[#080808]/90 backdrop-blur-xl border-b border-white/[0.06]'
@@ -126,6 +103,5 @@ export default function Header() {
         </nav>
       </div>
     </header>
-    </>
   )
 }
