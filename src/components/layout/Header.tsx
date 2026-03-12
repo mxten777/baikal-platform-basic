@@ -67,12 +67,12 @@ export default function Header() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMenuOpen(v => !v)}
-            className="flex md:hidden flex-col gap-1.5 p-2"
+            className="flex md:hidden flex-col justify-center gap-[5px] p-3 -mr-1 min-w-[44px] min-h-[44px] rounded-md"
             aria-label="메뉴"
           >
-            <span className={`block h-px w-6 bg-white transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-[7px]' : ''}`} />
-            <span className={`block h-px w-6 bg-white transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`} />
-            <span className={`block h-px w-6 bg-white transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-[7px]' : ''}`} />
+            <span className={`block h-[2px] w-6 bg-white rounded-full transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-[7px]' : ''}`} />
+            <span className={`block h-[2px] w-6 bg-white rounded-full transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`} />
+            <span className={`block h-[2px] w-6 bg-white rounded-full transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-[7px]' : ''}`} />
           </button>
         </div>
       </div>
