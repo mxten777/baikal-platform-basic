@@ -49,7 +49,7 @@ export default function Header() {
           className="hamburger-menu-btn"
           style={{
             position: 'absolute',
-            top: '72px',
+            top: '10px',
             left: '16px',
             width: '44px',
             height: '44px',
