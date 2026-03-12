@@ -39,7 +39,7 @@ export default function Header() {
       style={{
         position: 'fixed',
         top: '10px',
-        right: '12px',
+        right: '16px',
         width: '44px',
         height: '44px',
         display: 'flex',
@@ -49,7 +49,6 @@ export default function Header() {
         background: 'rgba(20,20,20,0.92)',
         border: '1px solid rgba(255,255,255,0.18)',
         color: '#ffffff',
-        fontSize: '20px',
         zIndex: 300,
         cursor: 'pointer',
         WebkitTapHighlightColor: 'transparent',
@@ -63,7 +62,18 @@ export default function Header() {
       }}
       aria-label="메뉴"
     >
-      {menuOpen ? '✕' : '☰'}
+      {menuOpen ? (
+        <svg width="18" height="18" viewBox="0 0 18 18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="none">
+          <line x1="2" y1="2" x2="16" y2="16"/>
+          <line x1="16" y1="2" x2="2" y2="16"/>
+        </svg>
+      ) : (
+        <svg width="20" height="15" viewBox="0 0 20 15" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="none">
+          <line x1="0" y1="1" x2="20" y2="1"/>
+          <line x1="0" y1="7.5" x2="20" y2="7.5"/>
+          <line x1="0" y1="14" x2="20" y2="14"/>
+        </svg>
+      )}
     </button>,
     document.body
   ) : null
