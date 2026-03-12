@@ -57,6 +57,9 @@ export default function AdminMedia() {
 
     if (storageResult.data) {
       const nameMap: Record<string, string> = {}
+      if (dbResult.error) {
+        console.error('[media_files] SELECT 실패:', dbResult.error.message)
+      }
       for (const row of dbResult.data ?? []) {
         nameMap[row.storage_key] = row.original_name
       }
@@ -110,7 +113,11 @@ export default function AdminMedia() {
       const { data } = supabase.storage.from(BUCKET).getPublicUrl(fileName)
 
       // DB에 storage_key → 원본 파일명 영구 저장
-      await supabase.from('media_files').upsert({ storage_key: fileName, original_name: file.name })
+      const { error: dbError } = await supabase.from('media_files').upsert({ storage_key: fileName, original_name: file.name })
+      if (dbError) {
+        console.error('[media_files] UPSERT 실패:', dbError.message)
+        setError(`파일명 저장 실패: ${dbError.message}`)
+      }
 
       uploaded.push({
         name: file.name,
