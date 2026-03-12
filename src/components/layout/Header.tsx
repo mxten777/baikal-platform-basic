@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, NavLink } from 'react-router-dom'
 
@@ -11,24 +11,25 @@ const nav = [
 ]
 
 function HamburgerPortalButton({ menuOpen, onToggle }: { menuOpen: boolean; onToggle: () => void }) {
-  const btnRef = useRef<HTMLButtonElement>(null)
+  const [tick, setTick] = useState(0)
   const [dbg, setDbg] = useState('init')
 
   useEffect(() => {
     const id = setInterval(() => {
-      const el = btnRef.current
-      if (!el) { setDbg('NO_DOM'); return }
-      const r = el.getBoundingClientRect()
-      const style = window.getComputedStyle(el)
-      setDbg(`top=${Math.round(r.top)} disp=${style.display} vis=${style.visibility} op=${style.opacity} anim=${style.animationName}`)
-    }, 400)
+      setTick(t => {
+        const next = t + 1
+        setDbg(`tick=${next} t=${Date.now() % 100000}`)
+        return next
+      })
+    }, 800)
     return () => clearInterval(id)
   }, [])
 
   return createPortal(
     <>
+      {/* key={tick}: Samsung Internet GPU layer 버그 대응 - 매 800ms DOM 완전 remount → 새 GPU layer 강제 생성 */}
       <button
-        ref={btnRef}
+        key={tick}
         onClick={onToggle}
         className="hamburger-portal-btn"
         style={{
@@ -46,8 +47,6 @@ function HamburgerPortalButton({ menuOpen, onToggle }: { menuOpen: boolean; onTo
           zIndex: 9999,
           cursor: 'pointer',
           WebkitTapHighlightColor: 'transparent',
-          animation: 'samsung-gc-fix 1s linear infinite',
-          WebkitAnimation: 'samsung-gc-fix 1s linear infinite',
         }}
         aria-label="메뉴"
       >
