@@ -301,7 +301,8 @@ limit 5;
 - 100만 벡터까지는 ivfflat, 그 이상은 hnsw 고려',
   'article',
   'published', FALSE,
-  NOW() - INTERVAL '8 days'
+  NOW() - INTERVAL '8 days',
+  NULL
 ),
 (
   'openai-gpt4o-mini-cost-optimization',
@@ -337,7 +338,8 @@ GPT-4o는 강력하지만 토큰당 비용이 높습니다.
 - 라우팅 적용: 월 $34 (90% 절감)',
   'article',
   'published', TRUE,
-  NOW() - INTERVAL '12 days'
+  NOW() - INTERVAL '12 days',
+  NULL
 ),
 (
   'ai-agent-langraph-intro',
@@ -383,7 +385,8 @@ graph.add_conditional_edges(
 - 에러 복구 및 재시도 로직 구조화',
   'article',
   'published', FALSE,
-  NOW() - INTERVAL '15 days'
+  NOW() - INTERVAL '15 days',
+  NULL
 ),
 (
   'baikal-platform-devlog-1',
@@ -415,7 +418,8 @@ AI가 도와주니까 혼자서도 충분히 만들 수 있습니다.
 콘텐츠가 쌓일수록 강해지는 플랫폼을 만들겠습니다.',
   'note',
   'published', TRUE,
-  NOW() - INTERVAL '3 days'
+  NOW() - INTERVAL '3 days',
+  NULL
 ),
 (
   'python-fastapi-async-best-practices',
@@ -465,7 +469,8 @@ async def heavy_compute():
 - 파일 I/O: aiofiles 사용',
   'article',
   'published', FALSE,
-  NOW() - INTERVAL '20 days'
+  NOW() - INTERVAL '20 days',
+  NULL
 ),
 (
   'typescript-type-safety-ai-apps',
@@ -512,7 +517,8 @@ const response = await openai.chat.completions.create({
 ```',
   'article',
   'published', FALSE,
-  NOW() - INTERVAL '25 days'
+  NOW() - INTERVAL '25 days',
+  NULL
 ),
 (
   'x-post-llm-context-window-tip',
@@ -521,7 +527,8 @@ const response = await openai.chat.completions.create({
   NULL,
   'x_post',
   'published', FALSE,
-  NOW() - INTERVAL '1 day'
+  NOW() - INTERVAL '1 day',
+  NULL
 ),
 (
   'x-post-rag-retrieval-precision',
@@ -530,7 +537,8 @@ const response = await openai.chat.completions.create({
   NULL,
   'x_post',
   'published', FALSE,
-  NOW() - INTERVAL '4 days'
+  NOW() - INTERVAL '4 days',
+  NULL
 ),
 (
   'note-ai-product-ideation',
@@ -557,7 +565,8 @@ const response = await openai.chat.completions.create({
 → AI 미팅 요약기 프로젝트 시작 결정',
   'note',
   'published', TRUE,
-  NOW() - INTERVAL '6 days'
+  NOW() - INTERVAL '6 days',
+  NULL
 ),
 (
   'research-embedding-model-comparison',
@@ -594,6 +603,7 @@ const response = await openai.chat.completions.create({
 API 의존성 없이 사용 가능한 점도 장점입니다.',
   'research',
   'published', TRUE,
-  NOW() - INTERVAL '10 days'
+  NOW() - INTERVAL '10 days',
+  NULL
 )
 ON CONFLICT (slug) DO NOTHING;
