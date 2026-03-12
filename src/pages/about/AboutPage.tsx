@@ -127,11 +127,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* 명함 & 포트폴리오 */}
       <section className="relative bg-[#080808] py-24">

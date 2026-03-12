@@ -90,7 +90,16 @@ export default function ServicesPage() {
                   <p className="mt-2 text-sm leading-relaxed text-white/35 group-hover:text-white/45 transition-colors">{s.desc}</p>
                   <div className="mt-5 flex flex-wrap gap-1.5">
                     {s.tags.map(t => (
-                      <span key={t} className="rounded-full border border-white/[0.07] bg-white/[0.0 relative overflow-hidden group">
+                      <span key={t} className="rounded-full border border-white/[0.07] bg-white/[0.03] px-2.5 py-0.5 text-[11px] text-white/30 group-hover:border-white/[0.12] group-hover:text-white/40 transition-all">{t}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <div className="mt-16 rounded-2xl border border-blue-500/15 bg-blue-500/5 p-10 text-center relative overflow-hidden group">
             {/* 배경 애니메이션 */}
             <div className="absolute inset-0 opacity-30">
               <div className="absolute top-0 left-0 w-[300px] h-[300px] rounded-full bg-blue-500/10 blur-[80px] animate-pulse-glow" />
@@ -106,16 +115,7 @@ export default function ServicesPage() {
               >
                 무료 상담 신청 →
               </Link>
-            </div*/}
-          <div className="mt-16 rounded-2xl border border-blue-500/15 bg-blue-500/5 p-10 text-center">
-            <h2 className="text-3xl font-black text-white">어떤 도움이 필요하세요?</h2>
-            <p className="mt-3 text-white/35">구체적인 내용을 공유해주시면 무료로 상담드립니다.</p>
-            <Link
-              to="/contact"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-black hover:bg-blue-50 transition-all"
-            >
-              무료 상담 신청 →
-            </Link>
+            </div>
           </div>
         </div>
       </section>
