@@ -34,11 +34,7 @@ export default function Header() {
 
   return (
     <header
-        className={`fixed top-0 left-0 right-0 z-[9999] transition-all duration-500 ${
-          scrolled
-            ? 'bg-[#080808] border-b border-white/[0.06]'
-            : 'bg-gradient-to-b from-black/60 to-transparent md:bg-transparent'
-        }`}
+        className="fixed top-0 left-0 right-0 z-[9999] bg-[#080808] border-b border-white/[0.06]"
         style={{
           WebkitTransform: 'translateZ(0)',
           transform: 'translateZ(0)',
