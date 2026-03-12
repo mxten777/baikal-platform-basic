@@ -14,40 +14,40 @@ function HamburgerPortalButton({ menuOpen, onToggle }: { menuOpen: boolean; onTo
   const [tick, setTick] = useState(0)
 
   useEffect(() => {
-    // key={tick}으로 800ms마다 DOM 완전 remount → Samsung Internet GPU layer 재생성
     const id = setInterval(() => setTick(t => t + 1), 800)
     return () => clearInterval(id)
   }, [])
 
   return createPortal(
-    <button
-      key={tick}
-      onClick={onToggle}
-      className="hamburger-portal-btn"
-      style={{
-        position: 'fixed',
-        top: '10px',
-        right: '16px',
-        width: '44px',
-        height: '44px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: '10px',
-        background: '#141414',
-        border: '1px solid rgba(255,255,255,0.22)',
-        zIndex: 9999,
-        cursor: 'pointer',
-        WebkitTapHighlightColor: 'transparent',
-      }}
-      aria-label="메뉴"
-    >
-      {menuOpen ? (
-        <svg width="18" height="18" viewBox="0 0 18 18" strokeWidth="2.5" strokeLinecap="round" fill="none"
-          style={{ stroke: '#ffffff', display: 'block' }}>
-          <line x1="2" y1="2" x2="16" y2="16" />
-          <line x1="16" y1="2" x2="2" y2="16" />
-        </svg>
+    <>
+      <button
+        key={tick}
+        onClick={onToggle}
+        className="hamburger-portal-btn"
+        style={{
+          position: 'fixed',
+          top: '10px',
+          right: '16px',
+          width: '44px',
+          height: '44px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: '10px',
+          background: '#141414',
+          border: '1px solid rgba(255,255,255,0.22)',
+          zIndex: 9999,
+          cursor: 'pointer',
+          WebkitTapHighlightColor: 'transparent',
+        }}
+        aria-label="메뉴"
+      >
+        {menuOpen ? (
+          <svg width="18" height="18" viewBox="0 0 18 18" strokeWidth="2.5" strokeLinecap="round" fill="none"
+            style={{ stroke: '#ffffff', display: 'block' }}>
+            <line x1="2" y1="2" x2="16" y2="16" />
+            <line x1="16" y1="2" x2="2" y2="16" />
+          </svg>
       ) : (
         <svg width="20" height="15" viewBox="0 0 20 15" strokeWidth="2.5" strokeLinecap="round" fill="none"
           style={{ stroke: '#ffffff', display: 'block' }}>
@@ -56,7 +56,24 @@ function HamburgerPortalButton({ menuOpen, onToggle }: { menuOpen: boolean; onTo
           <line x1="0" y1="14" x2="20" y2="14" />
         </svg>
       )}
-    </button>,
+      </button>
+      {/* 디버그: 버튼 우측 상단 바로 아래 */}
+      <div style={{
+        position: 'fixed',
+        top: '60px',
+        right: '4px',
+        background: 'rgba(0,0,0,0.88)',
+        color: '#0f0',
+        fontSize: '10px',
+        fontFamily: 'monospace',
+        padding: '4px 6px',
+        borderRadius: '6px',
+        zIndex: 99999,
+        lineHeight: 1.4,
+      }}>
+        tick={tick}
+      </div>
+    </>,
     document.body
   )
 }
