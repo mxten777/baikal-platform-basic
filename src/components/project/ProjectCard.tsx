@@ -22,31 +22,33 @@ export default function ProjectCard({ project, className }: ProjectCardProps) {
           <img
             src={project.thumbnail_url}
             alt={project.title}
-            className="h-full w-full object-cover transition-all duration-700 group-hover:scale-[1.06] opacity-80 group-hover:opacity-100"
+            className="h-full w-full object-cover transition-all duration-700 group-hover:scale-[1.06] opacity-90 group-hover:opacity-100"
             loading="lazy"
           />
         ) : (
-          <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-gradient-to-br from-[#0d1a2e] to-[#080808]">
-            {/* 배경 장식 원 */}
-            <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-blue-500/10 blur-2xl" />
-            <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-indigo-500/8 blur-2xl" />
+          <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-gradient-to-br from-[#0a1628] via-[#0d1a2e] to-[#080808]">
+            {/* 움직이는 배경 글로우 */}
+            <div className="absolute top-0 left-1/4 w-32 h-32 rounded-full bg-blue-500/15 blur-3xl animate-pulse-glow" />
+            <div className="absolute bottom-0 right-1/4 w-28 h-28 rounded-full bg-purple-500/10 blur-3xl animate-float" />
             {/* 그리드 패턴 */}
-            <div className="absolute inset-0 grid-bg opacity-40" />
+            <div className="absolute inset-0 grid-bg opacity-30" />
+            {/* 그라디언트 오버레이 */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5" />
             {/* 중앙 아이콘 영역 */}
-            <div className="relative flex flex-col items-center gap-2">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10 backdrop-blur-sm">
-                <span className="text-2xl font-black tracking-tight text-blue-400/70">
+            <div className="relative flex flex-col items-center gap-3 z-10">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-blue-500/30 bg-blue-500/10 backdrop-blur-md shadow-lg shadow-blue-500/20 transition-transform duration-500 group-hover:scale-110 group-hover:border-blue-400/40">
+                <span className="text-3xl font-black tracking-tight text-blue-400/80">
                   {project.category ? project.category.charAt(0) : 'AI'}
                 </span>
               </div>
               {project.category && (
-                <span className="text-[10px] font-semibold tracking-[0.2em] text-white/20 uppercase">{project.category}</span>
+                <span className="text-[10px] font-semibold tracking-[0.2em] text-blue-400/40 uppercase">{project.category}</span>
               )}
             </div>
           </div>
         )}
         {/* 이미지 오버레이 */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#080808]/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#080808]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       </div>
 
       <div className="p-5 sm:p-7">

@@ -72,16 +72,28 @@ export default function ContentCard({ content, variant = 'default', className }:
   return (
     <div className={cn('glass-card group overflow-hidden rounded-2xl', className)}>
       {/* Thumbnail */}
-      {content.thumbnail_url && (
-        <div className="aspect-video overflow-hidden bg-white/[0.03]">
+      <div className="aspect-video overflow-hidden bg-white/[0.03]">
+        {content.thumbnail_url ? (
           <img
             src={content.thumbnail_url}
             alt={content.title}
-            className="h-full w-full object-cover opacity-70 transition-all duration-500 group-hover:opacity-90 group-hover:scale-[1.02]"
+            className="h-full w-full object-cover opacity-80 transition-all duration-500 group-hover:opacity-95 group-hover:scale-[1.03]"
             loading="lazy"
           />
-        </div>
-      )}
+        ) : (
+          <div className="relative h-full w-full overflow-hidden bg-gradient-to-br from-[#0a1628] via-[#080808] to-[#0d1a2e]">
+            {/* 움직이는 배경 글로우 */}
+            <div className="absolute top-1/4 right-1/4 w-28 h-28 rounded-full bg-blue-500/12 blur-3xl animate-float" style={{animationDelay: '0.5s'}} />
+            <div className="absolute bottom-1/3 left-1/3 w-24 h-24 rounded-full bg-purple-500/8 blur-2xl animate-pulse-glow" />
+            {/* 그리드 패턴 */}
+            <div className="absolute inset-0 grid-bg opacity-25" />
+            {/* 채널 타입별 아이콘 표시 */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className={cn('h-2 w-2 rounded-full', dot, 'shadow-lg')} style={{boxShadow: `0 0 20px currentColor`}} />
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className="p-7">
         {/* Channel badge */}
