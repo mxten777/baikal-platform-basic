@@ -15,10 +15,11 @@ export default function Footer() {
           {/* 브랜드 */}
           <div className="md:col-span-5">
             <Link to="/" className="flex items-center gap-3 mb-6">
-              <div className="h-8 w-8 rounded-md bg-blue-500 flex items-center justify-center">
-                <span className="text-sm font-black text-white">B</span>
-              </div>
-              <span className="text-sm font-bold tracking-widest text-white">BAIKAL SYSTEMS</span>
+              <img
+                src="/images/baikal_logo_white.png"
+                alt="BAIKAL SYSTEMS"
+                className="h-8 w-auto object-contain"
+              />
             </Link>
             <p className="text-sm leading-relaxed text-white/35 max-w-xs">
               AI 소프트웨어 개발 회사.<br />

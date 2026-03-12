@@ -34,7 +34,7 @@ export default function Header() {
           <img
             src="/images/baikal_logo_white.png"
             alt="BAIKAL SYSTEMS"
-            className="h-7 w-auto object-contain"
+            className="h-9 w-auto object-contain"
           />
         </Link>
 
