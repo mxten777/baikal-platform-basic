@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import SEOHead from '@/components/seo/SEOHead'
 import { supabase } from '@/lib/supabase'
 import { Upload, Copy, Trash2, Check, Image as ImageIcon, FileText } from 'lucide-react'
@@ -27,10 +27,35 @@ function formatBytes(bytes: number) {
 export default function AdminMedia() {
   const [files, setFiles] = useState<UploadedFile[]>([])
   const [uploading, setUploading] = useState(false)
+  const [loadingFiles, setLoadingFiles] = useState(true)
   const [dragOver, setDragOver] = useState(false)
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  async function loadFiles() {
+    setLoadingFiles(true)
+    const { data } = await supabase.storage.from(BUCKET).list('', {
+      limit: 200,
+      sortBy: { column: 'created_at', order: 'desc' },
+    })
+    if (data) {
+      const loaded: UploadedFile[] = data.map(f => {
+        const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(f.name)
+        return {
+          name: f.name,
+          url: urlData.publicUrl,
+          size: (f.metadata?.size as number) ?? 0,
+          type: (f.metadata?.mimetype as string) ?? 'image/jpeg',
+          uploadedAt: f.created_at ?? new Date().toISOString(),
+        }
+      })
+      setFiles(loaded)
+    }
+    setLoadingFiles(false)
+  }
+
+  useEffect(() => { loadFiles() }, [])
 
   async function uploadFiles(fileList: FileList) {
     if (!fileList.length) return
@@ -81,7 +106,11 @@ export default function AdminMedia() {
     })
   }
 
-  function handleRemove(url: string) {
+  async function handleRemove(url: string) {
+    const storageKey = url.split(`/${BUCKET}/`)[1]?.split('?')[0]
+    if (storageKey) {
+      await supabase.storage.from(BUCKET).remove([storageKey])
+    }
     setFiles(prev => prev.filter(f => f.url !== url))
   }
 
@@ -132,10 +161,14 @@ export default function AdminMedia() {
         )}
 
         {/* 업로드된 파일 그리드 */}
-        {files.length === 0 ? (
+        {loadingFiles ? (
+          <div className="glass-card rounded-2xl p-10 text-center">
+            <p className="text-sm text-white/30 animate-pulse">파일 목록 로딩 중…</p>
+          </div>
+        ) : files.length === 0 ? (
           <div className="glass-card rounded-2xl p-10 text-center">
             <ImageIcon size={32} className="mx-auto mb-3 text-white/15" />
-            <p className="text-sm text-white/25">이 세션에서 업로드한 파일이 여기에 표시됩니다</p>
+            <p className="text-sm text-white/25">업로드된 파일이 없습니다</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">

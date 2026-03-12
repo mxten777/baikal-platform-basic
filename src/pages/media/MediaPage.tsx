@@ -1,4 +1,14 @@
+import { useEffect, useState } from 'react'
 import SEOHead from '@/components/seo/SEOHead'
+import { supabase } from '@/lib/supabase'
+
+const BUCKET = 'public-media'
+const IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']
+
+interface MediaFile {
+  name: string
+  url: string
+}
 
 const MEDIA_TYPES = [
   { icon: '🎥', title: 'YouTube', desc: 'AI 개발 과정을 담은 영상 콘텐츠' },
@@ -8,6 +18,29 @@ const MEDIA_TYPES = [
 ]
 
 export default function MediaPage() {
+  const [images, setImages] = useState<MediaFile[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function loadMedia() {
+      const { data } = await supabase.storage.from(BUCKET).list('', {
+        limit: 200,
+        sortBy: { column: 'created_at', order: 'desc' },
+      })
+      if (data) {
+        const imgs = data
+          .filter(f => IMAGE_EXTS.includes(f.name.split('.').pop()?.toLowerCase() ?? ''))
+          .map(f => {
+            const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(f.name)
+            return { name: f.name, url: urlData.publicUrl }
+          })
+        setImages(imgs)
+      }
+      setLoading(false)
+    }
+    loadMedia()
+  }, [])
+
   return (
     <>
       <SEOHead title="미디어" description="바이칼시스템즈 미디어 허브" canonical="/media" />
@@ -39,9 +72,41 @@ export default function MediaPage() {
               </div>
             ))}
           </div>
-          <div className="mt-16 flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 py-24 text-center">
-            <span className="text-5xl mb-4">🎬</span>
-            <p className="text-white/30">미디어 콘텐츠를 준비 중입니다</p>
+          {/* 이미지 갤러리 */}
+          <div className="mt-12">
+            <h2 className="text-lg font-bold text-white/60 mb-6">이미지 자산</h2>
+            {loading ? (
+              <div className="flex justify-center py-24">
+                <p className="text-white/30 animate-pulse">로딩 중…</p>
+              </div>
+            ) : images.length === 0 ? (
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 py-24 text-center">
+                <span className="text-5xl mb-4">🖼️</span>
+                <p className="text-white/30">등록된 이미지가 없습니다</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                {images.map(img => (
+                  <a
+                    key={img.name}
+                    href={img.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group block overflow-hidden rounded-2xl bg-white/[0.04] border border-white/[0.06] hover:border-white/[0.14] transition-colors"
+                  >
+                    <div className="aspect-video overflow-hidden">
+                      <img
+                        src={img.url}
+                        alt={img.name}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                    </div>
+                    <p className="truncate px-3 py-2.5 text-xs text-white/30">{img.name}</p>
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
