@@ -95,9 +95,8 @@ export default function Header() {
           className="debug-hamburger-btn"
           style={{
             position: 'absolute',
-            top: '50%',
+            top: '58px',
             right: '8px',
-            transform: 'translateY(-50%)',
             width: '70px',
             height: '50px',
             borderRadius: '8px',
@@ -124,7 +123,7 @@ export default function Header() {
           className="debug-hamburger-btn"
           style={{
             position: 'absolute',
-            bottom: '4px',
+            top: '112px',
             right: '8px',
             width: '70px',
             height: '50px',
