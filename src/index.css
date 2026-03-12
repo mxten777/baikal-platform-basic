@@ -219,6 +219,21 @@
   }
 }
 
+/*
+  Samsung Internet position:fixed compositing layer GC 버그 대응.
+  JS(setInterval/tick/DOM touch)는 JS 실행 사이 틈에 GC가 발생해 무효.
+  CSS @keyframes는 compositor 스레드에서 JS와 독립 실행 → GC 차단.
+  transform 사용: opacity 달리 stacking context 영향 없음, 육안 변화 없음.
+*/
+@-webkit-keyframes samsung-gc-fix {
+  0%, 100% { -webkit-transform: translateZ(0); transform: translateZ(0); }
+  50%       { -webkit-transform: translateZ(0.0001px); transform: translateZ(0.0001px); }
+}
+@keyframes samsung-gc-fix {
+  0%, 100% { transform: translateZ(0); }
+  50%       { transform: translateZ(0.0001px); }
+}
+
 @keyframes shimmer {
   0%   { background-position: -200% 0; }
   100% { background-position:  200% 0; }

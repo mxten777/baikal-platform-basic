@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, NavLink } from 'react-router-dom'
 
@@ -11,22 +11,13 @@ const nav = [
 ]
 
 // Samsung Internet: position:fixed 요소가 스크롤 후 compositing layer GC로 사라지는 버그.
-// React 컴포넌트가 re-render될 때만 브라우저가 해당 레이어를 "활성"으로 유지한다.
-// 버튼을 별도 컴포넌트로 분리 → 내부 tick state를 300ms마다 업데이트 → 강제 re-render.
+// JS(setInterval/tick) 방법은 JS 실행 사이 틈에 GC가 발생해 무효.
+// CSS @keyframes는 compositor 스레드에서 JS와 독립적으로 실행되므로 GC를 막을 수 있다.
 function HamburgerPortalButton({ menuOpen, onToggle }: { menuOpen: boolean; onToggle: () => void }) {
-  const [tick, setTick] = useState(0)
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  useEffect(() => {
-    timerRef.current = setInterval(() => setTick(t => t + 1), 300)
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [])
-
   return createPortal(
     <button
       onClick={onToggle}
       className="hamburger-portal-btn"
-      data-tick={tick}
       style={{
         position: 'fixed',
         top: '10px',
@@ -42,8 +33,9 @@ function HamburgerPortalButton({ menuOpen, onToggle }: { menuOpen: boolean; onTo
         zIndex: 9999,
         cursor: 'pointer',
         WebkitTapHighlightColor: 'transparent',
-        transform: 'translateZ(0)',
-        WebkitTransform: 'translateZ(0)',
+        // CSS animation은 compositor 스레드에서 JS와 독립 실행 → Samsung Internet GC 차단
+        animation: 'samsung-gc-fix 1s linear infinite',
+        WebkitAnimation: 'samsung-gc-fix 1s linear infinite',
       }}
       aria-label="메뉴"
     >
