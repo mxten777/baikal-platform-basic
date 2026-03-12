@@ -39,6 +39,11 @@ export default function Header() {
             ? 'bg-[#080808] border-b border-white/[0.06]'
             : 'bg-gradient-to-b from-black/60 to-transparent md:bg-transparent'
         }`}
+        style={{
+          WebkitTransform: 'translateZ(0)',
+          transform: 'translateZ(0)',
+          willChange: 'transform',
+        }}
       >
         {/* 햄버거 버튼 - 항상 렌더링, CSS로 데스크탑 숨김 */}
         <div
@@ -58,6 +63,9 @@ export default function Header() {
             border: '1px solid rgba(255,255,255,0.22)',
             cursor: 'pointer',
             WebkitTapHighlightColor: 'transparent',
+            WebkitTransform: 'translateZ(0)',
+            transform: 'translateZ(0)',
+            willChange: 'transform',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
