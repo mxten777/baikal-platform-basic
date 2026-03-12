@@ -26,8 +26,23 @@ export default function ProjectCard({ project, className }: ProjectCardProps) {
             loading="lazy"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-500/10 to-blue-900/20 transition-all duration-500 group-hover:from-blue-500/15 group-hover:to-blue-900/30">
-            <span className="text-3xl font-black tracking-tight text-blue-400/30 group-hover:text-blue-400/50 transition-colors duration-300">AI</span>
+          <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-gradient-to-br from-[#0d1a2e] to-[#080808]">
+            {/* 배경 장식 원 */}
+            <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-blue-500/10 blur-2xl" />
+            <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-indigo-500/8 blur-2xl" />
+            {/* 그리드 패턴 */}
+            <div className="absolute inset-0 grid-bg opacity-40" />
+            {/* 중앙 아이콘 영역 */}
+            <div className="relative flex flex-col items-center gap-2">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10 backdrop-blur-sm">
+                <span className="text-2xl font-black tracking-tight text-blue-400/70">
+                  {project.category ? project.category.charAt(0) : 'AI'}
+                </span>
+              </div>
+              {project.category && (
+                <span className="text-[10px] font-semibold tracking-[0.2em] text-white/20 uppercase">{project.category}</span>
+              )}
+            </div>
           </div>
         )}
         {/* 이미지 오버레이 */}
