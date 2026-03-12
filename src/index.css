@@ -219,6 +219,11 @@
   }
 }
 
+/* 디버그 햄버거 버튼 - PC에서도 보이도록 (디버그용) */
+.debug-hamburger-btn {
+  display: flex !important;
+}
+
 @keyframes shimmer {
   0%   { background-position: -200% 0; }
   100% { background-position:  200% 0; }

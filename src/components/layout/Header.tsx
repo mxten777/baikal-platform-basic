@@ -41,6 +41,23 @@ export default function Header() {
         }`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          {/* 디버깅: isMobile 상태 표시 */}
+          <div style={{
+            position: 'absolute',
+            top: '-25px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: '#000',
+            color: '#0f0',
+            fontSize: '12px',
+            fontFamily: 'monospace',
+            padding: '4px 8px',
+            borderRadius: '4px',
+            zIndex: 999999,
+          }}>
+            isMobile={isMobile ? 'true' : 'false'} | w={typeof window !== 'undefined' ? window.innerWidth : 0}
+          </div>
+
           <Link to="/" className="group flex items-center" style={{ position: 'relative' }}>
             <img
               src="/images/baikal_logo_white.png"
@@ -84,44 +101,51 @@ export default function Header() {
             >
               문의하기
             </Link>
-            {/* 햄버거 버튼 - flex item으로 header GPU layer 공유 */}
-            {isMobile && (
-              <div
-                onClick={() => setMenuOpen(v => !v)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && setMenuOpen(v => !v)}
-                style={{
-                  position: 'relative',
-                  width: '60px',
-                  height: '44px',
-                  borderRadius: '10px',
-                  background: '#ff0000',
-                  border: '3px solid #00ff00',
-                  cursor: 'pointer',
-                  WebkitTapHighlightColor: 'transparent',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  zIndex: 99999,
-                  opacity: 1,
-                  visibility: 'visible',
-                  pointerEvents: 'auto',
-                  transform: 'translateZ(0)',
-                  WebkitTransform: 'translateZ(0)',
-                  backfaceVisibility: 'visible',
-                  WebkitBackfaceVisibility: 'visible',
-                  perspective: '1000px',
-                  WebkitPerspective: '1000px',
-                }}
-                aria-label="메뉴"
-              >
-                <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#fff', position: 'relative', zIndex: 1 }}>
-                  {menuOpen ? '✕' : '☰'}
-                </span>
-              </div>
-            )}
+            {/* 햄버거 버튼 - 항상 렌더링, CSS에서만 숨김 */}
+            <div
+              onClick={() => setMenuOpen(v => !v)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && setMenuOpen(v => !v)}
+              className="debug-hamburger-btn"
+              style={{
+                position: 'relative',
+                width: '80px',
+                height: '60px',
+                borderRadius: '10px',
+                background: '#ff0000',
+                border: '5px solid #00ff00',
+                cursor: 'pointer',
+                WebkitTapHighlightColor: 'transparent',
+                display: 'flex !important',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                zIndex: 99999,
+                opacity: 1,
+                visibility: 'visible',
+                pointerEvents: 'auto',
+                transform: 'translateZ(0)',
+                WebkitTransform: 'translateZ(0)',
+                backfaceVisibility: 'visible',
+                WebkitBackfaceVisibility: 'visible',
+                perspective: '1000px',
+                WebkitPerspective: '1000px',
+              }}
+              aria-label="메뉴"
+            >
+              <span style={{ 
+                fontSize: '14px', 
+                fontWeight: 'bold', 
+                color: '#fff', 
+                position: 'relative', 
+                zIndex: 1,
+                textAlign: 'center',
+                lineHeight: 1.2,
+              }}>
+                {menuOpen ? '✕' : '☰'}<br/>BTN
+              </span>
+            </div>
           </div>
         </div>
 
