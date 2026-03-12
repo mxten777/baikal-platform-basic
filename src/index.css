@@ -265,3 +265,11 @@
   border-radius: 8px;
 }
 
+/* 햄버거 메뉴 버튼 - 데스크탑에서 숨김 */
+@media (min-width: 768px) {
+  .hamburger-menu-btn {
+    display: none !important;
+  }
+}
+
+

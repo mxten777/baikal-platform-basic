@@ -40,44 +40,46 @@ export default function Header() {
             : 'bg-gradient-to-b from-black/60 to-transparent md:bg-transparent'
         }`}
       >
-        {/* 햄버거 버튼 - 모바일에서만 렌더링 */}
-        {isMobile && (
-          <button
-            onClick={() => setMenuOpen(v => !v)}
-            style={{
-              position: 'absolute',
-              top: '10px',
-              right: '16px',
-              width: '44px',
-              height: '44px',
-              borderRadius: '10px',
-              background: '#141414',
-              border: '1px solid rgba(255,255,255,0.22)',
-              cursor: 'pointer',
-              WebkitTapHighlightColor: 'transparent',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 99999,
-            }}
-            aria-label="메뉴"
-          >
-            {menuOpen ? (
-              <svg width="18" height="18" viewBox="0 0 18 18" strokeWidth="2.5" strokeLinecap="round" fill="none"
-                style={{ stroke: '#ffffff', display: 'block' }}>
-                <line x1="2" y1="2" x2="16" y2="16" />
-                <line x1="16" y1="2" x2="2" y2="16" />
-              </svg>
-            ) : (
-              <svg width="20" height="15" viewBox="0 0 20 15" strokeWidth="2.5" strokeLinecap="round" fill="none"
-                style={{ stroke: '#ffffff', display: 'block' }}>
-                <line x1="0" y1="1" x2="20" y2="1" />
-                <line x1="0" y1="7.5" x2="20" y2="7.5" />
-                <line x1="0" y1="14" x2="20" y2="14" />
-              </svg>
-            )}
-          </button>
-        )}
+        {/* 햄버거 버튼 - 항상 렌더링, CSS로 데스크탑 숨김 */}
+        <div
+          onClick={() => setMenuOpen(v => !v)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === 'Enter' && setMenuOpen(v => !v)}
+          className="hamburger-menu-btn"
+          style={{
+            position: 'absolute',
+            top: '10px',
+            right: '16px',
+            width: '44px',
+            height: '44px',
+            borderRadius: '10px',
+            background: '#141414',
+            border: '1px solid rgba(255,255,255,0.22)',
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 99999,
+          }}
+          aria-label="메뉴"
+        >
+          {menuOpen ? (
+            <svg width="18" height="18" viewBox="0 0 18 18" strokeWidth="2.5" strokeLinecap="round" fill="none"
+              style={{ stroke: '#ffffff', display: 'block' }}>
+              <line x1="2" y1="2" x2="16" y2="16" />
+              <line x1="16" y1="2" x2="2" y2="16" />
+            </svg>
+          ) : (
+            <svg width="20" height="15" viewBox="0 0 20 15" strokeWidth="2.5" strokeLinecap="round" fill="none"
+              style={{ stroke: '#ffffff', display: 'block' }}>
+              <line x1="0" y1="1" x2="20" y2="1" />
+              <line x1="0" y1="7.5" x2="20" y2="7.5" />
+              <line x1="0" y1="14" x2="20" y2="14" />
+            </svg>
+          )}
+        </div>
 
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="group flex items-center">
