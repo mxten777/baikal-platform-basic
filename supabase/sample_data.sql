@@ -8,7 +8,7 @@
 -- =====================
 INSERT INTO projects (
   slug, title, subtitle, description, category,
-  status, featured, tech_stack, sort_order
+  status, featured, tech_stack, sort_order, thumbnail_url
 ) VALUES
 (
   'baikal-rag-search',
@@ -33,7 +33,8 @@ INSERT INTO projects (
   'NLP',
   'active', TRUE,
   ARRAY['Python', 'LangChain', 'pgvector', 'OpenAI', 'FastAPI', 'React'],
-  1
+  1,
+  'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80'
 ),
 (
   'ai-content-classifier',
@@ -58,7 +59,8 @@ LangChain, Supabase, TypeScript, OpenAI API를 조합해
   'AI Agent',
   'active', TRUE,
   ARRAY['TypeScript', 'Supabase', 'OpenAI', 'LangChain', 'Deno'],
-  2
+  2,
+  'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80'
 ),
 (
   'llm-prompt-optimizer',
@@ -83,7 +85,8 @@ LLM 프롬프트를 체계적으로 관리하고 성능을 측정하는 도구�
   'Platform / Infra',
   'active', TRUE,
   ARRAY['React', 'TypeScript', 'Python', 'FastAPI', 'PostgreSQL', 'Docker'],
-  3
+  3,
+  'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1200&q=80'
 ),
 (
   'ai-meeting-summarizer',
@@ -108,7 +111,8 @@ Whisper로 전사하고 GPT-4o로 요약 및 액션 아이템을 자동 추출�
   'NLP',
   'active', FALSE,
   ARRAY['Python', 'Whisper', 'GPT-4o', 'FastAPI', 'React', 'Slack API'],
-  4
+  4,
+  'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&q=80'
 ),
 (
   'vector-db-benchmark',
@@ -133,7 +137,8 @@ RAG 시스템 구축 시 Vector DB 선택을 위한 체계적인 벤치마크 �
   'Research / Experiment',
   'active', FALSE,
   ARRAY['Python', 'pgvector', 'Pinecone', 'Weaviate', 'Qdrant', 'Jupyter'],
-  5
+  5,
+  'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80'
 ),
 (
   'ai-agent-workflow',
@@ -158,7 +163,8 @@ LangGraph를 사용해 에이전트 상태 머신을 구현했으며
   'AI Agent',
   'active', TRUE,
   ARRAY['Python', 'LangGraph', 'LangChain', 'OpenAI', 'Redis', 'FastAPI'],
-  6
+  6,
+  'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80'
 )
 ON CONFLICT (slug) DO NOTHING;
 
@@ -167,7 +173,7 @@ ON CONFLICT (slug) DO NOTHING;
 -- =====================
 INSERT INTO contents (
   slug, title, summary, body, content_type,
-  status, is_featured, published_at
+  status, is_featured, published_at, thumbnail_url
 ) VALUES
 (
   'rag-system-architecture-2026',
@@ -206,7 +212,8 @@ search_results = vector_store.similarity_search(hypothetical_doc)
 > 1000만: Modular RAG + 커스텀 파이프라인',
   'article',
   'published', TRUE,
-  NOW() - INTERVAL '2 days'
+  NOW() - INTERVAL '2 days',
+  'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80'
 ),
 (
   'langchain-vs-llamaindex-2026',
@@ -240,7 +247,8 @@ search_results = vector_store.similarity_search(hypothetical_doc)
 → 코드 간결성이 중요할 때',
   'article',
   'published', TRUE,
-  NOW() - INTERVAL '5 days'
+  NOW() - INTERVAL '5 days',
+  'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80'
 ),
 (
   'supabase-vector-pgvector-setup',
