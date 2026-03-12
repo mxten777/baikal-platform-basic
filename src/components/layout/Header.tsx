@@ -39,24 +39,114 @@ export default function Header() {
             ? 'bg-[#080808] border-b border-white/[0.06]'
             : 'bg-gradient-to-b from-black/60 to-transparent md:bg-transparent'
         }`}
+        style={{ position: 'relative' }}
       >
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          {/* 디버깅: isMobile 상태 표시 */}
-          <div style={{
+        {/* 디버깅: isMobile 상태 표시 */}
+        <div style={{
+          position: 'absolute',
+          top: '-25px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: '#000',
+          color: '#0f0',
+          fontSize: '12px',
+          fontFamily: 'monospace',
+          padding: '4px 8px',
+          borderRadius: '4px',
+          zIndex: 999999,
+        }}>
+          isMobile={isMobile ? 'true' : 'false'} | w={typeof window !== 'undefined' ? window.innerWidth : 0}
+        </div>
+
+        {/* 햄버거 버튼 1 - 상단 */}
+        <div
+          onClick={() => setMenuOpen(v => !v)}
+          role="button"
+          tabIndex={0}
+          className="debug-hamburger-btn"
+          style={{
             position: 'absolute',
-            top: '-25px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            background: '#000',
-            color: '#0f0',
-            fontSize: '12px',
-            fontFamily: 'monospace',
-            padding: '4px 8px',
-            borderRadius: '4px',
+            top: '4px',
+            right: '8px',
+            width: '70px',
+            height: '50px',
+            borderRadius: '8px',
+            background: '#ff0000',
+            border: '4px solid #00ff00',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             zIndex: 999999,
-          }}>
-            isMobile={isMobile ? 'true' : 'false'} | w={typeof window !== 'undefined' ? window.innerWidth : 0}
-          </div>
+            opacity: 1,
+            visibility: 'visible',
+            transform: 'translateZ(0)',
+          }}
+        >
+          <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#fff', textAlign: 'center' }}>
+            BTN<br/>TOP
+          </span>
+        </div>
+
+        {/* 햄버거 버튼 2 - 중앙 */}
+        <div
+          role="button"
+          tabIndex={0}
+          className="debug-hamburger-btn"
+          style={{
+            position: 'absolute',
+            top: '50%',
+            right: '8px',
+            transform: 'translateY(-50%)',
+            width: '70px',
+            height: '50px',
+            borderRadius: '8px',
+            background: '#0000ff',
+            border: '4px solid #ffff00',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 999999,
+            opacity: 1,
+            visibility: 'visible',
+          }}
+        >
+          <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#fff', textAlign: 'center' }}>
+            BTN<br/>MID
+          </span>
+        </div>
+
+        {/* 햄버거 버튼 3 - 하단 */}
+        <div
+          role="button"
+          tabIndex={0}
+          className="debug-hamburger-btn"
+          style={{
+            position: 'absolute',
+            bottom: '4px',
+            right: '8px',
+            width: '70px',
+            height: '50px',
+            borderRadius: '8px',
+            background: '#ff00ff',
+            border: '4px solid #00ffff',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 999999,
+            opacity: 1,
+            visibility: 'visible',
+            transform: 'translateZ(0)',
+          }}
+        >
+          <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#fff', textAlign: 'center' }}>
+            BTN<br/>BOT
+          </span>
+        </div>
+
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 
           <Link to="/" className="group flex items-center" style={{ position: 'relative' }}>
             <img
