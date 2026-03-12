@@ -27,7 +27,7 @@ export default function Header() {
           : 'bg-gradient-to-b from-black/40 to-transparent md:bg-transparent'
       }`}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 
         {/* Logo */}
         <Link to="/" className="group flex items-center">
@@ -67,7 +67,7 @@ export default function Header() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMenuOpen(v => !v)}
-            className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg -mr-2"
+            className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg"
             style={{ color: '#ffffff', fontSize: '22px', background: 'rgba(255,255,255,0.12)', border: 'none', flexShrink: 0 }}
             aria-label="메뉴"
           >
