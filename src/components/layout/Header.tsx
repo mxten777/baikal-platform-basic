@@ -48,7 +48,7 @@ export default function Header() {
           onKeyDown={(e) => e.key === 'Enter' && setMenuOpen(v => !v)}
           className="hamburger-menu-btn"
           style={{
-            position: 'fixed',
+            position: 'absolute',
             top: '72px',
             left: '16px',
             width: '44px',
