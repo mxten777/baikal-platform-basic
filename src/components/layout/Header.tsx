@@ -12,6 +12,7 @@ const nav = [
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [scrollY, setScrollY] = useState(0)
   const [isMobile, setIsMobile] = useState(() =>
     typeof window !== 'undefined'
       ? window.matchMedia('(max-width: 767px)').matches
@@ -19,7 +20,10 @@ export default function Header() {
   )
 
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 40)
+    const handler = () => {
+      setScrolled(window.scrollY > 40)
+      setScrollY(window.scrollY)
+    }
     window.addEventListener('scroll', handler, { passive: true })
     return () => window.removeEventListener('scroll', handler)
   }, [])
@@ -90,6 +94,7 @@ export default function Header() {
           {/* 햄버거 버튼 - 모바일에서만 렌더링 */}
           {isMobile && (
             <button
+              key={Math.floor(scrollY / 50)}
               onClick={() => setMenuOpen(v => !v)}
               style={{
                 position: 'fixed',
