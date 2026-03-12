@@ -12,7 +12,6 @@ const nav = [
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [scrollY, setScrollY] = useState(0)
   const [isMobile, setIsMobile] = useState(() =>
     typeof window !== 'undefined'
       ? window.matchMedia('(max-width: 767px)').matches
@@ -20,10 +19,7 @@ export default function Header() {
   )
 
   useEffect(() => {
-    const handler = () => {
-      setScrolled(window.scrollY > 40)
-      setScrollY(window.scrollY)
-    }
+    const handler = () => setScrolled(window.scrollY > 40)
     window.addEventListener('scroll', handler, { passive: true })
     return () => window.removeEventListener('scroll', handler)
   }, [])
@@ -43,9 +39,8 @@ export default function Header() {
             ? 'bg-[#080808] border-b border-white/[0.06]'
             : 'bg-gradient-to-b from-black/60 to-transparent md:bg-transparent'
         }`}
-        style={{ position: 'fixed' }}
       >
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8" style={{ position: 'relative' }}>
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="group flex items-center" style={{ position: 'relative' }}>
             <img
               src="/images/baikal_logo_white.png"
@@ -89,36 +84,31 @@ export default function Header() {
             >
               문의하기
             </Link>
+            {/* 햄버거 버튼 - flex item으로 header GPU layer 공유 */}
+            {isMobile && (
+              <button
+                onClick={() => setMenuOpen(v => !v)}
+                style={{
+                  width: '60px',
+                  height: '44px',
+                  borderRadius: '10px',
+                  background: '#ff0000',
+                  border: '3px solid #00ff00',
+                  cursor: 'pointer',
+                  WebkitTapHighlightColor: 'transparent',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+                aria-label="메뉴"
+              >
+                <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#fff' }}>
+                  {menuOpen ? '✕' : '☰'}
+                </span>
+              </button>
+            )}
           </div>
-
-          {/* 햄버거 버튼 - 모바일에서만 렌더링 */}
-          {isMobile && (
-            <button
-              key={Math.floor(scrollY / 50)}
-              onClick={() => setMenuOpen(v => !v)}
-              style={{
-                position: 'fixed',
-                top: '10px',
-                right: '16px',
-                width: '60px',
-                height: '44px',
-                borderRadius: '10px',
-                background: '#ff0000',
-                border: '3px solid #00ff00',
-                cursor: 'pointer',
-                WebkitTapHighlightColor: 'transparent',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 9999,
-              }}
-              aria-label="메뉴"
-            >
-              <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#fff' }}>
-                {menuOpen ? '✕' : '☰'}
-              </span>
-            </button>
-          )}
         </div>
 
         {isMobile && (
