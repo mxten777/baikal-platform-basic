@@ -34,11 +34,12 @@ export default function Header() {
 
   return (
     <header
-        className="fixed top-0 left-0 right-0 z-[9999] bg-[#080808] border-b border-white/[0.06]"
+        className="fixed top-0 left-0 right-0 z-[9999] border-b border-white/[0.06]"
         style={{
           WebkitTransform: 'translateZ(0)',
           transform: 'translateZ(0)',
           willChange: 'transform',
+          background: '#ff0000',
         }}
       >
         {/* 햄버거 버튼 - 항상 렌더링, CSS로 데스크탑 숨김 */}
