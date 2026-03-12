@@ -87,34 +87,35 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* 햄버거 버튼 - absolute positioning (flex 레이아웃에서 분리) */}
-          <button
-            onClick={() => setMenuOpen(v => !v)}
-            className="md:hidden"
-            style={{
-              position: 'absolute',
-              top: '50%',
-              right: '16px',
-              transform: 'translateY(-50%)',
-              WebkitTransform: 'translateY(-50%)',
-              width: '60px',
-              height: '44px',
-              borderRadius: '10px',
-              background: '#ff0000',
-              border: '3px solid #00ff00',
-              cursor: 'pointer',
-              WebkitTapHighlightColor: 'transparent',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 10,
-            }}
-            aria-label="메뉴"
-          >
-            <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#fff' }}>
-              {menuOpen ? '✕' : '☰'}
-            </span>
-          </button>
+          {/* 햄버거 버튼 - 모바일에서만 렌더링 */}
+          {isMobile && (
+            <button
+              onClick={() => setMenuOpen(v => !v)}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                right: '16px',
+                transform: 'translateY(-50%)',
+                WebkitTransform: 'translateY(-50%)',
+                width: '60px',
+                height: '44px',
+                borderRadius: '10px',
+                background: '#ff0000',
+                border: '3px solid #00ff00',
+                cursor: 'pointer',
+                WebkitTapHighlightColor: 'transparent',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 10,
+              }}
+              aria-label="메뉴"
+            >
+              <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#fff' }}>
+                {menuOpen ? '✕' : '☰'}
+              </span>
+            </button>
+          )}
         </div>
 
         {isMobile && (
