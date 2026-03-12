@@ -209,6 +209,13 @@
   to   { opacity: 1; }
 }
 
+/* Samsung Internet position:fixed compositing GC 버그 대응 */
+@keyframes samsung-layer-fix {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.9999; }
+  100% { opacity: 1; }
+}
+
 @keyframes shimmer {
   0%   { background-position: -200% 0; }
   100% { background-position:  200% 0; }
