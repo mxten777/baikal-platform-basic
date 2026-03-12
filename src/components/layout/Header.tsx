@@ -19,6 +19,7 @@ export default function Header() {
   const headerRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLDivElement>(null)
 
+  // 모바일 해상도 감지
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 767px)')
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
@@ -27,7 +28,7 @@ export default function Header() {
     return () => mq.removeEventListener('change', handler)
   }, [])
 
-  // Samsung Internet 강제 고정
+  // Samsung Internet position:fixed 렌더링 버그 우회 - RAF로 위치 강제 보정
   useEffect(() => {
     const forceFixed = () => {
       if (headerRef.current) {
@@ -62,12 +63,9 @@ export default function Header() {
   return (
     <header
         ref={headerRef}
-        className="fixed top-0 left-0 right-0 z-[9999] border-b border-white/[0.06]"
-        style={{
-          background: '#080808',
-        }}
+        className="fixed top-0 left-0 right-0 z-[9999] bg-[#080808] border-b border-white/[0.06]"
       >
-        {/* 햄버거 버튼 - 항상 렌더링, CSS로 데스크탑 숨김 */}
+        {/* 모바일 햄버거 메뉴 버튼 */}
         <div
           ref={buttonRef}
           onClick={() => setMenuOpen(v => !v)}

@@ -215,8 +215,6 @@
   to   { opacity: 1; }
 }
 
-/* 햄버거 포털 버튼 - 사용 안 함 (이제 position:absolute 사용) */
-
 @keyframes shimmer {
   0%   { background-position: -200% 0; }
   100% { background-position:  200% 0; }
