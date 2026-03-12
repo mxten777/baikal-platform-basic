@@ -57,9 +57,6 @@ export default function AdminMedia() {
 
     if (storageResult.data) {
       const nameMap: Record<string, string> = {}
-      if (dbResult.error) {
-        console.error('[media_files] SELECT 실패:', dbResult.error.message)
-      }
       for (const row of dbResult.data ?? []) {
         nameMap[row.storage_key] = row.original_name
       }
@@ -88,11 +85,12 @@ export default function AdminMedia() {
     setUploading(true)
     setError(null)
     const uploaded: UploadedFile[] = []
+    const errors: string[] = []
 
     for (const file of Array.from(fileList)) {
       const mimeType = getMimeType(file)
       if (!ALLOWED_TYPES.includes(mimeType)) {
-        setError(`지원하지 않는 파일 형식입니다: ${file.name}`)
+        errors.push(`지원하지 않는 파일 형식: ${file.name}`)
         continue
       }
       const ext = (file.name.split('.').pop() ?? 'bin').replace(/[^a-zA-Z0-9]/g, '')
@@ -106,7 +104,7 @@ export default function AdminMedia() {
         })
 
       if (uploadError) {
-        setError(`업로드 실패: ${file.name} — ${uploadError.message}`)
+        errors.push(`업로드 실패: ${file.name} — ${uploadError.message}`)
         continue
       }
 
@@ -115,8 +113,7 @@ export default function AdminMedia() {
       // DB에 storage_key → 원본 파일명 영구 저장
       const { error: dbError } = await supabase.from('media_files').upsert({ storage_key: fileName, original_name: file.name })
       if (dbError) {
-        console.error('[media_files] UPSERT 실패:', dbError.message)
-        setError(`파일명 저장 실패: ${dbError.message}`)
+        errors.push(`파일명 저장 실패: ${file.name} — ${dbError.message}`)
       }
 
       uploaded.push({
@@ -129,6 +126,7 @@ export default function AdminMedia() {
     }
 
     setFiles(prev => [...uploaded, ...prev])
+    if (errors.length) setError(errors.join('\n'))
     setUploading(false)
   }
 

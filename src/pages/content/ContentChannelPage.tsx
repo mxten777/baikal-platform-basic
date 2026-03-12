@@ -14,8 +14,8 @@ const CHANNEL_MAP: Record<string, ContentType> = {
 
 export default function ContentChannelPage() {
   const { channel = 'all' } = useParams<{ channel: string }>()
-  const contentType = CHANNEL_MAP[channel]
-  const { data, isLoading } = useContents({ content_type: contentType })
+  const contentType = CHANNEL_MAP[channel] as ContentType | undefined
+  const { data, isLoading } = useContents(contentType ? { content_type: contentType } : {})
   return (
     <>
       <SEOHead title={`${channel.toUpperCase()} 콘텐츠`} />

@@ -41,11 +41,13 @@ async function fetchAnalytics(): Promise<AnalyticsStats> {
     supabase
       .from('page_views')
       .select('session_id')
-      .gte('viewed_at', todayStart),
+      .gte('viewed_at', todayStart)
+      .limit(5000),
     supabase
       .from('page_views')
       .select('path, session_id')
-      .gte('viewed_at', weekStart),
+      .gte('viewed_at', weekStart)
+      .limit(10000),
   ])
 
   const todayRows = todayData.data ?? []

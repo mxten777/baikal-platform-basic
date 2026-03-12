@@ -20,8 +20,6 @@ const STATUS_COLORS: Record<ProjectStatus, string> = {
   coming_soon: 'bg-blue-500/10 text-blue-400',
 }
 
-const CATEGORY_OPTIONS = PROJECT_CATEGORIES
-
 // ===== 빈 폼 초기값 =====
 const EMPTY_FORM: Partial<Project> & { slug: string; title: string } = {
   slug: '',
@@ -151,7 +149,7 @@ function ProjectFormModal({
                 className="admin-input w-full"
               >
                 <option value="">선택</option>
-                {CATEGORY_OPTIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                {PROJECT_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
             </div>
             <div>

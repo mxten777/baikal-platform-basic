@@ -5,9 +5,10 @@ export default function TopicDetailPage() {
   return (
     <>
       <SEOHead title={`${slug} 토픽`} canonical={`/topics/${slug}`} />
-      <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{slug}</h1>
-        <p className="mt-4 text-gray-500">토픽 상세 및 관련 콘텐츠 — Phase 4에서 구현</p>
+      <div className="mx-auto max-w-4xl px-6 py-24">
+        <p className="text-xs tracking-widest text-white/25 uppercase mb-4">TOPIC</p>
+        <h1 className="text-4xl font-black text-white mb-4">{slug}</h1>
+        <p className="text-white/30">토픽별 콘텐츠 모아보기 기능은 준비 중입니다.</p>
       </div>
     </>
   )
