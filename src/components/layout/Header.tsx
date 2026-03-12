@@ -14,7 +14,7 @@ function HamburgerPortalButton({ menuOpen, onToggle }: { menuOpen: boolean; onTo
   const [tick, setTick] = useState(0)
 
   useEffect(() => {
-    const id = setInterval(() => setTick(t => t + 1), 800)
+    const id = setInterval(() => setTick(t => t + 1), 100)
     return () => clearInterval(id)
   }, [])
 
@@ -58,7 +58,7 @@ function HamburgerPortalButton({ menuOpen, onToggle }: { menuOpen: boolean; onTo
       )}
       </button>
       {/* 디버그: 버튼 우측 상단 바로 아래 */}
-      <div style={{
+      <div key={`dbg-${tick}`} style={{
         position: 'fixed',
         top: '60px',
         right: '4px',
