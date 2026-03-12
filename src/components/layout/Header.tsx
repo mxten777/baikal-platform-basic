@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, NavLink } from 'react-router-dom'
 
@@ -18,6 +18,7 @@ export default function Header() {
       ? window.matchMedia('(max-width: 767px)').matches
       : false
   )
+  const btnRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 40)
@@ -33,8 +34,22 @@ export default function Header() {
     return () => mq.removeEventListener('change', handler)
   }, [])
 
+  // Samsung Internet: position:fixed 요소가 스크롤 후 compositing layer GC로 사라지는 버그 대응
+  // 주기적으로 DOM style을 직접 touch해서 브라우저가 레이어를 살아있다고 인식하게 함
+  useEffect(() => {
+    const id = setInterval(() => {
+      const el = btnRef.current
+      if (el) {
+        el.style.transform = 'translateZ(0)'
+        ;(el.style as CSSStyleDeclaration & { webkitTransform: string }).webkitTransform = 'translateZ(0)'
+      }
+    }, 500)
+    return () => clearInterval(id)
+  }, [])
+
   const hamburgerBtn = createPortal(
     <button
+      ref={btnRef}
       onClick={() => setMenuOpen(v => !v)}
       className="hamburger-portal-btn"
       style={{
