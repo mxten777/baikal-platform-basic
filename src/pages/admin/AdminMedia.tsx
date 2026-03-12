@@ -1,9 +1,14 @@
 import { useState, useRef, useCallback } from 'react'
 import SEOHead from '@/components/seo/SEOHead'
 import { supabase } from '@/lib/supabase'
-import { Upload, Copy, Trash2, Check, Image as ImageIcon } from 'lucide-react'
+import { Upload, Copy, Trash2, Check, Image as ImageIcon, FileText } from 'lucide-react'
 
 const BUCKET = 'public-media'
+
+const ALLOWED_TYPES = [
+  'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+  'application/pdf',
+]
 
 interface UploadedFile {
   name: string
@@ -34,8 +39,8 @@ export default function AdminMedia() {
     const uploaded: UploadedFile[] = []
 
     for (const file of Array.from(fileList)) {
-      if (!file.type.startsWith('image/')) {
-        setError(`이미지 파일만 업로드 가능합니다: ${file.name}`)
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        setError(`지원하지 않는 파일 형식입니다: ${file.name}`)
         continue
       }
       const ext = file.name.split('.').pop() ?? 'jpg'
@@ -104,7 +109,7 @@ export default function AdminMedia() {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/*,application/pdf"
             multiple
             className="hidden"
             onChange={e => e.target.files && uploadFiles(e.target.files)}
@@ -114,8 +119,8 @@ export default function AdminMedia() {
           ) : (
             <>
               <Upload size={28} className="text-white/20" />
-              <p className="text-sm text-white/40">이미지를 드래그하거나 클릭해서 업로드</p>
-              <p className="text-xs text-white/20">JPG, PNG, GIF, WebP, SVG 지원</p>
+              <p className="text-sm text-white/40">파일을 드래그하거나 클릭해서 업로드</p>
+              <p className="text-xs text-white/20">이미지 (JPG, PNG, GIF, WebP, SVG) · PDF</p>
             </>
           )}
         </div>
@@ -138,12 +143,24 @@ export default function AdminMedia() {
               <div key={f.url} className="glass-card rounded-xl overflow-hidden group">
                 {/* 미리보기 */}
                 <div className="aspect-video bg-white/[0.04] overflow-hidden relative">
-                  <img
-                    src={f.url}
-                    alt={f.name}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                  />
+                  {f.type === 'application/pdf' ? (
+                    <a
+                      href={f.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex h-full w-full flex-col items-center justify-center gap-2"
+                    >
+                      <FileText size={32} className="text-red-400/70" />
+                      <span className="text-[10px] text-white/30">PDF</span>
+                    </a>
+                  ) : (
+                    <img
+                      src={f.url}
+                      alt={f.name}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                  )}
                   {/* 오버레이 버튼 */}
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                     <button
