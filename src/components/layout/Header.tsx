@@ -39,132 +39,53 @@ export default function Header() {
             ? 'bg-[#080808] border-b border-white/[0.06]'
             : 'bg-gradient-to-b from-black/60 to-transparent md:bg-transparent'
         }`}
-        style={{ position: 'relative' }}
       >
-        {/* 디버깅: isMobile 상태 표시 */}
-        <div style={{
-          position: 'absolute',
-          top: '-25px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: '#000',
-          color: '#0f0',
-          fontSize: '12px',
-          fontFamily: 'monospace',
-          padding: '4px 8px',
-          borderRadius: '4px',
-          zIndex: 999999,
-        }}>
-          isMobile={isMobile ? 'true' : 'false'} | w={typeof window !== 'undefined' ? window.innerWidth : 0}
-        </div>
-
-        {/* 햄버거 버튼 1 - 상단 */}
-        <div
-          onClick={() => setMenuOpen(v => !v)}
-          role="button"
-          tabIndex={0}
-          className="debug-hamburger-btn"
-          style={{
-            position: 'absolute',
-            top: '4px',
-            right: '8px',
-            width: '70px',
-            height: '50px',
-            borderRadius: '8px',
-            background: '#ff0000',
-            border: '4px solid #00ff00',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 999999,
-            opacity: 1,
-            visibility: 'visible',
-            transform: 'translateZ(0)',
-          }}
-        >
-          <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#fff', textAlign: 'center' }}>
-            BTN<br/>TOP
-          </span>
-        </div>
-
-        {/* 햄버거 버튼 2 - 중앙 */}
-        <div
-          role="button"
-          tabIndex={0}
-          className="debug-hamburger-btn"
-          style={{
-            position: 'absolute',
-            top: '58px',
-            right: '8px',
-            width: '70px',
-            height: '50px',
-            borderRadius: '8px',
-            background: '#0000ff',
-            border: '4px solid #ffff00',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 999999,
-            opacity: 1,
-            visibility: 'visible',
-          }}
-        >
-          <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#fff', textAlign: 'center' }}>
-            BTN<br/>MID
-          </span>
-        </div>
-
-        {/* 햄버거 버튼 3 - 하단 */}
-        <div
-          role="button"
-          tabIndex={0}
-          className="debug-hamburger-btn"
-          style={{
-            position: 'absolute',
-            top: '112px',
-            right: '8px',
-            width: '70px',
-            height: '50px',
-            borderRadius: '8px',
-            background: '#ff00ff',
-            border: '4px solid #00ffff',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 999999,
-            opacity: 1,
-            visibility: 'visible',
-            transform: 'translateZ(0)',
-          }}
-        >
-          <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#fff', textAlign: 'center' }}>
-            BTN<br/>BOT
-          </span>
-        </div>
+        {/* 햄버거 버튼 - 모바일에서만 렌더링 */}
+        {isMobile && (
+          <button
+            onClick={() => setMenuOpen(v => !v)}
+            style={{
+              position: 'absolute',
+              top: '10px',
+              right: '16px',
+              width: '44px',
+              height: '44px',
+              borderRadius: '10px',
+              background: '#141414',
+              border: '1px solid rgba(255,255,255,0.22)',
+              cursor: 'pointer',
+              WebkitTapHighlightColor: 'transparent',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 99999,
+            }}
+            aria-label="메뉴"
+          >
+            {menuOpen ? (
+              <svg width="18" height="18" viewBox="0 0 18 18" strokeWidth="2.5" strokeLinecap="round" fill="none"
+                style={{ stroke: '#ffffff', display: 'block' }}>
+                <line x1="2" y1="2" x2="16" y2="16" />
+                <line x1="16" y1="2" x2="2" y2="16" />
+              </svg>
+            ) : (
+              <svg width="20" height="15" viewBox="0 0 20 15" strokeWidth="2.5" strokeLinecap="round" fill="none"
+                style={{ stroke: '#ffffff', display: 'block' }}>
+                <line x1="0" y1="1" x2="20" y2="1" />
+                <line x1="0" y1="7.5" x2="20" y2="7.5" />
+                <line x1="0" y1="14" x2="20" y2="14" />
+              </svg>
+            )}
+          </button>
+        )}
 
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-
-          <Link to="/" className="group flex items-center" style={{ position: 'relative' }}>
+          <Link to="/" className="group flex items-center">
             <img
               src="/images/baikal_logo_white.png"
               alt="BAIKAL SYSTEMS"
               className="h-9 w-auto object-contain"
             />
-            {/* 디버그: 로고 표시 확인 */}
-            <span style={{
-              position: 'absolute',
-              bottom: '-20px',
-              left: '0',
-              fontSize: '10px',
-              color: '#0f0',
-              fontFamily: 'monospace',
-              background: '#000',
-              padding: '2px 4px',
-              borderRadius: '3px',
-            }}>LOGO</span>
           </Link>
 
           <nav className="hidden items-center gap-8 md:flex">
@@ -190,51 +111,6 @@ export default function Header() {
             >
               문의하기
             </Link>
-            {/* 햄버거 버튼 - 항상 렌더링, CSS에서만 숨김 */}
-            <div
-              onClick={() => setMenuOpen(v => !v)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && setMenuOpen(v => !v)}
-              className="debug-hamburger-btn"
-              style={{
-                position: 'relative',
-                width: '80px',
-                height: '60px',
-                borderRadius: '10px',
-                background: '#ff0000',
-                border: '5px solid #00ff00',
-                cursor: 'pointer',
-                WebkitTapHighlightColor: 'transparent',
-                display: 'flex !important',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                zIndex: 99999,
-                opacity: 1,
-                visibility: 'visible',
-                pointerEvents: 'auto',
-                transform: 'translateZ(0)',
-                WebkitTransform: 'translateZ(0)',
-                backfaceVisibility: 'visible',
-                WebkitBackfaceVisibility: 'visible',
-                perspective: '1000px',
-                WebkitPerspective: '1000px',
-              }}
-              aria-label="메뉴"
-            >
-              <span style={{ 
-                fontSize: '14px', 
-                fontWeight: 'bold', 
-                color: '#fff', 
-                position: 'relative', 
-                zIndex: 1,
-                textAlign: 'center',
-                lineHeight: 1.2,
-              }}>
-                {menuOpen ? '✕' : '☰'}<br/>BTN
-              </span>
-            </div>
           </div>
         </div>
 

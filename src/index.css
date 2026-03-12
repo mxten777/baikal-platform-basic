@@ -209,20 +209,7 @@
   to   { opacity: 1; }
 }
 
-/* 햄버거 포털 버튼 - 데스크탑에서 숨김 (JS isMobile 의존 제거) */
-.hamburger-portal-btn {
-  display: flex !important;
-}
-@media (min-width: 768px) {
-  .hamburger-portal-btn {
-    display: none !important;
-  }
-}
-
-/* 디버그 햄버거 버튼 - PC에서도 보이도록 (디버그용) */
-.debug-hamburger-btn {
-  display: flex !important;
-}
+/* 햄버거 포털 버튼 - 사용 안 함 (이제 position:absolute 사용) */
 
 @keyframes shimmer {
   0%   { background-position: -200% 0; }
