@@ -53,7 +53,7 @@ export default function Header() {
           onKeyDown={(e) => e.key === 'Enter' && setMenuOpen(v => !v)}
           className="hamburger-menu-btn"
           style={{
-            position: 'absolute',
+            position: 'fixed',
             top: '10px',
             left: '16px',
             width: '44px',
@@ -65,7 +65,6 @@ export default function Header() {
             WebkitTapHighlightColor: 'transparent',
             WebkitTransform: 'translateZ(0)',
             transform: 'translateZ(0)',
-            willChange: 'transform',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
