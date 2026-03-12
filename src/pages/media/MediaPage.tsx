@@ -4,10 +4,12 @@ import { supabase } from '@/lib/supabase'
 
 const BUCKET = 'public-media'
 const IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']
+const PDF_EXT = 'pdf'
 
 interface MediaFile {
   name: string
   url: string
+  isPdf?: boolean
 }
 
 const MEDIA_TYPES = [
@@ -19,6 +21,7 @@ const MEDIA_TYPES = [
 
 export default function MediaPage() {
   const [images, setImages] = useState<MediaFile[]>([])
+  const [pdfs, setPdfs] = useState<MediaFile[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -28,13 +31,19 @@ export default function MediaPage() {
         sortBy: { column: 'created_at', order: 'desc' },
       })
       if (data) {
-        const imgs = data
-          .filter(f => IMAGE_EXTS.includes(f.name.split('.').pop()?.toLowerCase() ?? ''))
-          .map(f => {
-            const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(f.name)
-            return { name: f.name, url: urlData.publicUrl }
-          })
+        const imgs: MediaFile[] = []
+        const pdfFiles: MediaFile[] = []
+        for (const f of data) {
+          const ext = f.name.split('.').pop()?.toLowerCase() ?? ''
+          const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(f.name)
+          if (IMAGE_EXTS.includes(ext)) {
+            imgs.push({ name: f.name, url: urlData.publicUrl })
+          } else if (ext === PDF_EXT) {
+            pdfFiles.push({ name: f.name, url: urlData.publicUrl, isPdf: true })
+          }
+        }
         setImages(imgs)
+        setPdfs(pdfFiles)
       }
       setLoading(false)
     }
@@ -108,6 +117,27 @@ export default function MediaPage() {
               </div>
             )}
           </div>
+
+          {/* PDF 자료 */}
+          {!loading && pdfs.length > 0 && (
+            <div className="mt-12">
+              <h2 className="text-lg font-bold text-white/60 mb-6">PDF 자료</h2>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                {pdfs.map(pdf => (
+                  <a
+                    key={pdf.name}
+                    href={pdf.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white/[0.04] border border-white/[0.06] hover:border-red-400/30 transition-colors aspect-video"
+                  >
+                    <span className="text-4xl">📄</span>
+                    <p className="truncate w-full px-3 text-center text-xs text-white/30 group-hover:text-white/50 transition-colors">{pdf.name}</p>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </>
