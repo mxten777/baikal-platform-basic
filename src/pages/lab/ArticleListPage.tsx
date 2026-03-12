@@ -24,6 +24,13 @@ export default function ArticleListPage() {
       <section className="relative bg-[#080808] pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0 grid-bg opacity-60" />
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+        
+        {/* 프리미엄 배경 글로우 */}
+        <div className="absolute inset-0 opacity-40">
+          <div className="absolute top-1/3 left-1/4 w-[450px] h-[450px] rounded-full bg-cyan-500/10 blur-[120px] animate-float" />
+          <div className="absolute bottom-1/4 right-1/4 w-[350px] h-[350px] rounded-full bg-blue-500/8 blur-[100px] animate-pulse-glow" style={{animationDelay: '1.2s'}} />
+        </div>
+
         <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-6">
             <div className="h-px w-8 bg-blue-500/60" />

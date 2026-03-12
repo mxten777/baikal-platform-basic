@@ -22,9 +22,13 @@ export default function AboutPage() {
 
       {/* Hero */}
       <section className="relative bg-[#080808] py-28 overflow-hidden">
-        <div className="absolute inset-0 grid-bg opacity-60" />
+        <div className="absolute inset-0 grid-bg opacity-40" />
+        {/* 프리미엄 배경 글로우 */}
+        <div className="absolute inset-0 opacity-40">
+          <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-blue-500/10 blur-[120px] animate-float" />
+          <div className="absolute bottom-1/3 right-1/3 w-[400px] h-[400px] rounded-full bg-purple-500/8 blur-[100px] animate-pulse-glow" style={{animationDelay: '1.5s'}} />
+        </div>
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
-        <div className="absolute right-0 top-0 w-[600px] h-[400px] bg-hero-glow pointer-events-none" />
         <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-6">
             <div className="h-px w-8 bg-blue-500/60" />
@@ -59,11 +63,15 @@ export default function AboutPage() {
             <span className="section-label">OUR VALUES</span>
           </div>
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            {VALUES.map(v => (
-              <div key={v.num} className="glass-card rounded-2xl p-8">
-                <span className="text-5xl font-black text-white/[0.06]">{v.num}</span>
-                <h3 className="mt-4 text-lg font-bold text-white">{v.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/35">{v.desc}</p>
+            {VALUES.map((v, idx) => (
+              <div key={v.num} className="glass-card rounded-2xl p-8 relative overflow-hidden group hover:border-blue-500/20 transition-all">
+                {/* 배경 글로우 */}
+                <div className={`absolute -top-8 -right-8 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity ${
+                  idx === 0 ? 'bg-blue-500/10' : idx === 1 ? 'bg-purple-500/10' : 'bg-cyan-500/10'
+                }`} />
+                <span className="relative text-6xl font-black text-white/[0.04] group-hover:text-white/[0.06] transition-colors">{v.num}</span>
+                <h3 className="relative mt-4 text-lg font-bold text-white group-hover:text-blue-400 transition-colors">{v.title}</h3>
+                <p className="relative mt-2 text-sm leading-relaxed text-white/35 group-hover:text-white/45 transition-colors">{v.desc}</p>
               </div>
             ))}
           </div>
@@ -75,6 +83,7 @@ export default function AboutPage() {
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 items-center">
+            {/* 왼쪽: 텍스트 */}
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <div className="h-px w-8 bg-blue-500/60" />
@@ -85,19 +94,39 @@ export default function AboutPage() {
                 소수 인원의 팀으로 빠르게 실험하고, 배우고, 만들고 공유합니다.
                 AI를 직접 만들면서 얻는 실전 경험이 저희의 자산입니다.
               </p>
+              <div className="mt-8 space-y-4">
+                {TEAM.map(m => (
+                  <div key={m.role} className="glass-card rounded-2xl p-6 flex items-center gap-4 hover:border-blue-500/20 transition-colors">
+                    <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/10 flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/10">
+                      <span className="text-blue-400 font-black text-2xl">B</span>
+                    </div>
+                    <div>
+                      <p className="font-bold text-white">{m.name}</p>
+                      <p className="text-xs text-blue-400/60 font-semibold tracking-widest uppercase mt-0.5">{m.role}</p>
+                      <p className="mt-1.5 text-xs text-white/30 leading-relaxed">{m.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="space-y-4">
-              {TEAM.map(m => (
-                <div key={m.role} className="glass-card rounded-2xl p-6 flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-xl bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                    <span className="text-blue-400 font-black text-lg">B</span>
-                  </div>
-                  <div>
-                    <p className="font-bold text-white">{m.name}</p>
-                    <p className="text-xs text-blue-400/60 font-semibold tracking-widest uppercase">{m.role}</p>
-                    <p className="mt-1 text-xs text-white/30">{m.desc}</p>
-                  </div>
-                </div>
+
+            {/* 오른쪽: 이미지 */}
+            <div className="relative lg:pl-8">
+              <div className="aspect-[4/3] rounded-2xl overflow-hidden glass-card">
+                <img 
+                  src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80" 
+                  alt="Team collaboration"
+                  className="w-full h-full object-cover opacity-70 group-hover:opacity-85 transition-opacity"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#080808]/80 via-transparent to-transparent" />
+              </div>
+              {/* 장식 요소 */}
+              <div className="absolute -bottom-6 -left-6 w-32 h-32 rounded-full bg-blue-500/10 blur-3xl" />
+              <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-purple-500/8 blur-2xl" />
+            </div>
+          </div>
+        </div>
+      </section>
               ))}
             </div>
           </div>

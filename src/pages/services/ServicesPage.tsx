@@ -49,6 +49,13 @@ export default function ServicesPage() {
       <section className="relative bg-[#080808] py-24 overflow-hidden">
         <div className="absolute inset-0 grid-bg opacity-60" />
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+        
+        {/* 프리미엄 배경 글로우 */}
+        <div className="absolute inset-0 opacity-40">
+          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-500/10 blur-[120px] animate-float" />
+          <div className="absolute bottom-1/3 left-1/3 w-[400px] h-[400px] rounded-full bg-purple-500/8 blur-[100px] animate-pulse-glow" style={{animationDelay: '1.5s'}} />
+        </div>
+
         <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-6">
             <div className="h-px w-8 bg-blue-500/60" />
@@ -68,21 +75,38 @@ export default function ServicesPage() {
         <div className="absolute top-0 left-0 right-0 hidden" />
         <div className="mx-auto max-w-7xl px-6 lg:px-8 pt-10">
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {SERVICES.map(s => (
-              <div key={s.title} className="glass-card rounded-2xl p-7">
-                <span className="text-3xl">{s.icon}</span>
-                <h3 className="mt-4 text-lg font-bold text-white">{s.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/35">{s.desc}</p>
-                <div className="mt-5 flex flex-wrap gap-1.5">
-                  {s.tags.map(t => (
-                    <span key={t} className="rounded-full border border-white/[0.07] bg-white/[0.03] px-2.5 py-0.5 text-[11px] text-white/30">{t}</span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* CTA */}
+            {SERVICES.map((s, idx) => (
+              <div key={s.title} className="glass-card rounded-2xl p-7 group relative overflow-hidden hover:border-blue-500/20 transition-all duration-500">
+                {/* 호버 시 배경 글로우 */}
+                <div className={`absolute -top-8 -right-8 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${
+                  idx % 3 === 0 ? 'bg-blue-500/15' : idx % 3 === 1 ? 'bg-purple-500/15' : 'bg-cyan-500/15'
+                }`} />
+                
+                <div className="relative">
+                  <span className="text-5xl block transition-transform group-hover:scale-110 duration-300">{s.icon}</span>
+                  <h3 className={`mt-4 text-lg font-bold text-white transition-colors duration-300 ${
+                    idx % 3 === 0 ? 'group-hover:text-blue-400' : idx % 3 === 1 ? 'group-hover:text-purple-400' : 'group-hover:text-cyan-400'
+                  }`}>{s.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-white/35 group-hover:text-white/45 transition-colors">{s.desc}</p>
+                  <div className="mt-5 flex flex-wrap gap-1.5">
+                    {s.tags.map(t => (
+                      <span key={t} className="rounded-full border border-white/[0.07] bg-white/[0.0 relative overflow-hidden group">
+            {/* 배경 애니메이션 */}
+            <div className="absolute inset-0 opacity-30">
+              <div className="absolute top-0 left-0 w-[300px] h-[300px] rounded-full bg-blue-500/10 blur-[80px] animate-pulse-glow" />
+              <div className="absolute bottom-0 right-0 w-[250px] h-[250px] rounded-full bg-purple-500/8 blur-[60px] animate-float" style={{animationDelay: '1s'}} />
+            </div>
+            
+            <div className="relative">
+              <h2 className="text-3xl font-black text-white">어떤 도움이 필요하세요?</h2>
+              <p className="mt-3 text-white/35">구체적인 내용을 공유해주시면 무료로 상담드립니다.</p>
+              <Link
+                to="/contact"
+                className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-black hover:bg-blue-50 hover:scale-105 transition-all duration-300 shadow-lg shadow-blue-500/20"
+              >
+                무료 상담 신청 →
+              </Link>
+            </div*/}
           <div className="mt-16 rounded-2xl border border-blue-500/15 bg-blue-500/5 p-10 text-center">
             <h2 className="text-3xl font-black text-white">어떤 도움이 필요하세요?</h2>
             <p className="mt-3 text-white/35">구체적인 내용을 공유해주시면 무료로 상담드립니다.</p>
