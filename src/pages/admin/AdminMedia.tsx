@@ -4,13 +4,16 @@ import { supabase } from '@/lib/supabase'
 import { Upload, Copy, Trash2, Check, Image as ImageIcon, FileText } from 'lucide-react'
 
 const BUCKET = 'public-media'
-const NAME_MAP_KEY = 'media_name_map'
 
-function getNameMap(): Record<string, string> {
-  try { return JSON.parse(localStorage.getItem(NAME_MAP_KEY) ?? '{}') } catch { return {} }
-}
-function saveNameMap(map: Record<string, string>) {
-  localStorage.setItem(NAME_MAP_KEY, JSON.stringify(map))
+function getMimeType(file: File): string {
+  if (file.type) return file.type
+  const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
+  const map: Record<string, string> = {
+    jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png',
+    gif: 'image/gif', webp: 'image/webp', svg: 'image/svg+xml',
+    pdf: 'application/pdf',
+  }
+  return map[ext] ?? ''
 }
 
 const ALLOWED_TYPES = [
@@ -48,18 +51,19 @@ export default function AdminMedia() {
       sortBy: { column: 'created_at', order: 'desc' },
     })
     if (data) {
-      const nameMap = getNameMap()
-      const loaded: UploadedFile[] = data.map(f => {
-        const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(f.name)
-        const displayName = nameMap[f.name] ?? f.name
-        return {
-          name: displayName,
-          url: urlData.publicUrl,
-          size: (f.metadata?.size as number) ?? 0,
-          type: (f.metadata?.mimetype as string) ?? 'image/jpeg',
-          uploadedAt: f.created_at ?? new Date().toISOString(),
-        }
-      })
+      const loaded: UploadedFile[] = data
+        .filter(f => f.name !== '.emptyFolderPlaceholder')
+        .map(f => {
+          const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(f.name)
+          const displayName = (f.metadata?.['original_name'] as string | undefined) ?? f.name
+          return {
+            name: displayName,
+            url: urlData.publicUrl,
+            size: (f.metadata?.size as number) ?? 0,
+            type: (f.metadata?.mimetype as string) ?? 'image/jpeg',
+            uploadedAt: f.created_at ?? new Date().toISOString(),
+          }
+        })
       setFiles(loaded)
     }
     setLoadingFiles(false)
@@ -74,7 +78,8 @@ export default function AdminMedia() {
     const uploaded: UploadedFile[] = []
 
     for (const file of Array.from(fileList)) {
-      if (!ALLOWED_TYPES.includes(file.type)) {
+      const mimeType = getMimeType(file)
+      if (!ALLOWED_TYPES.includes(mimeType)) {
         setError(`지원하지 않는 파일 형식입니다: ${file.name}`)
         continue
       }
@@ -82,7 +87,11 @@ export default function AdminMedia() {
       const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
       const { error: uploadError } = await supabase.storage
         .from(BUCKET)
-        .upload(fileName, file, { cacheControl: '3600', upsert: false })
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false,
+          metadata: { original_name: file.name },
+        })
 
       if (uploadError) {
         setError(`업로드 실패: ${file.name} — ${uploadError.message}`)
@@ -90,15 +99,11 @@ export default function AdminMedia() {
       }
 
       const { data } = supabase.storage.from(BUCKET).getPublicUrl(fileName)
-      // localStorage에 저장키 → 원본 파일명 매핑 저장
-      const nameMap = getNameMap()
-      nameMap[fileName] = file.name
-      saveNameMap(nameMap)
       uploaded.push({
         name: file.name,
         url: data.publicUrl,
         size: file.size,
-        type: file.type,
+        type: mimeType,
         uploadedAt: new Date().toISOString(),
       })
     }
@@ -124,10 +129,6 @@ export default function AdminMedia() {
     const storageKey = url.split(`/${BUCKET}/`)[1]?.split('?')[0]
     if (storageKey) {
       await supabase.storage.from(BUCKET).remove([storageKey])
-      // localStorage 매핑도 제거
-      const nameMap = getNameMap()
-      delete nameMap[storageKey]
-      saveNameMap(nameMap)
     }
     setFiles(prev => prev.filter(f => f.url !== url))
   }
