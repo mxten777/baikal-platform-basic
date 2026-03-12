@@ -64,7 +64,7 @@ export default function Header() {
         ref={headerRef}
         className="fixed top-0 left-0 right-0 z-[9999] border-b border-white/[0.06]"
         style={{
-          background: '#00ff00',
+          background: '#080808',
         }}
       >
         {/* 햄버거 버튼 - 항상 렌더링, CSS로 데스크탑 숨김 */}
@@ -78,7 +78,7 @@ export default function Header() {
           style={{
             position: 'fixed',
             top: '10px',
-            left: '16px',
+            right: '16px',
             width: '44px',
             height: '44px',
             borderRadius: '10px',
