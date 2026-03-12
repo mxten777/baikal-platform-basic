@@ -49,8 +49,8 @@ export default function Header() {
           className="hamburger-menu-btn"
           style={{
             position: 'absolute',
-            top: '10px',
-            right: '16px',
+            top: '4px',
+            right: '8px',
             width: '44px',
             height: '44px',
             borderRadius: '10px',
