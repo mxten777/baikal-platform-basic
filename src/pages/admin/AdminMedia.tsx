@@ -43,7 +43,7 @@ export default function AdminMedia() {
       const loaded: UploadedFile[] = data.map(f => {
         const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(f.name)
         return {
-          name: f.name,
+          name: (f.metadata?.original_name as string) ?? f.name,
           url: urlData.publicUrl,
           size: (f.metadata?.size as number) ?? 0,
           type: (f.metadata?.mimetype as string) ?? 'image/jpeg',
@@ -72,7 +72,7 @@ export default function AdminMedia() {
       const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
       const { error: uploadError } = await supabase.storage
         .from(BUCKET)
-        .upload(fileName, file, { cacheControl: '3600', upsert: false })
+        .upload(fileName, file, { cacheControl: '3600', upsert: false, metadata: { original_name: file.name } })
 
       if (uploadError) {
         setError(`업로드 실패: ${file.name} — ${uploadError.message}`)

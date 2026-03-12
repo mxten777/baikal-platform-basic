@@ -36,10 +36,11 @@ export default function MediaPage() {
         for (const f of data) {
           const ext = f.name.split('.').pop()?.toLowerCase() ?? ''
           const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(f.name)
+          const displayName = (f.metadata?.original_name as string) ?? f.name
           if (IMAGE_EXTS.includes(ext)) {
-            imgs.push({ name: f.name, url: urlData.publicUrl })
+            imgs.push({ name: displayName, url: urlData.publicUrl })
           } else if (ext === PDF_EXT) {
-            pdfFiles.push({ name: f.name, url: urlData.publicUrl, isPdf: true })
+            pdfFiles.push({ name: displayName, url: urlData.publicUrl, isPdf: true })
           }
         }
         setImages(imgs)
