@@ -12,11 +12,19 @@ const nav = [
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 40)
     window.addEventListener('scroll', handler, { passive: true })
     return () => window.removeEventListener('scroll', handler)
+  }, [])
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
   }, [])
 
   return (
@@ -66,33 +74,37 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile menu button — fixed to viewport to avoid Samsung flex overflow bug */}
-      <button
-        onClick={() => setMenuOpen(v => !v)}
-        className="md:hidden"
-        style={{
-          position: 'fixed',
-          top: '10px',
-          right: '12px',
-          width: '44px',
-          height: '44px',
-          lineHeight: '44px',
-          textAlign: 'center',
-          borderRadius: '10px',
-          background: 'rgba(20,20,20,0.92)',
-          border: '1px solid rgba(255,255,255,0.18)',
-          color: '#ffffff',
-          fontSize: '20px',
-          zIndex: 200,
-          cursor: 'pointer',
-        }}
-        aria-label="메뉴"
-      >
-        {menuOpen ? '✕' : '☰'}
-      </button>
+      {/* Mobile menu button — JS-controlled, no Tailwind dependency */}
+      {isMobile && (
+        <button
+          onClick={() => setMenuOpen(v => !v)}
+          style={{
+            position: 'fixed',
+            top: '10px',
+            right: '12px',
+            width: '44px',
+            height: '44px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '10px',
+            background: 'rgba(20,20,20,0.92)',
+            border: '1px solid rgba(255,255,255,0.18)',
+            color: '#ffffff',
+            fontSize: '20px',
+            zIndex: 300,
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+          }}
+          aria-label="메뉴"
+        >
+          {menuOpen ? '✕' : '☰'}
+        </button>
+      )}
 
       {/* Mobile Nav */}
-      <div className={`md:hidden overflow-hidden transition-all duration-300 ${menuOpen ? 'max-h-96' : 'max-h-0'}`}>
+      {isMobile && (
+        <div style={{ overflow: 'hidden', maxHeight: menuOpen ? '400px' : '0', transition: 'max-height 0.3s ease' }}>
         <nav className="flex flex-col border-t border-white/[0.06] bg-[#080808]/95 backdrop-blur-xl px-6 py-4 gap-1">
           {nav.map(item => (
             <NavLink
@@ -117,6 +129,7 @@ export default function Header() {
           </Link>
         </nav>
       </div>
+      )}
     </header>
   )
 }
