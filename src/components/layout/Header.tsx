@@ -88,44 +88,25 @@ export default function Header() {
               onClick={() => setMenuOpen(v => !v)}
               className="flex md:hidden items-center justify-center"
               style={{
-                width: '44px',
+                width: '60px',
                 height: '44px',
                 borderRadius: '10px',
-                background: '#ff0000',  // 빨간색으로 변경 (디버그)
-                border: '3px solid #00ff00',  // 초록 테두리 (디버그)
+                background: '#ff0000',
+                border: '3px solid #00ff00',
                 cursor: 'pointer',
                 WebkitTapHighlightColor: 'transparent',
                 position: 'relative',
+                transform: 'translate3d(0,0,0)',
+                WebkitTransform: 'translate3d(0,0,0)',
+                willChange: 'transform',
+                isolation: 'isolate',
               }}
               aria-label="메뉴"
             >
-              {menuOpen ? (
-                <svg width="18" height="18" viewBox="0 0 18 18" strokeWidth="2.5" strokeLinecap="round" fill="none"
-                  style={{ stroke: '#ffffff', display: 'block' }}>
-                  <line x1="2" y1="2" x2="16" y2="16" />
-                  <line x1="16" y1="2" x2="2" y2="16" />
-                </svg>
-              ) : (
-                <svg width="20" height="15" viewBox="0 0 20 15" strokeWidth="2.5" strokeLinecap="round" fill="none"
-                  style={{ stroke: '#ffffff', display: 'block' }}>
-                  <line x1="0" y1="1" x2="20" y2="1" />
-                  <line x1="0" y1="7.5" x2="20" y2="7.5" />
-                  <line x1="0" y1="14" x2="20" y2="14" />
-                </svg>
-              )}
-              {/* 디버그 텍스트 */}
-              <span style={{
-                position: 'absolute',
-                bottom: '-20px',
-                right: '0',
-                fontSize: '10px',
-                color: '#0f0',
-                fontFamily: 'monospace',
-                background: '#000',
-                padding: '2px 4px',
-                borderRadius: '3px',
-                whiteSpace: 'nowrap',
-              }}>BTN</span>
+              {/* SVG 제거, 텍스트로 테스트 */}
+              <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#fff' }}>
+                {menuOpen ? '✕' : '☰'}
+              </span>
             </button>
           </div>
         </div>
