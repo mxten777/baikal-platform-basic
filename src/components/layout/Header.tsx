@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { Link, NavLink } from 'react-router-dom'
 
 const nav = [
@@ -17,7 +18,6 @@ export default function Header() {
       ? window.matchMedia('(max-width: 767px)').matches
       : false
   )
-  const [dbg, setDbg] = useState({ iw: 0, ow: 0, dpr: 1, mq: false, btnRect: null as DOMRect | null })
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 40)
@@ -33,40 +33,36 @@ export default function Header() {
     return () => mq.removeEventListener('change', handler)
   }, [])
 
-  useEffect(() => {
-    const update = () => {
-      const mq = window.matchMedia('(max-width: 767px)')
-      const btn = document.getElementById('__hamburger_btn__')
-      setDbg({
-        iw: window.innerWidth,
-        ow: window.outerWidth,
-        dpr: window.devicePixelRatio,
-        mq: mq.matches,
-        btnRect: btn ? btn.getBoundingClientRect() : null,
-      })
-    }
-    update()
-    const t = setInterval(update, 500)
-    return () => clearInterval(t)
-  }, [])
+  const hamburgerBtn = isMobile ? createPortal(
+    <button
+      onClick={() => setMenuOpen(v => !v)}
+      style={{
+        position: 'fixed',
+        top: '10px',
+        right: '12px',
+        width: '44px',
+        height: '44px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: '10px',
+        background: 'rgba(20,20,20,0.92)',
+        border: '1px solid rgba(255,255,255,0.18)',
+        color: '#ffffff',
+        fontSize: '20px',
+        zIndex: 300,
+        cursor: 'pointer',
+        WebkitTapHighlightColor: 'transparent',
+      }}
+      aria-label="메뉴"
+    >
+      {menuOpen ? '✕' : '☰'}
+    </button>,
+    document.body
+  ) : null
 
   return (
     <>
-      {/* 🔴 DEBUG */}
-      <div style={{
-        position:'fixed', bottom:8, left:8, zIndex:9999,
-        background:'rgba(0,0,0,0.9)', color:'#0f0', fontFamily:'monospace',
-        fontSize:10, padding:'6px 10px', borderRadius:6, lineHeight:1.8,
-        pointerEvents:'none', whiteSpace:'nowrap'
-      }}>
-        <div>isMobile: <b style={{color: isMobile?'#0f0':'#f00'}}>{String(isMobile)}</b></div>
-        <div>mq(≤767): <b style={{color: dbg.mq?'#0f0':'#f00'}}>{String(dbg.mq)}</b></div>
-        <div>innerW: <b>{dbg.iw}</b> | outerW: <b>{dbg.ow}</b></div>
-        <div>DPR: <b>{dbg.dpr}</b></div>
-        <div>btn rendered: <b style={{color: isMobile?'#0f0':'#f00'}}>{isMobile ? 'YES' : 'NO'}</b></div>
-        {dbg.btnRect && <div>btn rect: <b>{Math.round(dbg.btnRect.left)},{Math.round(dbg.btnRect.top)} {Math.round(dbg.btnRect.width)}x{Math.round(dbg.btnRect.height)}</b></div>}
-        {dbg.btnRect && <div>btn visible: <b style={{color:(dbg.btnRect.right<=dbg.iw&&dbg.btnRect.bottom<=window.innerHeight)?'#0f0':'#f00'}}>{dbg.btnRect.right<=dbg.iw&&dbg.btnRect.bottom<=window.innerHeight?'YES':'CLIPPED'}</b></div>}
-      </div>
       <header
         className={`fixed top-0 left-0 right-0 z-[200] transition-all duration-500 ${
           scrolled
@@ -143,34 +139,8 @@ export default function Header() {
         )}
       </header>
 
-      {/* 햄버거 버튼 — header 바깥에 위치 (backdrop-filter 영향 차단) */}
-      {isMobile && (
-        <button
-          id="__hamburger_btn__"
-          onClick={() => setMenuOpen(v => !v)}
-          style={{
-            position: 'fixed',
-            top: '10px',
-            right: '12px',
-            width: '44px',
-            height: '44px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '10px',
-            background: 'rgba(20,20,20,0.92)',
-            border: '1px solid rgba(255,255,255,0.18)',
-            color: '#ffffff',
-            fontSize: '20px',
-            zIndex: 300,
-            cursor: 'pointer',
-            WebkitTapHighlightColor: 'transparent',
-          }}
-          aria-label="메뉴"
-        >
-          {menuOpen ? '✕' : '☰'}
-        </button>
-      )}
+      {/* 햄버거 버튼 — createPortal로 document.body에 직접 마운트 */}
+      {hamburgerBtn}
     </>
   )
 }
