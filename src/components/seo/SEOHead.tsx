@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async'
-import { SITE_NAME, SITE_URL, DEFAULT_OG_IMAGE } from '@/lib/constants'
+import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, DEFAULT_OG_IMAGE } from '@/lib/constants'
 
 interface SEOHeadProps {
   title?: string
@@ -21,7 +21,7 @@ export default function SEOHead({
   type = 'website',
 }: SEOHeadProps) {
   const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} - AI 개발 플랫폼`
-  const desc = description ?? 'AI 소프트웨어 개발 회사 바이칼시스템즈의 AI 개발 콘텐츠 플랫폼'
+  const desc = description ?? SITE_DESCRIPTION
 
   return (
     <Helmet>

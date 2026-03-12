@@ -83,7 +83,7 @@ export default function Header() {
           border: '1px solid rgba(255,255,255,0.18)',
           color: '#ffffff',
           fontSize: '20px',
-          zIndex: 999,
+          zIndex: 200,
           cursor: 'pointer',
         }}
         aria-label="메뉴"
