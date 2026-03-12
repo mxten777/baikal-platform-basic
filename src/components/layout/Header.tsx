@@ -36,8 +36,8 @@ export default function Header() {
     <header
         className={`fixed top-0 left-0 right-0 z-[200] transition-all duration-500 ${
           scrolled
-            ? 'bg-[#080808]/90 backdrop-blur-xl border-b border-white/[0.06]'
-            : 'bg-gradient-to-b from-black/40 to-transparent md:bg-transparent'
+            ? 'bg-[#080808] border-b border-white/[0.06]'
+            : 'bg-gradient-to-b from-black/60 to-transparent md:bg-transparent'
         }`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -132,7 +132,7 @@ export default function Header() {
 
         {isMobile && (
           <div style={{ overflow: 'hidden', maxHeight: menuOpen ? '400px' : '0', transition: 'max-height 0.3s ease' }}>
-            <nav className="flex flex-col border-t border-white/[0.06] bg-[#080808]/95 backdrop-blur-xl px-6 py-4 gap-1">
+            <nav className="flex flex-col border-t border-white/[0.06] bg-[#080808] px-6 py-4 gap-1">
               {nav.map(item => (
                 <NavLink
                   key={item.to}
