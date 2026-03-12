@@ -41,12 +41,24 @@ export default function Header() {
         }`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link to="/" className="group flex items-center">
+          <Link to="/" className="group flex items-center" style={{ position: 'relative' }}>
             <img
               src="/images/baikal_logo_white.png"
               alt="BAIKAL SYSTEMS"
               className="h-9 w-auto object-contain"
             />
+            {/* 디버그: 로고 표시 확인 */}
+            <span style={{
+              position: 'absolute',
+              bottom: '-20px',
+              left: '0',
+              fontSize: '10px',
+              color: '#0f0',
+              fontFamily: 'monospace',
+              background: '#000',
+              padding: '2px 4px',
+              borderRadius: '3px',
+            }}>LOGO</span>
           </Link>
 
           <nav className="hidden items-center gap-8 md:flex">
@@ -79,10 +91,11 @@ export default function Header() {
                 width: '44px',
                 height: '44px',
                 borderRadius: '10px',
-                background: '#141414',
-                border: '1px solid rgba(255,255,255,0.22)',
+                background: '#ff0000',  // 빨간색으로 변경 (디버그)
+                border: '3px solid #00ff00',  // 초록 테두리 (디버그)
                 cursor: 'pointer',
                 WebkitTapHighlightColor: 'transparent',
+                position: 'relative',
               }}
               aria-label="메뉴"
             >
@@ -100,6 +113,19 @@ export default function Header() {
                   <line x1="0" y1="14" x2="20" y2="14" />
                 </svg>
               )}
+              {/* 디버그 텍스트 */}
+              <span style={{
+                position: 'absolute',
+                bottom: '-20px',
+                right: '0',
+                fontSize: '10px',
+                color: '#0f0',
+                fontFamily: 'monospace',
+                background: '#000',
+                padding: '2px 4px',
+                borderRadius: '3px',
+                whiteSpace: 'nowrap',
+              }}>BTN</span>
             </button>
           </div>
         </div>
