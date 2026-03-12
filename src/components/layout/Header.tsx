@@ -86,8 +86,11 @@ export default function Header() {
             </Link>
             {/* 햄버거 버튼 - flex item으로 header GPU layer 공유 */}
             {isMobile && (
-              <button
+              <div
                 onClick={() => setMenuOpen(v => !v)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && setMenuOpen(v => !v)}
                 style={{
                   width: '60px',
                   height: '44px',
@@ -100,13 +103,19 @@ export default function Header() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
+                  transform: 'translateZ(0)',
+                  WebkitTransform: 'translateZ(0)',
+                  backfaceVisibility: 'visible',
+                  WebkitBackfaceVisibility: 'visible',
+                  perspective: '1000px',
+                  WebkitPerspective: '1000px',
                 }}
                 aria-label="메뉴"
               >
                 <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#fff' }}>
                   {menuOpen ? '✕' : '☰'}
                 </span>
-              </button>
+              </div>
             )}
           </div>
         </div>
