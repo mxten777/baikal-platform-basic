@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, NavLink } from 'react-router-dom'
 
@@ -10,50 +10,80 @@ const nav = [
   { to: '/about', label: 'ABOUT' },
 ]
 
-// Samsung Internet: position:fixed 요소가 스크롤 후 compositing layer GC로 사라지는 버그.
-// JS(setInterval/tick) 방법은 JS 실행 사이 틈에 GC가 발생해 무효.
-// CSS @keyframes는 compositor 스레드에서 JS와 독립적으로 실행되므로 GC를 막을 수 있다.
 function HamburgerPortalButton({ menuOpen, onToggle }: { menuOpen: boolean; onToggle: () => void }) {
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const [dbg, setDbg] = useState('init')
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      const el = btnRef.current
+      if (!el) { setDbg('NO_DOM'); return }
+      const r = el.getBoundingClientRect()
+      const style = window.getComputedStyle(el)
+      setDbg(`top=${Math.round(r.top)} disp=${style.display} vis=${style.visibility} op=${style.opacity} anim=${style.animationName}`)
+    }, 400)
+    return () => clearInterval(id)
+  }, [])
+
   return createPortal(
-    <button
-      onClick={onToggle}
-      className="hamburger-portal-btn"
-      style={{
+    <>
+      <button
+        ref={btnRef}
+        onClick={onToggle}
+        className="hamburger-portal-btn"
+        style={{
+          position: 'fixed',
+          top: '10px',
+          right: '16px',
+          width: '44px',
+          height: '44px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: '10px',
+          background: '#141414',
+          border: '1px solid rgba(255,255,255,0.22)',
+          zIndex: 9999,
+          cursor: 'pointer',
+          WebkitTapHighlightColor: 'transparent',
+          animation: 'samsung-gc-fix 1s linear infinite',
+          WebkitAnimation: 'samsung-gc-fix 1s linear infinite',
+        }}
+        aria-label="메뉴"
+      >
+        {menuOpen ? (
+          <svg width="18" height="18" viewBox="0 0 18 18" strokeWidth="2.5" strokeLinecap="round" fill="none"
+            style={{ stroke: '#ffffff', display: 'block' }}>
+            <line x1="2" y1="2" x2="16" y2="16" />
+            <line x1="16" y1="2" x2="2" y2="16" />
+          </svg>
+        ) : (
+          <svg width="20" height="15" viewBox="0 0 20 15" strokeWidth="2.5" strokeLinecap="round" fill="none"
+            style={{ stroke: '#ffffff', display: 'block' }}>
+            <line x1="0" y1="1" x2="20" y2="1" />
+            <line x1="0" y1="7.5" x2="20" y2="7.5" />
+            <line x1="0" y1="14" x2="20" y2="14" />
+          </svg>
+        )}
+      </button>
+      <div style={{
         position: 'fixed',
-        top: '10px',
-        right: '16px',
-        width: '44px',
-        height: '44px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: '10px',
-        background: '#141414',
-        border: '1px solid rgba(255,255,255,0.22)',
-        zIndex: 9999,
-        cursor: 'pointer',
-        WebkitTapHighlightColor: 'transparent',
-        // CSS animation은 compositor 스레드에서 JS와 독립 실행 → Samsung Internet GC 차단
-        animation: 'samsung-gc-fix 1s linear infinite',
-        WebkitAnimation: 'samsung-gc-fix 1s linear infinite',
-      }}
-      aria-label="메뉴"
-    >
-      {menuOpen ? (
-        <svg width="18" height="18" viewBox="0 0 18 18" strokeWidth="2.5" strokeLinecap="round" fill="none"
-          style={{ stroke: '#ffffff', display: 'block' }}>
-          <line x1="2" y1="2" x2="16" y2="16" />
-          <line x1="16" y1="2" x2="2" y2="16" />
-        </svg>
-      ) : (
-        <svg width="20" height="15" viewBox="0 0 20 15" strokeWidth="2.5" strokeLinecap="round" fill="none"
-          style={{ stroke: '#ffffff', display: 'block' }}>
-          <line x1="0" y1="1" x2="20" y2="1" />
-          <line x1="0" y1="7.5" x2="20" y2="7.5" />
-          <line x1="0" y1="14" x2="20" y2="14" />
-        </svg>
-      )}
-    </button>,
+        bottom: '60px',
+        left: '8px',
+        right: '8px',
+        background: 'rgba(0,0,0,0.85)',
+        color: '#0f0',
+        fontSize: '11px',
+        fontFamily: 'monospace',
+        padding: '6px 8px',
+        borderRadius: '6px',
+        zIndex: 99999,
+        lineHeight: 1.5,
+        wordBreak: 'break-all',
+      }}>
+        BTN: {dbg}
+      </div>
+    </>,
     document.body
   )
 }
