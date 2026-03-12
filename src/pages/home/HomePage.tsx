@@ -76,13 +76,19 @@ export default function HomePage() {
 
       {/* ===== HERO ===== */}
       <section className="relative min-h-screen bg-[#080808] flex flex-col justify-center -mt-16" style={{overflow:'clip'}}>
-        {/* 배경 — 그리드 + 글로우 */}
-        <div className="absolute inset-0 grid-bg opacity-100" />
-        <div className="absolute inset-0 bg-hero-glow" />
-        {/* 우측 하단 보조 글로우 */}
-        <div className="absolute bottom-0 right-0 w-[600px] h-[400px] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none" />
-        {/* 왼쪽 상단 글로우 */}
-        <div className="absolute top-1/4 left-0 w-[400px] h-[400px] rounded-full bg-purple-500/4 blur-[100px] pointer-events-none" />
+        {/* 프리미엄 배경 레이어 */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-950/20 via-purple-950/10 to-[#080808]" />
+        <div className="absolute inset-0 grid-bg opacity-40" />
+        
+        {/* 움직이는 그라디언트 글로우 */}
+        <div className="absolute inset-0 opacity-50">
+          <div className="absolute top-0 -left-4 w-[500px] h-[500px] rounded-full bg-blue-500/10 blur-[100px] animate-float pointer-events-none" />
+          <div className="absolute bottom-1/4 right-0 w-[600px] h-[400px] rounded-full bg-purple-500/8 blur-[120px] animate-pulse-glow pointer-events-none" style={{animationDelay: '1s'}} />
+          <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full bg-cyan-500/6 blur-[100px] animate-float pointer-events-none" style={{animationDelay: '2s'}} />
+        </div>
+
+        {/* 추가 장식 요소 */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#080808_100%)]" />
 
         <div className="relative mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8 pt-28 sm:pt-32 pb-20 sm:pb-24">
           {/* 라벨 */}
