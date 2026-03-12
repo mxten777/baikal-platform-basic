@@ -220,6 +220,11 @@
 }
 
 /* Samsung Internet position:fixed compositing GC 버그 대응 */
+@-webkit-keyframes samsung-layer-fix {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.9999; }
+  100% { opacity: 1; }
+}
 @keyframes samsung-layer-fix {
   0%   { opacity: 1; }
   50%  { opacity: 0.9999; }

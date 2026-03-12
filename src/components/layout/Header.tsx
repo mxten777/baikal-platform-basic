@@ -52,11 +52,12 @@ export default function Header() {
         zIndex: 9999,
         cursor: 'pointer',
         WebkitTapHighlightColor: 'transparent',
-        // Safari WebKit: will-change가 GPU compositing layer를 강제하는 표준 방법
-        willChange: 'transform',
+        // Samsung Internet: position:fixed 요소가 스크롤 후 GC되는 버그 대응
+        // opacity 미세 변화 무한 애니메이션으로 compositing layer를 영구 유지
         transform: 'translateZ(0)',
         WebkitTransform: 'translateZ(0)',
-        opacity: 1,
+        animation: 'samsung-layer-fix 2s linear infinite',
+        WebkitAnimation: 'samsung-layer-fix 2s linear infinite',
       }}
       aria-label="메뉴"
     >
