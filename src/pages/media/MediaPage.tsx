@@ -26,18 +26,27 @@ export default function MediaPage() {
 
   useEffect(() => {
     async function loadMedia() {
-      const { data } = await supabase.storage.from(BUCKET).list('', {
-        limit: 200,
-        sortBy: { column: 'created_at', order: 'desc' },
-      })
-      if (data) {
+      const [storageResult, dbResult] = await Promise.all([
+        supabase.storage.from(BUCKET).list('', {
+          limit: 200,
+          sortBy: { column: 'created_at', order: 'desc' },
+        }),
+        supabase.from('media_files').select('storage_key, original_name'),
+      ])
+
+      if (storageResult.data) {
+        const nameMap: Record<string, string> = {}
+        for (const row of dbResult.data ?? []) {
+          nameMap[row.storage_key] = row.original_name
+        }
+
         const imgs: MediaFile[] = []
         const pdfFiles: MediaFile[] = []
-        for (const f of data) {
+        for (const f of storageResult.data) {
+          if (f.name === '.emptyFolderPlaceholder') continue
           const ext = f.name.split('.').pop()?.toLowerCase() ?? ''
           const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(f.name)
-          const stripped = f.name.replace(/^\d{13}-/, '')
-          const displayName = (() => { try { return decodeURIComponent(stripped) } catch { return stripped } })()
+          const displayName = nameMap[f.name] ?? f.name
           if (IMAGE_EXTS.includes(ext)) {
             imgs.push({ name: displayName, url: urlData.publicUrl })
           } else if (ext === PDF_EXT) {
