@@ -2,7 +2,7 @@ import { Outlet, NavLink } from 'react-router-dom'
 import { useAuth } from '@/features/auth/AuthProvider'
 import {
   LayoutDashboard, FileText, FolderKanban, Rss,
-  RefreshCw, Image, Search, Settings, LogOut
+  RefreshCw, Image, Search, Settings, LogOut, Tag
 } from 'lucide-react'
 
 const navItems = [
@@ -12,6 +12,7 @@ const navItems = [
   { to: '/admin/sources',   label: '수집 소스',   icon: Rss },
   { to: '/admin/sync-jobs', label: '동기화 작업', icon: RefreshCw },
   { to: '/admin/media',     label: '미디어',      icon: Image },
+  { to: '/admin/tags',      label: '태그',         icon: Tag },
   { to: '/admin/seo',       label: 'SEO',         icon: Search },
   { to: '/admin/settings',  label: '설정',        icon: Settings },
 ]

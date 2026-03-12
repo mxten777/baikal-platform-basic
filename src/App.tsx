@@ -42,6 +42,7 @@ import AdminProjects from '@/pages/admin/AdminProjects'
 import AdminSources from '@/pages/admin/AdminSources'
 import AdminSyncJobs from '@/pages/admin/AdminSyncJobs'
 import AdminMedia from '@/pages/admin/AdminMedia'
+import AdminTags from '@/pages/admin/AdminTags'
 import AdminSEO from '@/pages/admin/AdminSEO'
 import AdminSettings from '@/pages/admin/AdminSettings'
 
@@ -66,6 +67,7 @@ export default function App() {
         <Route path="sources" element={<AdminSources />} />
         <Route path="sync-jobs" element={<AdminSyncJobs />} />
         <Route path="media" element={<AdminMedia />} />
+        <Route path="tags" element={<AdminTags />} />
         <Route path="seo" element={<AdminSEO />} />
         <Route path="settings" element={<AdminSettings />} />
       </Route>

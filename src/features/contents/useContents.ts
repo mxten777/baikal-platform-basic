@@ -6,6 +6,8 @@ import {
   adminGetContents,
   adminPublishContent,
   adminRejectContent,
+  adminUpsertContent,
+  adminDeleteContent,
 } from './contentService'
 import type { ContentFilters } from '@/types/models'
 
@@ -58,6 +60,22 @@ export function useRejectContent() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => adminRejectContent(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: contentKeys.all }),
+  })
+}
+
+export function useUpsertContent() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (content: Parameters<typeof adminUpsertContent>[0]) => adminUpsertContent(content),
+    onSuccess: () => qc.invalidateQueries({ queryKey: contentKeys.all }),
+  })
+}
+
+export function useDeleteContent() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => adminDeleteContent(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: contentKeys.all }),
   })
 }

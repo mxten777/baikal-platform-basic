@@ -175,6 +175,11 @@ export async function adminRejectContent(id: string): Promise<void> {
   if (error) throw error
 }
 
+export async function adminDeleteContent(id: string): Promise<void> {
+  const { error } = await supabase.from('contents').delete().eq('id', id)
+  if (error) throw error
+}
+
 export async function adminUpsertContent(
   content: Partial<Content> & { slug: string; title: string; content_type: string }
 ): Promise<Content> {
