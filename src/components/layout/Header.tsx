@@ -34,7 +34,7 @@ export default function Header() {
 
   return (
     <header
-        className={`fixed top-0 left-0 right-0 z-[200] transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-[9999] transition-all duration-500 ${
           scrolled
             ? 'bg-[#080808] border-b border-white/[0.06]'
             : 'bg-gradient-to-b from-black/60 to-transparent md:bg-transparent'
@@ -92,6 +92,7 @@ export default function Header() {
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && setMenuOpen(v => !v)}
                 style={{
+                  position: 'relative',
                   width: '60px',
                   height: '44px',
                   borderRadius: '10px',
@@ -103,6 +104,10 @@ export default function Header() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
+                  zIndex: 99999,
+                  opacity: 1,
+                  visibility: 'visible',
+                  pointerEvents: 'auto',
                   transform: 'translateZ(0)',
                   WebkitTransform: 'translateZ(0)',
                   backfaceVisibility: 'visible',
@@ -112,7 +117,7 @@ export default function Header() {
                 }}
                 aria-label="메뉴"
               >
-                <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#fff' }}>
+                <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#fff', position: 'relative', zIndex: 1 }}>
                   {menuOpen ? '✕' : '☰'}
                 </span>
               </div>
