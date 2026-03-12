@@ -46,18 +46,27 @@ export default function AdminMedia() {
 
   async function loadFiles() {
     setLoadingFiles(true)
-    const { data } = await supabase.storage.from(BUCKET).list('', {
-      limit: 200,
-      sortBy: { column: 'created_at', order: 'desc' },
-    })
-    if (data) {
-      const loaded: UploadedFile[] = data
+
+    const [storageResult, dbResult] = await Promise.all([
+      supabase.storage.from(BUCKET).list('', {
+        limit: 200,
+        sortBy: { column: 'created_at', order: 'desc' },
+      }),
+      supabase.from('media_files').select('storage_key, original_name'),
+    ])
+
+    if (storageResult.data) {
+      const nameMap: Record<string, string> = {}
+      for (const row of dbResult.data ?? []) {
+        nameMap[row.storage_key] = row.original_name
+      }
+
+      const loaded: UploadedFile[] = storageResult.data
         .filter(f => f.name !== '.emptyFolderPlaceholder')
         .map(f => {
           const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(f.name)
-          const displayName = (f.metadata?.['original_name'] as string | undefined) ?? f.name
           return {
-            name: displayName,
+            name: nameMap[f.name] ?? f.name,
             url: urlData.publicUrl,
             size: (f.metadata?.size as number) ?? 0,
             type: (f.metadata?.mimetype as string) ?? 'image/jpeg',
@@ -99,6 +108,10 @@ export default function AdminMedia() {
       }
 
       const { data } = supabase.storage.from(BUCKET).getPublicUrl(fileName)
+
+      // DB에 storage_key → 원본 파일명 영구 저장
+      await supabase.from('media_files').upsert({ storage_key: fileName, original_name: file.name })
+
       uploaded.push({
         name: file.name,
         url: data.publicUrl,
@@ -128,7 +141,10 @@ export default function AdminMedia() {
   async function handleRemove(url: string) {
     const storageKey = url.split(`/${BUCKET}/`)[1]?.split('?')[0]
     if (storageKey) {
-      await supabase.storage.from(BUCKET).remove([storageKey])
+      await Promise.all([
+        supabase.storage.from(BUCKET).remove([storageKey]),
+        supabase.from('media_files').delete().eq('storage_key', storageKey),
+      ])
     }
     setFiles(prev => prev.filter(f => f.url !== url))
   }
