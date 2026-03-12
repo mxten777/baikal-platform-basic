@@ -22,7 +22,9 @@
 
 ---
 
-## 2. 발견 및 수정 내역
+## 2. 발견 및 수정 내역 (1차: 2026-03-12)
+
+> 아래 **2-1 ~ 2-9**는 초기 1차 점검 결과입니다.
 
 ### 2-1. [버그] 카테고리 필터 항상 빈 결과
 
@@ -165,7 +167,83 @@ Service 함수 `adminUpsertContent` (in `contentService.ts`)는 서비스 레이
 
 ---
 
-## 3. 수정 없이 통과한 항목
+---
+
+## 3. 추가 수정 내역 (2차: 2026-03-12 — 모바일 반응형 / 정합성)
+
+### 3-1. [버그] S22 모바일 햄버거 버튼 미표시
+
+**파일**: `src/components/layout/Header.tsx`
+
+**원인**: 버튼 라인이 `h-px`(1px)으로 선언되어 Samsung Galaxy S22(DPR 2) 환경에서 서브픽셀 렌더링으로 사라짐.  
+이후 `md:hidden` + flex 컨테이너에서 Samsung Internet의 `innerWidth`(400) / `outerWidth`(365) 불일치로 버튼이 뷰포트 밖으로 overflow되는 2차 문제 발생.
+
+**수정 과정**:
+1. `h-px` → `h-[2px]` + `rounded-full` — DPR 렌더링 개선
+2. SVG 아이콘으로 교체 — span stroke 렌더링 실패 차단
+3. SVG → 유니코드 `☰` / `✕` + inline style 강제 색상 — SVG 간헐 실패 차단
+4. 버튼을 `position: fixed; right: 12px; top: 10px`으로 이전 — flex 컨테이너 overflow 문제 완전 분리
+
+**현황 (디버그 오버레이로 확인)**: S22 `innerWidth: 400px`, `DPR: 2`, `md(≥768): NO` — 정상 동작
+
+---
+
+### 3-2. [버그] `AuthProvider` — 인증 상태 변경 시 로딩 미해제
+
+**파일**: `src/features/auth/AuthProvider.tsx`
+
+**원인**: `supabase.auth.onAuthStateChange` 콜백에서 `setIsLoading(false)` 호출 누락.  
+`getSession()` 초기 로드는 정상이나, 토큰 갱신/로그아웃 이벤트 시 `isLoading`이 `true`로 남아 `ProtectedRoute`가 로딩 스피너에서 벗어나지 못하는 상황 가능.
+
+**수정**:
+```diff
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    setSession(session)
+    setUser(session?.user ?? null)
++   setIsLoading(false)
+  })
+```
+
+---
+
+### 3-3. [중복] `SEOHead` 기본 description 하드코딩 중복
+
+**파일**: `src/components/seo/SEOHead.tsx`
+
+**원인**: 기본 description 값이 `constants.ts`의 `SITE_DESCRIPTION`과 동일한 내용으로 하드코딩 중복.  
+문구 수정 시 두 곳을 동시에 변경해야 하는 유지보수 부채.
+
+**수정**: `SITE_DESCRIPTION` 상수 import 후 사용.
+```diff
+- import { SITE_NAME, SITE_URL, DEFAULT_OG_IMAGE } from '@/lib/constants'
++ import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, DEFAULT_OG_IMAGE } from '@/lib/constants'
+
+- const desc = description ?? 'AI 소프트웨어 개발 회사 바이칼시스템즈의 AI 개발 콘텐츠 플랫폼'
++ const desc = description ?? SITE_DESCRIPTION
+```
+
+---
+
+### 3-4. [정합성] Header z-index 불일치
+
+**파일**: `src/components/layout/Header.tsx`
+
+**원인**: `<header>` 요소 `z-[200]`, 모바일 버튼 `zIndex: 999`로 서로 불일치.  
+z-index 스택 관리 혼란 유발.
+
+**수정**: 버튼 `zIndex` → `200`으로 통일.
+
+---
+
+## 4. 미해결 항목 (수동 조치 필요)
+
+| 항목 | 내용 |
+|------|------|
+| `public/og-default.svg` 파일 없음 | `constants.ts`의 `DEFAULT_OG_IMAGE`가 `/og-default.svg`를 참조하나 파일 미생성. 소셜 공유 시 OG 이미지 깨짐. SVG 파일 생성 또는 경로 수정 필요. |
+
+---
+
+## 5. 수정 없이 통과한 항목
 
 | 항목 | 판단 |
 |------|------|
@@ -175,25 +253,30 @@ Service 함수 `adminUpsertContent` (in `contentService.ts`)는 서비스 레이
 
 ---
 
-## 4. 점검 후 상태
+## 6. 점검 후 상태
 
 ```
 npx tsc --noEmit  →  0 errors
 ```
 
-| 항목 | 점검 전 | 점검 후 |
-|------|---------|---------|
-| TS 오류 | 0 | 0 |
-| 미사용 export | 6건 | 0건 |
-| 중복 함수/상수 | 3건 | 0건 |
-| 중복 라우트 | 1건 | 0건 |
-| 미사용 CSS 클래스 | 1건 | 0건 |
-| 미사용 Tailwind 설정 | 14개 항목 | 0건 |
-| 카테고리 필터 버그 | 1건 (치명적) | 수정 완료 |
+| 항목 | 1차 점검 전 | 1차 점검 후 | 2차 점검 후 |
+|------|------------|------------|------------|
+| TS 오류 | 0 | 0 | 0 |
+| 미사용 export | 6건 | 0건 | 0건 |
+| 중복 함수/상수 | 3건 | 0건 | 0건 |
+| 중복 라우트 | 1건 | 0건 | 0건 |
+| 미사용 CSS 클래스 | 1건 | 0건 | 0건 |
+| 미사용 Tailwind 설정 | 14개 항목 | 0건 | 0건 |
+| 카테고리 필터 버그 | 1건 (치명적) | 수정 완료 | — |
+| 모바일 버튼 미표시 | — | — | 수정 완료 |
+| AuthProvider 로딩 버그 | — | — | 수정 완료 |
+| SEOHead 중복 상수 | — | — | 수정 완료 |
+| Header z-index 불일치 | — | — | 수정 완료 |
+| og-default.svg 파일 누락 | — | — | **미해결** |
 
 ---
 
-## 5. 유지보수 가이드라인
+## 7. 유지보수 가이드라인
 
 향후 코드 추가 시 아래 원칙을 준수합니다.
 
