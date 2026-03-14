@@ -242,6 +242,9 @@ search_results = vector_store.similarity_search(hypothetical_doc)
 → 복잡한 에이전트 워크플로우가 필요할 때
 → 다양한 외부 도구 통합이 필요할 때
 
+
+
+
 **LlamaIndex를 선택하세요:**
 → 순수 RAG 시스템 구축에 집중할 때
 → 코드 간결성이 중요할 때',

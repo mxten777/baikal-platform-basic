@@ -14,28 +14,28 @@ FROM cron.job
 WHERE jobname IN ('sync-rss-feeds', 'sync-youtube-videos');
 
 -- RSS 동기화: 매 30분
--- ⚠️  YOUR_CRON_SECRET_HERE 를 실제 시크릿으로 교체하세요
+-- anon key 사용 (CRON_SECRET 미설정 시 JWT 검증만)
 SELECT cron.schedule(
   'sync-rss-feeds',
   '*/30 * * * *',
   $$
     SELECT net.http_post(
       url     := 'https://slpmknspczdbaowkuftx.supabase.co/functions/v1/sync-rss',
-      headers := '{"Content-Type":"application/json","Authorization":"Bearer YOUR_CRON_SECRET_HERE"}'::jsonb,
+      headers := '{"Content-Type":"application/json","Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNscG1rbnNwY3pkYmFvd2t1ZnR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjI0NjksImV4cCI6MjA4ODgzODQ2OX0.34CpTCYofHtlxSXF4or11ObRS_O5IvPRiv6z_eZWM78"}'::jsonb,
       body    := '{}'::jsonb
     );
   $$
 );
 
 -- YouTube 동기화: 매 1시간
--- ⚠️  YOUR_CRON_SECRET_HERE 를 실제 시크릿으로 교체하세요
+-- anon key 사용 (CRON_SECRET 미설정 시 JWT 검증만)
 SELECT cron.schedule(
   'sync-youtube-videos',
   '0 * * * *',
   $$
     SELECT net.http_post(
       url     := 'https://slpmknspczdbaowkuftx.supabase.co/functions/v1/sync-youtube',
-      headers := '{"Content-Type":"application/json","Authorization":"Bearer YOUR_CRON_SECRET_HERE"}'::jsonb,
+      headers := '{"Content-Type":"application/json","Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNscG1rbnNwY3pkYmFvd2t1ZnR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjI0NjksImV4cCI6MjA4ODgzODQ2OX0.34CpTCYofHtlxSXF4or11ObRS_O5IvPRiv6z_eZWM78"}'::jsonb,
       body    := '{}'::jsonb
     );
   $$

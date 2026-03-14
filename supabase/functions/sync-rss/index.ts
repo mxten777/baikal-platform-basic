@@ -239,7 +239,7 @@ Deno.serve(async (req: Request) => {
               source_url: item.source_url,
               source_raw: item.raw_data,
               thumbnail_url: item.thumbnail_url,
-              status: 'pending',
+              status: 'published',
               external_id: item.external_id,
               content_hash: contentHash,
               lang: 'ko',

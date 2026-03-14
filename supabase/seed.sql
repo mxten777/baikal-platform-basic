@@ -40,11 +40,34 @@ INSERT INTO topics (slug, title, description, sort_order) VALUES
   ('nlp-applications', 'NLP 응용', '자연어처리 실전 응용 프로젝트', 5);
 
 -- 기본 수집 소스
-INSERT INTO content_sources (name, source_type, url, is_active, sync_interval_minutes)
+-- 바이칼 공식 블로그 (아직 운영 전 — is_active = FALSE)
+INSERT INTO content_sources (id, name, source_type, url, is_active, sync_interval_minutes)
 VALUES (
+  'c617ccc2-0000-0000-0000-000000000001',
   '바이칼 공식 블로그',
   'rss',
   'https://www.baikalsys.kr/blog/rss.xml',
   FALSE,
   60
+);
+
+-- 네이버 블로그 (운영 중 — is_active = TRUE)
+INSERT INTO content_sources (id, name, source_type, url, is_active, sync_interval_minutes)
+VALUES (
+  'ee63c773-299a-4262-aedc-2954d57e3eb1',
+  '네이버 블로그 - jngdy',
+  'rss',
+  'https://rss.blog.naver.com/jngdy',
+  TRUE,
+  30
+);
+
+-- rss_sources: 네이버 블로그 RSS 피드 등록
+INSERT INTO rss_sources (source_id, feed_url, feed_type, site_name, language)
+VALUES (
+  'ee63c773-299a-4262-aedc-2954d57e3eb1',
+  'https://rss.blog.naver.com/jngdy',
+  'rss2',
+  '네이버 블로그 - jngdy',
+  'ko'
 );
