@@ -4,20 +4,10 @@ import { useState } from 'react'
 import SEOHead from '@/components/seo/SEOHead'
 import type { SyncJob } from '@/types/models'
 
-const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
-
 async function triggerSync(type: 'rss' | 'youtube'): Promise<{ ok: boolean; results: unknown[] }> {
-  const res = await fetch(`${SUPABASE_URL}/functions/v1/sync-${type}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${ANON_KEY}`,
-    },
-    body: '{}',
-  })
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  return res.json()
+  const { data, error } = await supabase.functions.invoke(`sync-${type}`, { body: {} })
+  if (error) throw error
+  return data
 }
 
 async function getSyncJobs(): Promise<SyncJob[]> {
