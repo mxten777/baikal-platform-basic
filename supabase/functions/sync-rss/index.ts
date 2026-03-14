@@ -14,6 +14,12 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 const CRON_SECRET = Deno.env.get('CRON_SECRET') ?? ''
 
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+}
+
 // ===== 타입 =====
 interface RssItem {
   external_id: string
@@ -137,6 +143,11 @@ async function fetchAndParseRSS(
 
 // ===== 메인 핸들러 =====
 Deno.serve(async (req: Request) => {
+  // CORS preflight
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: CORS_HEADERS })
+  }
+
   // Cron 인증
   const authHeader = req.headers.get('authorization') ?? ''
   const token = authHeader.replace('Bearer ', '')
@@ -162,7 +173,7 @@ Deno.serve(async (req: Request) => {
 
   if (sourcesError) {
     console.error('RSS 소스 조회 실패:', sourcesError)
-    return new Response(JSON.stringify({ error: sourcesError.message }), { status: 500 })
+    return new Response(JSON.stringify({ error: sourcesError.message }), { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } })
   }
 
   const results: Record<string, unknown>[] = []
@@ -328,6 +339,6 @@ Deno.serve(async (req: Request) => {
   }
 
   return new Response(JSON.stringify({ ok: true, results }), {
-    headers: { 'Content-Type': 'application/json' },
+    headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
   })
 })

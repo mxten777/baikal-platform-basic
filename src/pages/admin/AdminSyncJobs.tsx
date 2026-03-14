@@ -5,9 +5,20 @@ import SEOHead from '@/components/seo/SEOHead'
 import type { SyncJob } from '@/types/models'
 
 async function triggerSync(type: 'rss' | 'youtube'): Promise<{ ok: boolean; results: unknown[] }> {
-  const { data, error } = await supabase.functions.invoke(`sync-${type}`, { body: {} })
-  if (error) throw error
-  return data
+  const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sync-${type}`
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+    },
+    body: '{}',
+  })
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`HTTP ${res.status}: ${text}`)
+  }
+  return res.json()
 }
 
 async function getSyncJobs(): Promise<SyncJob[]> {
