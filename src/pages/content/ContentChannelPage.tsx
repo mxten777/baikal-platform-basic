@@ -5,7 +5,7 @@ import ContentCard from '@/components/content/ContentCard'
 import type { ContentType } from '@/types/models'
 
 const CHANNEL_MAP: Record<string, ContentType> = {
-  blog: 'article',
+  blog: 'rss',
   rss: 'rss',
   x: 'x_post',
   instagram: 'instagram',
