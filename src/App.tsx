@@ -1,4 +1,5 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import PublicLayout from '@/layouts/PublicLayout'
 import AdminLayout from '@/layouts/AdminLayout'
 import ProtectedRoute from '@/routes/ProtectedRoute'
@@ -46,8 +47,16 @@ import AdminTags from '@/pages/admin/AdminTags'
 import AdminSEO from '@/pages/admin/AdminSEO'
 import AdminSettings from '@/pages/admin/AdminSettings'
 
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }) }, [pathname])
+  return null
+}
+
 export default function App() {
   return (
+    <>
+    <ScrollToTop />
     <Routes>
       {/* Auth */}
       <Route path="/login" element={<LoginPage />} />
@@ -110,5 +119,6 @@ export default function App() {
         <Route path="/archive/year/:year" element={<ArchiveYearPage />} />
       </Route>
     </Routes>
+    </>
   )
 }
