@@ -149,7 +149,7 @@ export default function Header() {
                 <NavLink
                   key={item.to}
                   to={item.to}
-                  onClick={() => setMenuOpen(false)}
+                  onClick={() => { setMenuOpen(false); window.scrollTo({ top: 0, behavior: 'instant' }) }}
                   className={({ isActive }) =>
                     `py-3 text-[11px] font-semibold tracking-[0.18em] transition-colors ${
                       isActive ? 'text-white' : 'text-white/40'
@@ -161,7 +161,7 @@ export default function Header() {
               ))}
               <Link
                 to="/contact"
-                onClick={() => setMenuOpen(false)}
+                onClick={() => { setMenuOpen(false); window.scrollTo({ top: 0, behavior: 'instant' }) }}
                 className="mt-3 rounded-full border border-white/15 px-5 py-3 text-center text-[11px] font-semibold tracking-widest text-white/70"
               >
                 문의하기
