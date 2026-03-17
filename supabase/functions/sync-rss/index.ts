@@ -169,7 +169,7 @@ Deno.serve(async (req: Request) => {
       last_modified,
       source:content_sources!inner(id, name, is_active)
     `)
-    .eq('content_sources.is_active', true)
+    .eq('source.is_active', true)
 
   if (sourcesError) {
     console.error('RSS 소스 조회 실패:', sourcesError)
