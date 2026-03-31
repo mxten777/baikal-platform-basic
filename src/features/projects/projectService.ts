@@ -4,10 +4,7 @@ import type { Project, ProjectFilters } from '@/types/models'
 export async function getProjects(filters: ProjectFilters = {}): Promise<Project[]> {
   let query = supabase
     .from('projects')
-    .select(`
-      *,
-      tags:content_tag_map(tag:tags(*))
-    `)
+    .select('*')
     .eq('status', filters.status ?? 'active')
     .order('sort_order', { ascending: true })
     .order('launched_at', { ascending: false })

@@ -19,11 +19,11 @@ export const CONTENT_TYPES_KO: Record<string, string> = {
 
 // value는 DB의 category 컬럼 값과 동일해야 합니다
 export const PROJECT_CATEGORIES: { label: string; value: string }[] = [
-  { label: 'NLP', value: 'NLP' },
-  { label: 'Computer Vision', value: 'Computer Vision' },
-  { label: 'AI Agent', value: 'AI Agent' },
-  { label: 'Platform / Infra', value: 'Platform / Infra' },
-  { label: 'Research / Experiment', value: 'Research / Experiment' },
+  { label: 'AI 플랫폼', value: 'AI Platform' },
+  { label: 'AI 에이전트', value: 'AI Agent' },
+  { label: 'SaaS / MVP', value: 'SaaS / MVP' },
+  { label: '플랫폼 / 인프라', value: 'Platform / Infra' },
+  { label: '웹사이트', value: 'Website' },
 ]
 
 export const PER_PAGE_DEFAULT = 12
