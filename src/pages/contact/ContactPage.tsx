@@ -1,7 +1,8 @@
 import SEOHead from '@/components/seo/SEOHead'
 
 const CONTACT_ITEMS = [
-  { icon: '📧', label: '이메일', value: 'hello@baikalsys.kr', href: 'mailto:hello@baikalsys.kr' },
+  { icon: '📧', label: '업무 이메일', value: 'jngdy@baikalsys.kr', href: 'mailto:jngdy@baikalsys.kr' },
+  { icon: '📩', label: '네이버 메일', value: 'jngdy@naver.com', href: 'mailto:jngdy@naver.com' },
   { icon: '🌐', label: '웹사이트', value: 'www.baikalsys.kr', href: 'https://www.baikalsys.kr' },
   { icon: '🐦', label: 'X (Twitter)', value: '@baikalsys', href: 'https://x.com/baikalsys' },
 ]
@@ -37,7 +38,7 @@ export default function ContactPage() {
       <section className="bg-[#080808] pb-24">
         <div className="absolute top-0 left-0 right-0 hidden" />
         <div className="mx-auto max-w-3xl px-6 lg:px-8 pt-12">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {CONTACT_ITEMS.map(c => (
               <a
                 key={c.label}
@@ -63,7 +64,7 @@ export default function ContactPage() {
               <li className="flex items-start gap-2"><span className="text-blue-400/60 mt-0.5">·</span> 관련 자료나 레퍼런스 링크 (선택)</li>
             </ul>
             <a
-              href="mailto:hello@baikalsys.kr"
+              href="mailto:jngdy@baikalsys.kr"
               className="mt-8 group inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-black hover:bg-blue-50 transition-all"
             >
               이메일 보내기

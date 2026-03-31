@@ -86,8 +86,13 @@ export default function Footer() {
               <p className="mb-4 text-[10px] font-semibold tracking-[0.2em] text-white/25 uppercase">Contact</p>
               <ul className="space-y-2.5 sm:space-y-3">
                 <li>
-                  <a href="mailto:hello@baikalsys.kr" className="text-sm text-white/35 transition-colors duration-200 hover:text-white/80">
-                    hello@baikalsys.kr
+                  <a href="mailto:jngdy@baikalsys.kr" className="text-sm text-white/35 transition-colors duration-200 hover:text-white/80">
+                    jngdy@baikalsys.kr
+                  </a>
+                </li>
+                <li>
+                  <a href="mailto:jngdy@naver.com" className="text-sm text-white/35 transition-colors duration-200 hover:text-white/80">
+                    jngdy@naver.com
                   </a>
                 </li>
                 <li>
