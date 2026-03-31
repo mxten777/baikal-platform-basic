@@ -26,7 +26,7 @@ export default function ProjectCard({ project, className }: ProjectCardProps) {
           <img
             src={thumbnailSrc}
             alt={project.title}
-            className="h-full w-full object-cover transition-all duration-700 group-hover:scale-[1.06] opacity-90 group-hover:opacity-100"
+            className="h-full w-full object-cover transition-all duration-700 group-hover:scale-[1.06]"
             loading="lazy"
           />
         ) : (
