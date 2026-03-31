@@ -9,7 +9,7 @@ import { SITE_URL } from '@/lib/constants'
 
 // 통계 데이터
 const STATS = [
-  { value: '15+', label: 'AI 프로젝트', color: 'text-blue-400' },
+  { value: '40+', label: 'AI 프로젝트', color: 'text-blue-400' },
   { value: '3년+', label: '개발 경력', color: 'text-purple-400' },
   { value: '100%', label: 'AI 특화', color: 'text-green-400' },
   { value: '∞', label: '가능성', color: 'text-amber-400' },
