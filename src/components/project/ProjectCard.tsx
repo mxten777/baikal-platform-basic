@@ -35,10 +35,16 @@ export default function ProjectCard({ project, className }: ProjectCardProps) {
           <span className="text-base">{style.icon}</span>
           {project.category}
         </span>
-        {/* sort_order 번호 */}
-        <span className="relative z-10 font-mono text-xs text-white/15 tabular-nums">
-          #{String(project.sort_order ?? 0).padStart(2, '0')}
-        </span>
+        {/* sort_order 번호 or featured 배지 */}
+        {project.featured ? (
+          <span className="relative z-10 flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase text-amber-400/90">
+            ★ FEATURED
+          </span>
+        ) : (
+          <span className="relative z-10 font-mono text-xs text-white/15 tabular-nums">
+            #{String(project.sort_order ?? 0).padStart(2, '0')}
+          </span>
+        )}
       </div>
 
       <div className="p-5 sm:p-7">

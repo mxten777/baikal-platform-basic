@@ -4,7 +4,7 @@ import { useState } from 'react'
 import SEOHead from '@/components/seo/SEOHead'
 import type { SyncJob } from '@/types/models'
 
-async function triggerSync(type: 'rss' | 'youtube'): Promise<{ ok: boolean; results: unknown[] }> {
+async function triggerSync(type: 'rss' | 'youtube' | 'instagram'): Promise<{ ok: boolean; results: unknown[] }> {
   const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sync-${type}`
   const res = await fetch(url, {
     method: 'POST',
@@ -41,10 +41,10 @@ const STATUS_BADGE: Record<string, string> = {
 export default function AdminSyncJobs() {
   const queryClient = useQueryClient()
   const { data: jobs, isLoading } = useQuery({ queryKey: ['admin', 'sync-jobs'], queryFn: getSyncJobs })
-  const [syncing, setSyncing] = useState<'rss' | 'youtube' | null>(null)
+  const [syncing, setSyncing] = useState<'rss' | 'youtube' | 'instagram' | null>(null)
   const [syncResult, setSyncResult] = useState<string | null>(null)
 
-  async function handleSync(type: 'rss' | 'youtube') {
+  async function handleSync(type: 'rss' | 'youtube' | 'instagram') {
     setSyncing(type)
     setSyncResult(null)
     try {
@@ -88,6 +88,13 @@ export default function AdminSyncJobs() {
               className="rounded-xl bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-400 hover:bg-red-500/20 disabled:opacity-40 transition-colors"
             >
               {syncing === 'youtube' ? '동기화 중...' : 'YouTube 동기화'}
+            </button>
+            <button
+              onClick={() => handleSync('instagram')}
+              disabled={syncing !== null}
+              className="rounded-xl bg-pink-500/10 px-4 py-2 text-sm font-semibold text-pink-400 hover:bg-pink-500/20 disabled:opacity-40 transition-colors"
+            >
+              {syncing === 'instagram' ? '동기화 중...' : 'Instagram 동기화'}
             </button>
           </div>
         </div>

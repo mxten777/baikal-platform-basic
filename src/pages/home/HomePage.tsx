@@ -7,12 +7,19 @@ import { useFeaturedProjects } from '@/features/projects/useProjects'
 import { useFeaturedContents } from '@/features/contents/useContents'
 import { SITE_URL } from '@/lib/constants'
 
+// 기술 스택 마키
+const TECH_TAGS = [
+  'React', 'TypeScript', 'OpenAI GPT-4o', 'Python', 'FastAPI',
+  'LangChain', 'pgvector', 'Supabase', 'PostgreSQL', 'Docker',
+  'Tailwind CSS', 'Vercel', 'Vite', 'Ollama', 'RAG',
+]
+
 // 통계 데이터
 const STATS = [
-  { value: '40+', label: 'AI 프로젝트', color: 'text-blue-400' },
-  { value: '3년+', label: '개발 경력', color: 'text-purple-400' },
-  { value: '100%', label: 'AI 특화', color: 'text-green-400' },
-  { value: '∞', label: '가능성', color: 'text-amber-400' },
+  { value: '40+', label: 'AI 프로젝트', color: 'text-blue-400', accent: '#3b82f6' },
+  { value: '3년+', label: '개발 경력', color: 'text-purple-400', accent: '#a855f7' },
+  { value: '100%', label: 'AI 특화', color: 'text-green-400', accent: '#22c55e' },
+  { value: '∞', label: '가능성', color: 'text-amber-400', accent: '#f59e0b' },
 ]
 
 // 스크롤 진입 애니메이션 훅
@@ -30,7 +37,7 @@ function useScrollReveal() {
 }
 
 // 숫자 카운터 컴포넌트
-function AnimatedStat({ value, label, color, delay = 0 }: { value: string; label: string; color: string; delay?: number }) {
+function AnimatedStat({ value, label, color, accent, delay = 0 }: { value: string; label: string; color: string; accent: string; delay?: number }) {
   const [visible, setVisible] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -42,12 +49,14 @@ function AnimatedStat({ value, label, color, delay = 0 }: { value: string; label
   }, [delay])
 
   return (
-    <div ref={ref} className="group relative">
-      <div className={`transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-        <p className={`text-3xl sm:text-4xl font-black ${color} group-hover:scale-110 transition-transform duration-300 inline-block`}>
+    <div ref={ref} className="stat-card group">
+      {/* 컬러 상단 액센트 */}
+      <div className="h-[2px] w-full" style={{ background: accent }} />
+      <div className={`p-5 sm:p-6 transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+        <p className={`text-3xl sm:text-4xl font-black ${color} transition-transform duration-300 group-hover:scale-105 inline-block`}>
           {value}
         </p>
-        <p className="mt-1.5 text-[10px] sm:text-xs tracking-widest text-white/25 uppercase">{label}</p>
+        <p className="mt-2 text-[10px] sm:text-xs tracking-widest text-white/25 uppercase">{label}</p>
       </div>
     </div>
   )
@@ -91,10 +100,17 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#080808_100%)]" />
 
         <div className="relative mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8 pt-28 sm:pt-32 pb-20 sm:pb-24">
-          {/* 라벨 */}
-          <div className="animate-fade-up flex items-center gap-3 mb-8 sm:mb-10">
-            <div className="h-px w-8 bg-blue-500/60" />
-            <span className="section-label text-[9px] sm:text-xs">BAIKAL AI CONTENT PLATFORM</span>
+          {/* 어나운스먼트 배지 */}
+          <div className="animate-fade-up mb-7 sm:mb-9">
+            <Link
+              to="/projects"
+              className="inline-flex items-center gap-2.5 rounded-full border border-blue-500/20 bg-blue-500/[0.07] px-4 py-1.5 backdrop-blur-sm transition-all duration-300 hover:border-blue-500/40 hover:bg-blue-500/12 group"
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-badge-pulse flex-shrink-0" />
+              <span className="text-[11px] font-semibold tracking-wider text-blue-300/80">40+ AI 프로젝트 완료</span>
+              <span className="text-white/15 select-none">·</span>
+              <span className="text-[11px] text-white/35 group-hover:text-white/55 transition-colors">포트폴리오 보기 →</span>
+            </Link>
           </div>
 
           {/* 메인 헤드라인 */}
@@ -133,14 +149,12 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* 통계 — 프리미엄 카드형 */}
-          <div className="animate-fade-up animate-delay-300 mt-16 sm:mt-20">
-            <div className="border-t border-white/[0.06] pt-8 sm:pt-10">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
-                {STATS.map((s, i) => (
-                  <AnimatedStat key={s.label} value={s.value} label={s.label} color={s.color} delay={i * 120} />
-                ))}
-              </div>
+          {/* 통계 — 프리미엄 stat-card */}
+          <div className="animate-fade-up animate-delay-300 mt-14 sm:mt-18">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+              {STATS.map((s, i) => (
+                <AnimatedStat key={s.label} value={s.value} label={s.label} color={s.color} accent={s.accent} delay={i * 120} />
+              ))}
             </div>
           </div>
         </div>
@@ -151,6 +165,24 @@ export default function HomePage() {
           <div className="h-10 w-px bg-gradient-to-b from-white/20 to-transparent" />
         </div>
       </section>
+
+      {/* ===== TECH MARQUEE ===== */}
+      <div className="relative bg-[#080808] overflow-hidden" aria-hidden="true">
+        <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-[#080808] to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-[#080808] to-transparent z-10 pointer-events-none" />
+        <div className="border-y border-white/[0.05] py-4 sm:py-5">
+          <div className="flex animate-marquee w-max">
+            {[...TECH_TAGS, ...TECH_TAGS].map((tag, i) => (
+              <span key={i} className="inline-flex items-center gap-3 px-5 sm:px-8 whitespace-nowrap">
+                <span className="h-1 w-1 rounded-full bg-blue-500/35 flex-shrink-0" />
+                <span className="text-[10px] sm:text-[11px] font-semibold tracking-[0.18em] uppercase text-white/18">
+                  {tag}
+                </span>
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* ===== PHILOSOPHY ===== */}
       <section className="relative py-24 sm:py-32 bg-[#080808]" style={{overflow:'clip'}}>
@@ -181,14 +213,17 @@ export default function HomePage() {
             {/* 특징 그리드 */}
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
               {[
-                { icon: '⚡', title: 'AI MVP 개발', desc: '아이디어를 빠르게 작동하는 AI 제품으로', delay: 'animate-delay-100' },
-                { icon: '📚', title: '지식 축적', desc: '모든 개발 과정을 문서화하고 공유', delay: 'animate-delay-200' },
-                { icon: '🔄', title: '자동 수집', desc: 'SNS, YouTube, 블로그 콘텐츠 자동 아카이브', delay: 'animate-delay-300' },
-                { icon: '🚀', title: 'SEO 성장', desc: '콘텐츠가 쌓일수록 강해지는 플랫폼', delay: 'animate-delay-400' },
+                { icon: '⚡', num: '01', title: 'AI MVP 개발', desc: '아이디어를 빠르게 작동하는 AI 제품으로', delay: 'animate-delay-100' },
+                { icon: '📚', num: '02', title: '지식 축적', desc: '모든 개발 과정을 문서화하고 공유', delay: 'animate-delay-200' },
+                { icon: '🔄', num: '03', title: '자동 수집', desc: 'SNS, YouTube, 블로그 콘텐츠 자동 아카이브', delay: 'animate-delay-300' },
+                { icon: '🚀', num: '04', title: 'SEO 성장', desc: '콘텐츠가 쌓일수록 강해지는 플랫폼', delay: 'animate-delay-400' },
               ].map(f => (
                 <div key={f.title} className={`reveal-scale ${f.delay} glass-card rounded-2xl p-5 sm:p-6 group cursor-default`}>
-                  <span className="text-xl sm:text-2xl group-hover:animate-float inline-block transition-transform duration-300">{f.icon}</span>
-                  <h3 className="mt-3 text-xs sm:text-sm font-bold text-white">{f.title}</h3>
+                  <div className="flex items-start justify-between mb-3">
+                    <span className="text-xl sm:text-2xl group-hover:animate-float inline-block transition-transform duration-300">{f.icon}</span>
+                    <span className="font-mono text-[10px] text-white/12 tabular-nums leading-none">{f.num}</span>
+                  </div>
+                  <h3 className="text-xs sm:text-sm font-bold text-white">{f.title}</h3>
                   <p className="mt-1.5 text-[11px] sm:text-xs leading-relaxed text-white/35">{f.desc}</p>
                 </div>
               ))}
@@ -314,6 +349,12 @@ export default function HomePage() {
           <div className="w-[800px] h-[400px] rounded-full bg-blue-500/8 blur-[120px]" />
         </div>
         <div className="absolute inset-0 grid-bg opacity-50" />
+        {/* 대형 장식 배경 텍스트 */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none">
+          <span className="text-[clamp(5rem,18vw,16rem)] font-black text-white/[0.018] leading-none tracking-tight">
+            BUILD
+          </span>
+        </div>
 
         <div className="reveal relative mx-auto max-w-4xl px-5 sm:px-6 text-center">
           <div className="flex items-center justify-center gap-3 mb-6 sm:mb-8">

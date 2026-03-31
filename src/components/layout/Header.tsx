@@ -11,6 +11,7 @@ const nav = [
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const [isMobile, setIsMobile] = useState(() =>
     typeof window !== 'undefined'
       ? window.matchMedia('(max-width: 767px)').matches
@@ -18,6 +19,14 @@ export default function Header() {
   )
   const headerRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLDivElement>(null)
+
+  // 스크롤 감지 → 글래스모피즘
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 30)
+    handler()
+    window.addEventListener('scroll', handler, { passive: true })
+    return () => window.removeEventListener('scroll', handler)
+  }, [])
 
   // 모바일 해상도 감지
   useEffect(() => {
@@ -63,7 +72,11 @@ export default function Header() {
   return (
     <header
         ref={headerRef}
-        className="fixed top-0 left-0 right-0 z-[9999] bg-[#080808] border-b border-white/[0.06]"
+        className={`fixed top-0 left-0 right-0 z-[9999] transition-all duration-300 ${
+          scrolled
+            ? 'bg-[#080808]/85 backdrop-blur-xl border-b border-white/[0.08] shadow-2xl shadow-black/50'
+            : 'bg-[#080808] border-b border-white/[0.04]'
+        }`}
       >
         {/* 모바일 햄버거 메뉴 버튼 */}
         <div
