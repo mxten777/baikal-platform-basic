@@ -2,8 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import SEOHead from '@/components/seo/SEOHead'
 import { supabase } from '@/lib/supabase'
 import { Upload, Copy, Trash2, Check, Image as ImageIcon, FileText } from 'lucide-react'
-
-const BUCKET = 'public-media'
+import { MEDIA_BUCKET as BUCKET } from '@/lib/constants'
 
 function getMimeType(file: File): string {
   if (file.type) return file.type

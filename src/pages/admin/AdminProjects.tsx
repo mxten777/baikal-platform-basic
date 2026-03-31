@@ -97,7 +97,9 @@ function ProjectFormModal({
               <input
                 required
                 value={form.slug}
-                onChange={e => set('slug', e.target.value)}
+                onChange={e => set('slug', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-{2,}/g, '-'))}
+                pattern="[a-z0-9][a-z0-9-]*"
+                title="소문자·숫자·하이픈만 사용 가능"
                 className="admin-input w-full font-mono"
                 placeholder="url-slug"
               />

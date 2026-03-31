@@ -27,3 +27,5 @@ export const PROJECT_CATEGORIES: { label: string; value: string }[] = [
 ]
 
 export const PER_PAGE_DEFAULT = 12
+
+export const MEDIA_BUCKET = 'public-media'

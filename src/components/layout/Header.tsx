@@ -71,7 +71,7 @@ export default function Header() {
           onClick={() => setMenuOpen(v => !v)}
           role="button"
           tabIndex={0}
-          onKeyDown={(e) => e.key === 'Enter' && setMenuOpen(v => !v)}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setMenuOpen(v => !v)}
           className="hamburger-menu-btn"
           style={{
             position: 'fixed',

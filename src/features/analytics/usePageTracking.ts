@@ -38,6 +38,6 @@ export function usePageTracking() {
         session_id: sessionId,
         referrer,
       })
-      .then() // 결과 무시
+      .then(({ error }) => { if (error) console.warn('[page_view]', error.message) })
   }, [location.pathname])
 }

@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import SEOHead from '@/components/seo/SEOHead'
 import { supabase } from '@/lib/supabase'
-
-const BUCKET = 'public-media'
+import { MEDIA_BUCKET as BUCKET } from '@/lib/constants'
 const IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']
 const PDF_EXT = 'pdf'
 

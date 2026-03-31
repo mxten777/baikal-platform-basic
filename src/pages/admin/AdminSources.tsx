@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import SEOHead from '@/components/seo/SEOHead'
 import type { ContentSource } from '@/types/models'
@@ -16,12 +17,15 @@ export default function AdminSources() {
   const qc = useQueryClient()
   const { data: sources, isLoading } = useQuery({ queryKey: ['admin', 'sources'], queryFn: getSources })
 
+  const [mutationError, setMutationError] = useState<string | null>(null)
+
   const toggleActive = useMutation({
     mutationFn: async ({ id, is_active }: { id: string; is_active: boolean }) => {
       const { error } = await supabase.from('content_sources').update({ is_active }).eq('id', id)
       if (error) throw error
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'sources'] }),
+    onSuccess: () => { setMutationError(null); qc.invalidateQueries({ queryKey: ['admin', 'sources'] }) },
+    onError: (err: Error) => setMutationError(err.message),
   })
 
   return (
@@ -32,6 +36,11 @@ export default function AdminSources() {
           <h1 className="text-2xl font-black tracking-tight text-white">수집 소스 관리</h1>
           <p className="mt-1 text-sm text-white/35">AI 콘텐츠 수집 소스를 관리합니다</p>
         </div>
+        {mutationError && (
+          <div className="mb-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+            {mutationError}
+          </div>
+        )}
         {isLoading ? (
           <div className="space-y-2">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="skeleton h-12 rounded-xl" />)}</div>
         ) : (

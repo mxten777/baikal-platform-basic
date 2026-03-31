@@ -10,6 +10,11 @@ interface ContentCardProps {
   className?: string
 }
 
+function getHostname(url: string): string {
+  try { return new URL(url).hostname }
+  catch { return '' }
+}
+
 const CHANNEL_DOT: Record<string, string> = {
   youtube: 'bg-red-500',
   x_post: 'bg-white/40',
@@ -55,7 +60,7 @@ export default function ContentCard({ content, variant = 'default', className }:
           <div className="flex items-center gap-1.5">
             <span className={cn('h-1.5 w-1.5 rounded-full flex-shrink-0', dot)} />
             <span className="text-[10px] font-semibold uppercase tracking-widest text-white/30">
-              {CONTENT_TYPES_KO[content.content_type]}
+              {CONTENT_TYPES_KO[content.content_type] ?? content.content_type}
             </span>
           </div>
           <p className="mt-1 text-sm font-medium text-white/70 line-clamp-2 leading-snug">
@@ -100,7 +105,7 @@ export default function ContentCard({ content, variant = 'default', className }:
         <div className="flex items-center gap-2">
           <span className={cn('h-1.5 w-1.5 rounded-full flex-shrink-0', dot)} />
           <span className="text-xs font-semibold uppercase tracking-widest text-white/30">
-            {CONTENT_TYPES_KO[content.content_type]}
+            {CONTENT_TYPES_KO[content.content_type] ?? content.content_type}
           </span>
         </div>
 
@@ -126,7 +131,7 @@ export default function ContentCard({ content, variant = 'default', className }:
           )}
           {isExternal && content.source_url && (
             <span className="truncate max-w-[140px] text-[11px] text-white/15">
-              {(() => { try { return new URL(content.source_url).hostname } catch { return '' } })()}
+              {getHostname(content.source_url)}
             </span>
           )}
           {!isExternal && (

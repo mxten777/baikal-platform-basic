@@ -82,7 +82,7 @@ export async function getContentBySlug(slug: string): Promise<Content | null> {
     .from('contents')
     .update({ view_count: (data.view_count ?? 0) + 1 })
     .eq('id', data.id)
-    .then()
+    .then(({ error }) => { if (error) console.warn('[view_count]', error.message) })
 
   return data as Content
 }
