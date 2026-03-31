@@ -8,6 +8,10 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project, className }: ProjectCardProps) {
+  // thumbnail_url이 없고 demo_url이 있으면 thum.io로 자동 스크린샷 생성
+  const thumbnailSrc = project.thumbnail_url
+    ?? (project.demo_url ? `https://image.thum.io/get/width/640/crop/400/${project.demo_url}` : null)
+
   return (
     <Link
       to={`/projects/${project.slug}`}
@@ -18,9 +22,9 @@ export default function ProjectCard({ project, className }: ProjectCardProps) {
 
       {/* Thumbnail */}
       <div className="aspect-video overflow-hidden bg-white/[0.03] relative">
-        {project.thumbnail_url ? (
+        {thumbnailSrc ? (
           <img
-            src={project.thumbnail_url}
+            src={thumbnailSrc}
             alt={project.title}
             className="h-full w-full object-cover transition-all duration-700 group-hover:scale-[1.06] opacity-90 group-hover:opacity-100"
             loading="lazy"
