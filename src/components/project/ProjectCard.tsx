@@ -17,12 +17,13 @@ export default function ProjectCard({ project, className }: ProjectCardProps) {
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
 
       {/* Thumbnail */}
-      <div className="aspect-video overflow-hidden bg-white/[0.03] relative">
+      <div className="aspect-video overflow-hidden bg-white/[0.03] relative" style={{ isolation: 'isolate' }}>
         {project.thumbnail_url ? (
           <img
             src={project.thumbnail_url}
             alt={project.title}
             className="h-full w-full object-cover transition-all duration-700 group-hover:scale-[1.06]"
+            style={{ transform: 'translateZ(0)', imageRendering: 'auto' }}
             loading="lazy"
           />
         ) : (
