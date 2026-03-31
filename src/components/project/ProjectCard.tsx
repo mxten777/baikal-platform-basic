@@ -7,60 +7,42 @@ interface ProjectCardProps {
   className?: string
 }
 
+const CATEGORY_STYLES: Record<string, { bg: string; border: string; text: string; glow: string; icon: string }> = {
+  'AI Platform':     { bg: 'from-blue-950/80 to-[#080808]',    border: 'border-blue-500/25',   text: 'text-blue-400',   glow: 'bg-blue-500/20',    icon: '🤖' },
+  'AI Agent':        { bg: 'from-violet-950/80 to-[#080808]',  border: 'border-violet-500/25', text: 'text-violet-400', glow: 'bg-violet-500/20',  icon: '⚡' },
+  'SaaS / MVP':      { bg: 'from-emerald-950/80 to-[#080808]', border: 'border-emerald-500/25',text: 'text-emerald-400',glow: 'bg-emerald-500/20', icon: '🚀' },
+  'Platform / Infra':{ bg: 'from-amber-950/80 to-[#080808]',  border: 'border-amber-500/25',  text: 'text-amber-400',  glow: 'bg-amber-500/20',   icon: '⚙️' },
+  'Website':         { bg: 'from-rose-950/80 to-[#080808]',   border: 'border-rose-500/25',   text: 'text-rose-400',   glow: 'bg-rose-500/20',    icon: '🌐' },
+}
+
 export default function ProjectCard({ project, className }: ProjectCardProps) {
+  const style = CATEGORY_STYLES[project.category ?? ''] ?? CATEGORY_STYLES['AI Platform']
+
   return (
     <Link
       to={`/projects/${project.slug}`}
       className={cn('glass-card group block overflow-hidden rounded-2xl relative', className)}
     >
       {/* 상단 컬러 라인 */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
+      <div className={cn('absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent to-transparent via-current opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10', style.text)} />
 
-      {/* Thumbnail */}
-      <div className="aspect-video overflow-hidden bg-white/[0.03] relative" style={{ isolation: 'isolate' }}>
-        {project.thumbnail_url ? (
-          <img
-            src={project.thumbnail_url}
-            alt={project.title}
-            className="h-full w-full object-cover transition-all duration-700 group-hover:scale-[1.06]"
-            style={{ transform: 'translateZ(0)', imageRendering: 'auto' }}
-            loading="lazy"
-          />
-        ) : (
-          <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-gradient-to-br from-[#0a1628] via-[#0d1a2e] to-[#080808]">
-            {/* 움직이는 배경 글로우 */}
-            <div className="absolute top-0 left-1/4 w-32 h-32 rounded-full bg-blue-500/15 blur-3xl animate-pulse-glow" />
-            <div className="absolute bottom-0 right-1/4 w-28 h-28 rounded-full bg-purple-500/10 blur-3xl animate-float" />
-            {/* 그리드 패턴 */}
-            <div className="absolute inset-0 grid-bg opacity-30" />
-            {/* 그라디언트 오버레이 */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5" />
-            {/* 중앙 아이콘 영역 */}
-            <div className="relative flex flex-col items-center gap-3 z-10">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-blue-500/30 bg-blue-500/10 backdrop-blur-md shadow-lg shadow-blue-500/20 transition-transform duration-500 group-hover:scale-110 group-hover:border-blue-400/40">
-                <span className="text-3xl font-black tracking-tight text-blue-400/80">
-                  {project.category ? project.category.charAt(0) : 'AI'}
-                </span>
-              </div>
-              {project.category && (
-                <span className="text-[10px] font-semibold tracking-[0.2em] text-blue-400/40 uppercase">{project.category}</span>
-              )}
-            </div>
-          </div>
-        )}
-        {/* 이미지 오버레이 */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#080808]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      {/* 카테고리 배너 */}
+      <div className={cn('relative flex items-center justify-between overflow-hidden px-5 py-4 bg-gradient-to-br', style.bg)}>
+        {/* 배경 글로우 */}
+        <div className={cn('absolute -top-4 -right-4 w-24 h-24 rounded-full blur-2xl opacity-40', style.glow)} />
+        {/* 카테고리 배지 */}
+        <span className={cn('relative z-10 flex items-center gap-2 text-xs font-bold uppercase tracking-widest', style.text)}>
+          <span className="text-base">{style.icon}</span>
+          {project.category}
+        </span>
+        {/* sort_order 번호 */}
+        <span className="relative z-10 font-mono text-xs text-white/15 tabular-nums">
+          #{String(project.sort_order ?? 0).padStart(2, '0')}
+        </span>
       </div>
 
       <div className="p-5 sm:p-7">
-        {/* Category */}
-        {project.category && (
-          <span className="inline-block rounded-full border border-blue-500/20 bg-blue-500/5 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-blue-400/70 group-hover:border-blue-500/35 group-hover:text-blue-400/90 transition-all duration-300">
-            {project.category}
-          </span>
-        )}
-
-        <h3 className="mt-4 text-lg sm:text-xl font-bold leading-snug text-white/85 line-clamp-2 transition-colors duration-300 group-hover:text-white">
+        <h3 className="text-lg sm:text-xl font-bold leading-snug text-white/85 line-clamp-2 transition-colors duration-300 group-hover:text-white">
           {project.title}
         </h3>
 
