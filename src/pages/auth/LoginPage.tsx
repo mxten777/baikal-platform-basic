@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '@/features/auth/AuthProvider'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import SEOHead from '@/components/seo/SEOHead'
 
 export default function LoginPage() {
@@ -42,13 +42,14 @@ export default function LoginPage() {
         <div className="relative w-full max-w-md animate-fade-up">
           {/* 로고 */}
           <div className="mb-10 text-center">
-            <div className="inline-flex items-center gap-2 mb-4">
-              <div className="h-8 w-8 rounded-lg bg-blue-500 flex items-center justify-center">
-                <span className="text-sm font-black text-white">B</span>
-              </div>
-              <span className="text-xl font-black tracking-tight text-white">BAIKAL</span>
-              <span className="text-xs font-semibold tracking-widest text-white/30 uppercase">Admin</span>
+            <div className="mb-5">
+              <img
+                src="/images/baikal_logo_white.png"
+                alt="BAIKAL"
+                className="mx-auto h-12 w-auto object-contain"
+              />
             </div>
+            <span className="inline-block text-xs font-semibold tracking-widest text-white/30 uppercase mb-3">Admin</span>
             <p className="text-sm text-white/35">관리자 전용 페이지입니다</p>
           </div>
 
@@ -107,6 +108,19 @@ export default function LoginPage() {
           <p className="mt-6 text-center text-xs text-white/20">
             BAIKAL AI Content Platform
           </p>
+
+          {/* 홈으로 버튼 */}
+          <div className="mt-4 text-center">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors"
+            >
+              <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              홈으로 돌아가기
+            </Link>
+          </div>
         </div>
       </div>
     </>
