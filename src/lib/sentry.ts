@@ -9,13 +9,6 @@ import * as Sentry from '@sentry/react'
  */
 export function initSentry() {
   const dsn = import.meta.env.VITE_SENTRY_DSN as string | undefined
-  // 진단용 로그 — 배포 후 DSN 인식 여부 확인용
-  // eslint-disable-next-line no-console
-  console.info('[Sentry] init check', {
-    hasDsn: !!dsn,
-    dsnPrefix: dsn ? dsn.slice(0, 20) + '...' : 'undefined',
-    mode: import.meta.env.MODE,
-  })
   if (!dsn) {
     // 개발/미설정 환경: 활성화하지 않음
     return
