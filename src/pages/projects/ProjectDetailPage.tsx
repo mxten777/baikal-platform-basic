@@ -1,11 +1,13 @@
 import { useParams, Link } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import rehypeSanitize from 'rehype-sanitize'
 import SEOHead from '@/components/seo/SEOHead'
 import ContentCard from '@/components/content/ContentCard'
 import { useProject } from '@/features/projects/useProjects'
 import { formatDate } from '@/utils/date'
 import { SITE_URL } from '@/lib/constants'
+import { markdownSanitizeSchema } from '@/lib/markdown'
 
 export default function ProjectDetailPage() {
   const { slug = '' } = useParams<{ slug: string }>()
@@ -130,7 +132,10 @@ export default function ProjectDetailPage() {
           <div className="lg:col-span-2">
             {project.description && (
               <div className="prose-content">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[[rehypeSanitize, markdownSanitizeSchema]]}
+                >
                   {project.description}
                 </ReactMarkdown>
               </div>

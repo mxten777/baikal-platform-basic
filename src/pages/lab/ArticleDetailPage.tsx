@@ -1,10 +1,12 @@
 import { useParams, Link } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import rehypeSanitize from 'rehype-sanitize'
 import SEOHead from '@/components/seo/SEOHead'
 import { useContent } from '@/features/contents/useContents'
 import { formatDate } from '@/utils/date'
 import { SITE_URL } from '@/lib/constants'
+import { markdownSanitizeSchema } from '@/lib/markdown'
 
 export default function ArticleDetailPage() {
   const { slug = '' } = useParams<{ slug: string }>()
@@ -93,7 +95,12 @@ export default function ArticleDetailPage() {
 
         {content.body && (
           <div className="prose-content">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{content.body}</ReactMarkdown>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[[rehypeSanitize, markdownSanitizeSchema]]}
+            >
+              {content.body}
+            </ReactMarkdown>
           </div>
         )}
 
