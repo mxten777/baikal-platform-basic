@@ -137,8 +137,8 @@ Deno.serve(async (req: Request) => {
 
   const authHeader = req.headers.get('authorization') ?? ''
   const token = authHeader.replace('Bearer ', '')
-  if (CRON_SECRET && token !== CRON_SECRET) {
-    return new Response('Unauthorized', { status: 401 })
+  if (!CRON_SECRET || token !== CRON_SECRET) {
+    return new Response('Unauthorized', { status: 401, headers: CORS_HEADERS })
   }
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)

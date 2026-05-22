@@ -130,10 +130,10 @@ async function fetchChannelVideos(
 
 // ===== 메인 핸들러 =====
 Deno.serve(async (req: Request) => {
-  // Cron 인증
+  // Cron 인증 — CRON_SECRET 미설정 또는 토큰 불일치 시 401
   const authHeader = req.headers.get('authorization') ?? ''
   const token = authHeader.replace('Bearer ', '')
-  if (CRON_SECRET && token !== CRON_SECRET) {
+  if (!CRON_SECRET || token !== CRON_SECRET) {
     return new Response('Unauthorized', { status: 401 })
   }
 

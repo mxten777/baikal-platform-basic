@@ -174,11 +174,11 @@ Deno.serve(async (req: Request) => {
     return new Response(null, { status: 204, headers: CORS_HEADERS })
   }
 
-  // Cron 인증
+  // Cron 인증 — CRON_SECRET 미설정 또는 토큰 불일치 시 모두 401
   const authHeader = req.headers.get('authorization') ?? ''
   const token = authHeader.replace('Bearer ', '')
-  if (CRON_SECRET && token !== CRON_SECRET) {
-    return new Response('Unauthorized', { status: 401 })
+  if (!CRON_SECRET || token !== CRON_SECRET) {
+    return new Response('Unauthorized', { status: 401, headers: CORS_HEADERS })
   }
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
