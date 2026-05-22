@@ -29,6 +29,22 @@ const CONTENT_TYPE_OPTIONS: ContentType[] = [
 
 const STATUS_OPTIONS: ContentStatus[] = ['pending', 'published', 'rejected', 'archived']
 
+// ===== 입력 검증 제약 =====
+const MAX_TITLE_LEN = 200
+const MAX_SUMMARY_LEN = 500
+const MAX_META_TITLE_LEN = 120
+const MAX_META_DESC_LEN = 300
+
+function isValidHttpUrl(value: string): boolean {
+  if (!value) return true
+  try {
+    const u = new URL(value)
+    return u.protocol === 'http:' || u.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
 // ── ContentFormModal ────────────────────────────────────────────────────────
 interface FormState {
   id?: string
@@ -86,6 +102,7 @@ interface ContentFormModalProps {
 
 function ContentFormModal({ initial, onClose }: ContentFormModalProps) {
   const [form, setForm] = useState<FormState>(initial ? toFormState(initial) : EMPTY_FORM)
+  const [formError, setFormError] = useState<string | null>(null)
   const upsert = useUpsertContent()
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
@@ -96,13 +113,40 @@ function ContentFormModal({ initial, onClose }: ContentFormModalProps) {
     setForm(prev => ({
       ...prev,
       title: value,
+      // 신규: 자동 생성 / 수정: slug 수동으로만 변경 하지만 기존 slug 유지
       slug: prev.id ? prev.slug : toSlug(value),
     }))
   }
 
+  function handleSlugRegenerate() {
+    if (!form.title.trim()) return
+    if (form.id && !confirm('슬러그를 재생성하면 기존 URL이 변경됩니다. 계속할까요?')) return
+    set('slug', toSlug(form.title))
+  }
+
+  function validate(): string | null {
+    const title = form.title.trim()
+    if (!title) return '제목을 입력해 주세요.'
+    if (title.length > MAX_TITLE_LEN) return `제목은 ${MAX_TITLE_LEN}자 이하로 입력해 주세요.`
+    if (form.summary.length > MAX_SUMMARY_LEN) return `요약은 ${MAX_SUMMARY_LEN}자 이하로 입력해 주세요.`
+    if (form.meta_title.length > MAX_META_TITLE_LEN) return `Meta 제목은 ${MAX_META_TITLE_LEN}자 이하로 입력해 주세요.`
+    if (form.meta_desc.length > MAX_META_DESC_LEN) return `Meta 설명은 ${MAX_META_DESC_LEN}자 이하로 입력해 주세요.`
+    if (!isValidHttpUrl(form.thumbnail_url)) return '썸네일 URL 형식이 올바르지 않습니다. (http/https)'
+    if (!isValidHttpUrl(form.source_url)) return '소스 URL 형식이 올바르지 않습니다.'
+    if (!isValidHttpUrl(form.canonical_url)) return 'Canonical URL 형식이 올바르지 않습니다.'
+    const slug = (form.slug || toSlug(form.title)).trim()
+    if (!/^[a-z0-9-]+$/.test(slug)) return '슬러그는 소문자 영문/숫자/하이픈만 사용해 주세요.'
+    return null
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!form.title.trim()) return
+    const err = validate()
+    if (err) {
+      setFormError(err)
+      return
+    }
+    setFormError(null)
     await upsert.mutateAsync({
       id: form.id,
       title: form.title.trim(),
@@ -150,12 +194,22 @@ function ContentFormModal({ initial, onClose }: ContentFormModalProps) {
           {/* 슬러그 */}
           <div>
             <label className="block mb-1.5 text-xs font-semibold text-white/50 uppercase tracking-wider">슬러그</label>
-            <input
-              className="admin-input w-full font-mono text-xs"
-              placeholder="url-slug"
-              value={form.slug}
-              onChange={e => set('slug', e.target.value)}
-            />
+            <div className="flex gap-2">
+              <input
+                className="admin-input flex-1 font-mono text-xs"
+                placeholder="url-slug"
+                value={form.slug}
+                onChange={e => set('slug', e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={handleSlugRegenerate}
+                className="rounded-xl border border-white/[0.08] px-3 text-xs text-white/60 hover:text-white hover:border-white/20 transition-colors"
+                title="제목으로부터 슬러그 재생성"
+              >
+                재생성
+              </button>
+            </div>
           </div>
 
           {/* 유형 + 상태 */}
@@ -299,6 +353,9 @@ function ContentFormModal({ initial, onClose }: ContentFormModalProps) {
             />
           </div>
 
+          {formError && (
+            <p className="text-xs text-red-400">{formError}</p>
+          )}
           {upsert.isError && (
             <p className="text-xs text-red-400">저장 중 오류가 발생했습니다. 다시 시도해주세요.</p>
           )}
