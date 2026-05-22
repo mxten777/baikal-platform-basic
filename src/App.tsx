@@ -1,51 +1,52 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { useEffect } from 'react'
+import { Suspense, lazy, useEffect } from 'react'
 import PublicLayout from '@/layouts/PublicLayout'
 import AdminLayout from '@/layouts/AdminLayout'
 import ProtectedRoute from '@/routes/ProtectedRoute'
 
-// Public pages
-import HomePage from '@/pages/home/HomePage'
-import AboutPage from '@/pages/about/AboutPage'
-import ServicesPage from '@/pages/services/ServicesPage'
-import ContactPage from '@/pages/contact/ContactPage'
+// ── Lazy-loaded pages (route-level code splitting) ──────────────────────────
+// Public
+const HomePage             = lazy(() => import('@/pages/home/HomePage'))
+const AboutPage            = lazy(() => import('@/pages/about/AboutPage'))
+const ServicesPage         = lazy(() => import('@/pages/services/ServicesPage'))
+const ContactPage          = lazy(() => import('@/pages/contact/ContactPage'))
 
 // Projects
-import ProjectListPage from '@/pages/projects/ProjectListPage'
-import ProjectDetailPage from '@/pages/projects/ProjectDetailPage'
-import ProjectCategoryPage from '@/pages/projects/ProjectCategoryPage'
+const ProjectListPage      = lazy(() => import('@/pages/projects/ProjectListPage'))
+const ProjectDetailPage    = lazy(() => import('@/pages/projects/ProjectDetailPage'))
+const ProjectCategoryPage  = lazy(() => import('@/pages/projects/ProjectCategoryPage'))
 
 // Lab
-import ArticleListPage from '@/pages/lab/ArticleListPage'
-import ArticleDetailPage from '@/pages/lab/ArticleDetailPage'
+const ArticleListPage      = lazy(() => import('@/pages/lab/ArticleListPage'))
+const ArticleDetailPage    = lazy(() => import('@/pages/lab/ArticleDetailPage'))
 
 // Content Hub
-import ContentHubPage from '@/pages/content/ContentHubPage'
-import ContentChannelPage from '@/pages/content/ContentChannelPage'
+const ContentHubPage       = lazy(() => import('@/pages/content/ContentHubPage'))
+const ContentChannelPage   = lazy(() => import('@/pages/content/ContentChannelPage'))
 
 // Media
-import MediaPage from '@/pages/media/MediaPage'
+const MediaPage            = lazy(() => import('@/pages/media/MediaPage'))
 
 // Topics
-import TopicListPage from '@/pages/topics/TopicListPage'
-import TopicDetailPage from '@/pages/topics/TopicDetailPage'
+const TopicListPage        = lazy(() => import('@/pages/topics/TopicListPage'))
+const TopicDetailPage      = lazy(() => import('@/pages/topics/TopicDetailPage'))
 
 // Archive
-import ArchiveYearPage from '@/pages/archive/ArchiveYearPage'
+const ArchiveYearPage      = lazy(() => import('@/pages/archive/ArchiveYearPage'))
 
 // Auth
-import LoginPage from '@/pages/auth/LoginPage'
+const LoginPage            = lazy(() => import('@/pages/auth/LoginPage'))
 
 // Admin
-import AdminDashboard from '@/pages/admin/AdminDashboard'
-import AdminContents from '@/pages/admin/AdminContents'
-import AdminProjects from '@/pages/admin/AdminProjects'
-import AdminSources from '@/pages/admin/AdminSources'
-import AdminSyncJobs from '@/pages/admin/AdminSyncJobs'
-import AdminMedia from '@/pages/admin/AdminMedia'
-import AdminTags from '@/pages/admin/AdminTags'
-import AdminSEO from '@/pages/admin/AdminSEO'
-import AdminSettings from '@/pages/admin/AdminSettings'
+const AdminDashboard       = lazy(() => import('@/pages/admin/AdminDashboard'))
+const AdminContents        = lazy(() => import('@/pages/admin/AdminContents'))
+const AdminProjects        = lazy(() => import('@/pages/admin/AdminProjects'))
+const AdminSources         = lazy(() => import('@/pages/admin/AdminSources'))
+const AdminSyncJobs        = lazy(() => import('@/pages/admin/AdminSyncJobs'))
+const AdminMedia           = lazy(() => import('@/pages/admin/AdminMedia'))
+const AdminTags            = lazy(() => import('@/pages/admin/AdminTags'))
+const AdminSEO             = lazy(() => import('@/pages/admin/AdminSEO'))
+const AdminSettings        = lazy(() => import('@/pages/admin/AdminSettings'))
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -53,10 +54,19 @@ function ScrollToTop() {
   return null
 }
 
+function RouteFallback() {
+  return (
+    <div className="min-h-[40vh] flex items-center justify-center">
+      <div className="skeleton h-8 w-48 rounded-xl" />
+    </div>
+  )
+}
+
 export default function App() {
   return (
     <>
     <ScrollToTop />
+    <Suspense fallback={<RouteFallback />}>
     <Routes>
       {/* Auth */}
       <Route path="/login" element={<LoginPage />} />
@@ -119,6 +129,7 @@ export default function App() {
         <Route path="/archive/year/:year" element={<ArchiveYearPage />} />
       </Route>
     </Routes>
+    </Suspense>
     </>
   )
 }
