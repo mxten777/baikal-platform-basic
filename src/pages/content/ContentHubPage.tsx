@@ -8,7 +8,7 @@ const CHANNEL_TABS: { label: string; type?: ContentType | ContentType[] }[] = [
   { label: '전체' },
   { label: '아티클', type: 'article' },
   { label: 'YouTube', type: 'youtube' },
-  { label: 'RSS', type: 'rss' },
+  { label: '블로그', type: 'rss' },
   { label: 'X (Twitter)', type: 'x_post' },
   { label: 'Instagram', type: 'instagram' },
   { label: '연구/실험', type: ['experiment', 'research'] },
@@ -29,6 +29,22 @@ export default function ContentHubPage() {
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
     setSearch(searchInput)
+    setPage(1)
+  }
+
+  function handleSearchInput(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = e.target.value
+    setSearchInput(val)
+    // 입력 비우면 즉시 전체 결과로 복귀
+    if (val === '') {
+      setSearch('')
+      setPage(1)
+    }
+  }
+
+  function clearSearch() {
+    setSearchInput('')
+    setSearch('')
     setPage(1)
   }
 
@@ -60,13 +76,27 @@ export default function ContentHubPage() {
             </div>
             {/* Search */}
             <form onSubmit={handleSearch} className="flex gap-2 w-full max-w-sm">
-              <input
-                type="search"
-                value={searchInput}
-                onChange={e => setSearchInput(e.target.value)}
-                placeholder="콘텐츠 검색..."
-                className="flex-1 rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm text-white placeholder-white/20 focus:border-blue-500/40 focus:outline-none"
-              />
+              <div className="relative flex-1">
+                <input
+                  type="search"
+                  value={searchInput}
+                  onChange={handleSearchInput}
+                  placeholder="콘텐츠 검색..."
+                  className="w-full rounded-full border border-white/10 bg-white/[0.04] pl-5 pr-10 py-2.5 text-sm text-white placeholder-white/20 focus:border-blue-500/40 focus:outline-none"
+                />
+                {searchInput && (
+                  <button
+                    type="button"
+                    onClick={clearSearch}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/60 transition-colors"
+                    aria-label="검색어 지우기"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                    </svg>
+                  </button>
+                )}
+              </div>
               <button
                 type="submit"
                 className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-white/50 hover:text-white transition-colors"

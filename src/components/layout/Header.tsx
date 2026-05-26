@@ -1,16 +1,34 @@
 ﻿import { useState, useEffect, useRef } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 
-const nav = [
+type NavItem = {
+  to: string
+  label: string
+  children?: { to: string; label: string; sub: string }[]
+}
+
+const nav: NavItem[] = [
   { to: '/projects', label: 'PROJECTS' },
-  { to: '/lab/articles', label: 'LAB' },
-  { to: '/content', label: 'CONTENTS' },
-  { to: '/media', label: 'MEDIA' },
-  { to: '/about', label: 'ABOUT' },
+  {
+    to: '/lab/articles',
+    label: 'LAB',
+    children: [
+      { to: '/lab/articles',    label: '기술 아티클', sub: 'Articles'    },
+      { to: '/lab/notes',       label: '개발 노트',   sub: 'Notes'       },
+      { to: '/lab/experiments', label: '실험 기록',   sub: 'Experiments' },
+      { to: '/lab/research',    label: '연구 기록',   sub: 'Research'    },
+    ],
+  },
+  { to: '/content',  label: 'CONTENTS' },
+  { to: '/services', label: 'SERVICES' },
+  { to: '/media',    label: 'MEDIA'    },
+  { to: '/about',    label: 'ABOUT'    },
 ]
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [mobileLabOpen, setMobileLabOpen] = useState(false)
+  const location = useLocation()
   const [scrolled, setScrolled] = useState(false)
   const [isMobile, setIsMobile] = useState(() =>
     typeof window !== 'undefined'
@@ -130,19 +148,61 @@ export default function Header() {
           </Link>
 
           <nav className="hidden items-center gap-8 md:flex">
-            {nav.map(item => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) =>
-                  `relative text-[11px] font-semibold tracking-[0.18em] transition-colors duration-200 hover-underline ${
-                    isActive ? 'text-white' : 'text-white/40 hover:text-white/80'
-                  }`
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
+            {nav.map(item =>
+              item.children ? (
+                /* LAB — hover dropdown */
+                <div key={item.to} className="relative group">
+                  <NavLink
+                    to={item.to}
+                    className={({ isActive }) => {
+                      const labActive = location.pathname.startsWith('/lab')
+                      return `relative flex items-center gap-1 text-[11px] font-semibold tracking-[0.18em] transition-colors duration-200 hover-underline ${
+                        isActive || labActive ? 'text-white' : 'text-white/40 hover:text-white/80'
+                      }`
+                    }}
+                  >
+                    {item.label}
+                    <svg className="w-2.5 h-2.5 opacity-40 transition-transform duration-200 group-hover:rotate-180" viewBox="0 0 10 6" fill="none">
+                      <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </NavLink>
+
+                  {/* Dropdown panel */}
+                  <div className="absolute left-1/2 -translate-x-1/2 top-full pt-3 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 translate-y-1 group-hover:translate-y-0">
+                    <div className="min-w-[180px] rounded-xl border border-white/[0.08] bg-[#0e0e0e]/95 backdrop-blur-xl shadow-2xl shadow-black/60 overflow-hidden py-1.5">
+                      {item.children.map(child => (
+                        <NavLink
+                          key={child.to}
+                          to={child.to}
+                          className={({ isActive }) =>
+                            `flex items-center justify-between gap-4 px-4 py-2.5 text-xs transition-colors duration-150 ${
+                              isActive
+                                ? 'bg-white/[0.06] text-white'
+                                : 'text-white/50 hover:bg-white/[0.04] hover:text-white/80'
+                            }`
+                          }
+                        >
+                          <span className="font-medium">{child.label}</span>
+                          <span className="text-[10px] tracking-widest text-white/20 font-mono uppercase">{child.sub}</span>
+                        </NavLink>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    `relative text-[11px] font-semibold tracking-[0.18em] transition-colors duration-200 hover-underline ${
+                      isActive ? 'text-white' : 'text-white/40 hover:text-white/80'
+                    }`
+                  }
+                >
+                  {item.label}
+                </NavLink>
+              )
+            )}
           </nav>
 
           <div className="flex items-center gap-4">
@@ -156,22 +216,59 @@ export default function Header() {
         </div>
 
         {isMobile && (
-          <div style={{ overflow: 'hidden', maxHeight: menuOpen ? '400px' : '0', transition: 'max-height 0.3s ease' }}>
+          <div style={{ overflow: 'hidden', maxHeight: menuOpen ? '500px' : '0', transition: 'max-height 0.3s ease' }}>
             <nav className="flex flex-col border-t border-white/[0.06] bg-[#080808] px-6 py-4 gap-1">
-              {nav.map(item => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  onClick={() => { setMenuOpen(false); window.scrollTo({ top: 0, behavior: 'instant' }) }}
-                  className={({ isActive }) =>
-                    `py-3 text-[11px] font-semibold tracking-[0.18em] transition-colors ${
-                      isActive ? 'text-white' : 'text-white/40'
-                    }`
-                  }
-                >
-                  {item.label}
-                </NavLink>
-              ))}
+              {nav.map(item =>
+                item.children ? (
+                  <div key={item.to}>
+                    <button
+                      onClick={() => setMobileLabOpen(v => !v)}
+                      className={`w-full flex items-center justify-between py-3 text-[11px] font-semibold tracking-[0.18em] transition-colors ${
+                        location.pathname.startsWith('/lab') ? 'text-white' : 'text-white/40'
+                      }`}
+                    >
+                      {item.label}
+                      <svg
+                        className={`w-2.5 h-2.5 opacity-40 transition-transform duration-200 ${mobileLabOpen ? 'rotate-180' : ''}`}
+                        viewBox="0 0 10 6" fill="none"
+                      >
+                        <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                    <div style={{ overflow: 'hidden', maxHeight: mobileLabOpen ? '200px' : '0', transition: 'max-height 0.25s ease' }}>
+                      <div className="flex flex-col gap-0.5 pl-3 pb-2 border-l border-white/[0.06] ml-1">
+                        {item.children.map(child => (
+                          <NavLink
+                            key={child.to}
+                            to={child.to}
+                            onClick={() => { setMenuOpen(false); setMobileLabOpen(false); window.scrollTo({ top: 0, behavior: 'instant' }) }}
+                            className={({ isActive }) =>
+                              `py-2 text-[11px] tracking-wider transition-colors ${
+                                isActive ? 'text-white' : 'text-white/30 hover:text-white/60'
+                              }`
+                            }
+                          >
+                            {child.label}
+                          </NavLink>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => { setMenuOpen(false); window.scrollTo({ top: 0, behavior: 'instant' }) }}
+                    className={({ isActive }) =>
+                      `py-3 text-[11px] font-semibold tracking-[0.18em] transition-colors ${
+                        isActive ? 'text-white' : 'text-white/40'
+                      }`
+                    }
+                  >
+                    {item.label}
+                  </NavLink>
+                )
+              )}
               <Link
                 to="/contact"
                 onClick={() => { setMenuOpen(false); window.scrollTo({ top: 0, behavior: 'instant' }) }}

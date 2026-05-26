@@ -9,7 +9,7 @@ export const CONTENT_TYPES_KO: Record<string, string> = {
   note:         '개발 노트',
   experiment:   '실험 기록',
   research:     '연구 기록',
-  rss:          'RSS',
+  rss:          '블로그',
   x_post:       'X(Twitter)',
   instagram:    'Instagram',
   youtube:      'YouTube',

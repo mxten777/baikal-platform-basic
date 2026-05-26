@@ -26,6 +26,28 @@ const CHANNEL_DOT: Record<string, string> = {
   note: 'bg-green-400',
 }
 
+const PLACEHOLDER_ICON: Record<string, string> = {
+  youtube:     '▶',
+  x_post:      '𝕏',
+  instagram:   '◈',
+  rss:         '◉',
+  article:     '✦',
+  research:    '◈',
+  experiment:  '⊕',
+  note:        '◇',
+}
+
+const PLACEHOLDER_ACCENT: Record<string, string> = {
+  youtube:    '#ef4444',
+  x_post:     'rgba(255,255,255,0.25)',
+  instagram:  '#ec4899',
+  rss:        '#fb923c',
+  article:    '#60a5fa',
+  research:   '#a78bfa',
+  experiment: '#2dd4bf',
+  note:       '#4ade80',
+}
+
 const LAB_PATH: Partial<Record<string, string>> = {
   article: 'articles',
   note: 'notes',
@@ -41,6 +63,8 @@ export default function ContentCard({ content, variant = 'default', className }:
 
   const isExternal = ['rss', 'x_post', 'instagram', 'youtube', 'external_link'].includes(content.content_type)
   const dot = CHANNEL_DOT[content.content_type] ?? 'bg-white/20'
+  const placeholderIcon = PLACEHOLDER_ICON[content.content_type] ?? '◇'
+  const placeholderAccent = PLACEHOLDER_ACCENT[content.content_type] ?? 'rgba(255,255,255,0.15)'
   const linkProps = isExternal
     ? { href: content.source_url ?? href, target: '_blank', rel: 'noopener noreferrer' }
     : { href }
@@ -86,16 +110,23 @@ export default function ContentCard({ content, variant = 'default', className }:
             loading="lazy"
           />
         ) : (
-          <div className="relative h-full w-full overflow-hidden bg-gradient-to-br from-[#0a1628] via-[#080808] to-[#0d1a2e]">
-            {/* 움직이는 배경 글로우 */}
-            <div className="absolute top-1/4 right-1/4 w-28 h-28 rounded-full bg-blue-500/12 blur-3xl animate-float" style={{animationDelay: '0.5s'}} />
-            <div className="absolute bottom-1/3 left-1/3 w-24 h-24 rounded-full bg-purple-500/8 blur-2xl animate-pulse-glow" />
-            {/* 그리드 패턴 */}
-            <div className="absolute inset-0 grid-bg opacity-25" />
-            {/* 채널 타입별 아이콘 표시 */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className={cn('h-2 w-2 rounded-full', dot, 'shadow-lg')} style={{boxShadow: `0 0 20px currentColor`}} />
-            </div>
+          <div className="relative h-full w-full flex flex-col items-center justify-center gap-3 bg-[#0a0a0a]">
+            {/* 타입 컬러 글로우 */}
+            <div
+              className="absolute inset-0 opacity-10"
+              style={{ background: `radial-gradient(ellipse at center, ${placeholderAccent} 0%, transparent 70%)` }}
+            />
+            {/* 아이콘 */}
+            <span
+              className="relative text-3xl select-none leading-none"
+              style={{ color: placeholderAccent, filter: `drop-shadow(0 0 12px ${placeholderAccent})` }}
+            >
+              {placeholderIcon}
+            </span>
+            {/* 타입명 */}
+            <span className="relative text-[10px] font-semibold tracking-[0.2em] uppercase" style={{ color: placeholderAccent, opacity: 0.6 }}>
+              {CONTENT_TYPES_KO[content.content_type] ?? content.content_type}
+            </span>
           </div>
         )}
       </div>

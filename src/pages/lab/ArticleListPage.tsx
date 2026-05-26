@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import SEOHead from '@/components/seo/SEOHead'
 import { useContents } from '@/features/contents/useContents'
 import ContentCard from '@/components/content/ContentCard'
@@ -60,7 +60,21 @@ export default function ArticleListPage() {
           ) : (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 py-32 text-center">
               <span className="text-4xl mb-4">✍️</span>
-              <p className="text-white/30">{config.title}을(를) 준비 중입니다</p>
+              <p className="text-white/30 mb-6">{config.title}을(를) 준비 중입니다</p>
+              <div className="flex items-center gap-3">
+                <Link
+                  to="/content"
+                  className="rounded-full border border-white/10 px-5 py-2 text-xs font-semibold text-white/40 hover:border-white/20 hover:text-white/70 transition-all"
+                >
+                  콘텐츠 허브 보기
+                </Link>
+                <Link
+                  to="/projects"
+                  className="rounded-full border border-blue-500/20 bg-blue-500/[0.07] px-5 py-2 text-xs font-semibold text-blue-300/70 hover:border-blue-500/40 hover:text-blue-300 transition-all"
+                >
+                  프로젝트 보기 →
+                </Link>
+              </div>
             </div>
           )}
         </div>
