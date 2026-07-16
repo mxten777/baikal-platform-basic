@@ -16,6 +16,9 @@ const ProjectListPage      = lazy(() => import('@/pages/projects/ProjectListPage
 const ProjectDetailPage    = lazy(() => import('@/pages/projects/ProjectDetailPage'))
 const ProjectCategoryPage  = lazy(() => import('@/pages/projects/ProjectCategoryPage'))
 
+// Solutions
+const SolutionDetailPage   = lazy(() => import('@/pages/solutions/SolutionDetailPage'))
+
 // Lab
 const ArticleListPage      = lazy(() => import('@/pages/lab/ArticleListPage'))
 const ArticleDetailPage    = lazy(() => import('@/pages/lab/ArticleDetailPage'))
@@ -102,6 +105,9 @@ export default function App() {
         <Route path="/projects" element={<ProjectListPage />} />
         <Route path="/projects/category/:category" element={<ProjectCategoryPage />} />
         <Route path="/projects/:slug" element={<ProjectDetailPage />} />
+
+        {/* Solutions */}
+        <Route path="/solutions/:slug" element={<SolutionDetailPage />} />
 
         {/* Lab */}
         <Route path="/lab/articles" element={<ArticleListPage />} />

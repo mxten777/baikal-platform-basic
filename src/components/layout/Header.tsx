@@ -9,6 +9,7 @@ type NavItem = {
 
 const nav: NavItem[] = [
   { to: '/projects', label: 'PROJECTS' },
+  { to: '/solutions/safelyn', label: 'SOLUTIONS' },
   {
     to: '/lab/articles',
     label: 'LAB',

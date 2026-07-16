@@ -3,6 +3,7 @@ import {
   getContents,
   getContentBySlug,
   getFeaturedContents,
+  getContentsByTag,
   adminGetContents,
   adminPublishContent,
   adminRejectContent,
@@ -38,6 +39,14 @@ export function useFeaturedContents(limit = 6) {
   return useQuery({
     queryKey: contentKeys.featured(limit),
     queryFn: () => getFeaturedContents(limit),
+  })
+}
+
+export function useContentsByTag(tagSlug: string, page = 1) {
+  return useQuery({
+    queryKey: ['contents', 'tag', tagSlug, page] as const,
+    queryFn: () => getContentsByTag(tagSlug, page),
+    enabled: Boolean(tagSlug),
   })
 }
 

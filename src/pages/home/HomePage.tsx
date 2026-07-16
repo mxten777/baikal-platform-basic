@@ -3,9 +3,11 @@ import { useEffect, useRef, useState } from 'react'
 import SEOHead from '@/components/seo/SEOHead'
 import ProjectCard from '@/components/project/ProjectCard'
 import ContentCard from '@/components/content/ContentCard'
+import FeaturedSolutionCard from '@/components/solution/FeaturedSolutionCard'
 import { useFeaturedProjects } from '@/features/projects/useProjects'
-import { useFeaturedContents } from '@/features/contents/useContents'
+import { useContentsByTag } from '@/features/contents/useContents'
 import { SITE_URL } from '@/lib/constants'
+import { FEATURED_SOLUTION } from '@/lib/solutions'
 
 // 기술 스택 마키
 const TECH_TAGS = [
@@ -20,6 +22,46 @@ const STATS = [
   { value: '3년+', label: '개발 경력', color: 'text-purple-400', accent: '#a855f7' },
   { value: '100%', label: 'AI 특화', color: 'text-green-400', accent: '#22c55e' },
   { value: '∞', label: '가능성', color: 'text-amber-400', accent: '#f59e0b' },
+]
+
+// 홈 서비스 요약 (상세는 /services)
+const HOME_SERVICES = [
+  {
+    icon: '🛡️',
+    title: 'SafeLyn 파트너십',
+    desc: '산업 안전 솔루션 도입 상담·맞춤 구축·운영 지원. SafeLyn 공식 파트너.',
+    tags: ['안전 관리', 'HSE', '도입 상담'],
+    href: '/solutions/safelyn',
+    accentClass: 'group-hover:text-emerald-400',
+    glowClass: 'bg-emerald-500/15',
+  },
+  {
+    icon: '⚡',
+    title: 'AI MVP 개발',
+    desc: '아이디어를 2~4주 만에 작동하는 AI 제품으로. 빠른 검증과 시장 피드백에 집중.',
+    tags: ['LLM', 'RAG', 'AI 에이전트'],
+    href: '/services',
+    accentClass: 'group-hover:text-blue-400',
+    glowClass: 'bg-blue-500/15',
+  },
+  {
+    icon: '🔍',
+    title: 'RAG 시스템',
+    desc: '기업 내부 지식기반을 AI와 연결하는 검색 증강 생성 시스템.',
+    tags: ['Vector DB', '시맨틱 검색', 'LLM 통합'],
+    href: '/services',
+    accentClass: 'group-hover:text-purple-400',
+    glowClass: 'bg-purple-500/15',
+  },
+  {
+    icon: '🌐',
+    title: 'AI SaaS 플랫폼',
+    desc: '스케일링 가능한 AI 서비스 플랫폼 소프트웨어 개발 및 아키텍처 설계.',
+    tags: ['React', 'TypeScript', 'Supabase'],
+    href: '/services',
+    accentClass: 'group-hover:text-cyan-400',
+    glowClass: 'bg-cyan-500/15',
+  },
 ]
 
 // 스크롤 진입 애니메이션 훅
@@ -64,15 +106,17 @@ function AnimatedStat({ value, label, color, accent, delay = 0 }: { value: strin
 
 export default function HomePage() {
   const { data: projects, isLoading: projectsLoading } = useFeaturedProjects(6)
-  const { data: contents, isLoading: contentsLoading } = useFeaturedContents(6)
+  const { data: safetyResult, isLoading: safetyLoading } = useContentsByTag('safety')
   useScrollReveal()
+
+  const safetyContents = safetyResult?.data ?? []
 
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: '바이칼시스템즈',
     url: SITE_URL,
-    description: 'AI 소프트웨어 개발 회사',
+    description: 'AI 소프트웨어 개발 및 산업 안전 솔루션 파트너',
     sameAs: [
       'https://x.com/baikalsys',
       'https://www.youtube.com/@baikalsys',
@@ -103,13 +147,13 @@ export default function HomePage() {
           {/* 어나운스먼트 배지 */}
           <div className="animate-fade-up mb-7 sm:mb-9">
             <Link
-              to="/projects"
-              className="inline-flex items-center gap-2.5 rounded-full border border-blue-500/20 bg-blue-500/[0.07] px-4 py-1.5 backdrop-blur-sm transition-all duration-300 hover:border-blue-500/40 hover:bg-blue-500/12 group"
+              to="/solutions/safelyn"
+              className="inline-flex items-center gap-2.5 rounded-full border border-emerald-500/20 bg-emerald-500/[0.07] px-4 py-1.5 backdrop-blur-sm transition-all duration-300 hover:border-emerald-500/40 hover:bg-emerald-500/12 group"
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-badge-pulse flex-shrink-0" />
-              <span className="text-[11px] font-semibold tracking-wider text-blue-300/80">40+ AI 프로젝트 완료</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-badge-pulse flex-shrink-0" />
+              <span className="text-[11px] font-semibold tracking-wider text-emerald-300/80">SafeLyn 파트너 도입 상담 진행 중</span>
               <span className="text-white/15 select-none">·</span>
-              <span className="text-[11px] text-white/35 group-hover:text-white/55 transition-colors">포트폴리오 보기 →</span>
+              <span className="text-[11px] text-white/35 group-hover:text-white/55 transition-colors">솔루션 보기 →</span>
             </Link>
           </div>
 
@@ -129,8 +173,9 @@ export default function HomePage() {
           {/* 서브 카피 + CTA */}
           <div className="animate-fade-up animate-delay-200 mt-10 sm:mt-12 flex flex-col gap-6 sm:gap-8 lg:flex-row lg:items-end lg:justify-between">
             <p className="max-w-md text-sm sm:text-base leading-relaxed text-white/40">
-              바이칼시스템즈는 AI MVP 프로젝트를 지속 개발하고,<br className="hidden sm:block" />
-              그 과정과 인사이트를 이 플랫폼에 쌓아갑니다.
+              바이칼시스템즈는 AI MVP 개발을 지속하며,<br className="hidden sm:block" />
+              현재 산업 안전 관리 솔루션 <strong className="text-white/60">SafeLyn</strong>의
+              공식 파트너로서 도입 상담을 지원합니다.
             </p>
             <div className="flex items-center gap-3 sm:gap-4">
               <Link
@@ -141,10 +186,10 @@ export default function HomePage() {
                 <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
               </Link>
               <Link
-                to="/lab/articles"
+                to="/solutions/safelyn"
                 className="flex items-center gap-2 sm:gap-3 rounded-full border border-white/10 px-5 sm:px-7 py-3 sm:py-3.5 text-xs sm:text-sm font-semibold text-white/60 transition-all duration-300 hover:border-white/25 hover:text-white"
               >
-                기술 아티클
+                SafeLyn 알아보기
               </Link>
             </div>
           </div>
@@ -184,50 +229,129 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ===== PHILOSOPHY ===== */}
-      <section className="relative py-24 sm:py-32 bg-[#080808]" style={{overflow:'clip'}}>
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-blue-500/5 blur-[100px] pointer-events-none" />
+      {/* ===== FEATURED SOLUTION ===== */}
+      <FeaturedSolutionCard solution={FEATURED_SOLUTION} />
+
+      {/* ===== 안전 콘텐츠 ===== */}
+      <section className="relative py-24 sm:py-32 bg-[#080808]">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-emerald-500/4 blur-[100px] pointer-events-none" />
         <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
-            <div className="reveal-left">
-              <div className="flex items-center gap-3 mb-6 sm:mb-8">
-                <div className="h-px w-8 bg-blue-500/60" />
-                <span className="section-label">OUR APPROACH</span>
+          <div className="reveal flex items-end justify-between mb-12 sm:mb-16">
+            <div>
+              <div className="flex items-center gap-3 mb-5 sm:mb-6">
+                <div className="h-px w-8 bg-emerald-500/60" />
+                <span className="section-label">SAFETY CONTENTS</span>
               </div>
-              <h2 className="text-4xl sm:text-5xl font-black leading-tight tracking-[-0.02em] text-white lg:text-6xl">
-                만들고 공유하며<br />
-                <span className="text-white/30">함께 성장합니다</span>
+              <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white lg:text-5xl">
+                안전 콘텐츠
               </h2>
-              <p className="mt-5 sm:mt-6 text-sm sm:text-base leading-relaxed text-white/40 max-w-md">
-                단순한 개발사가 아닙니다.
-                AI 프로젝트의 기획, 개발, 실패, 성공 — 모든 과정을 투명하게 기록하고
-                공유하는 지식 플랫폼입니다.
+              <p className="mt-3 text-sm text-white/30 max-w-sm">
+                산업 안전 관리, HSE 트렌드, 현장 사례를 다룹니다.
               </p>
-              <Link
-                to="/about"
-                className="mt-6 sm:mt-8 inline-flex items-center gap-2 text-sm text-blue-400/70 hover:text-blue-400 transition-colors group"
-              >
-                더 알아보기 <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
-              </Link>
             </div>
-            {/* 특징 그리드 */}
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              {[
-                { icon: '⚡', num: '01', title: 'AI MVP 개발', desc: '아이디어를 빠르게 작동하는 AI 제품으로', delay: 'animate-delay-100' },
-                { icon: '📚', num: '02', title: '지식 축적', desc: '모든 개발 과정을 문서화하고 공유', delay: 'animate-delay-200' },
-                { icon: '🔄', num: '03', title: '자동 수집', desc: 'SNS, YouTube, 블로그 콘텐츠 자동 아카이브', delay: 'animate-delay-300' },
-                { icon: '🚀', num: '04', title: 'SEO 성장', desc: '콘텐츠가 쌓일수록 강해지는 플랫폼', delay: 'animate-delay-400' },
-              ].map(f => (
-                <div key={f.title} className={`reveal-scale ${f.delay} glass-card rounded-2xl p-5 sm:p-6 group cursor-default`}>
-                  <div className="flex items-start justify-between mb-3">
-                    <span className="text-xl sm:text-2xl group-hover:animate-float inline-block transition-transform duration-300">{f.icon}</span>
-                    <span className="font-mono text-[10px] text-white/12 tabular-nums leading-none">{f.num}</span>
-                  </div>
-                  <h3 className="text-xs sm:text-sm font-bold text-white">{f.title}</h3>
-                  <p className="mt-1.5 text-[11px] sm:text-xs leading-relaxed text-white/35">{f.desc}</p>
-                </div>
+            <Link
+              to="/content"
+              className="hidden sm:flex items-center gap-2 text-sm text-white/30 transition-colors hover:text-white/70 group"
+            >
+              전체 보기 <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
+            </Link>
+          </div>
+
+          {safetyLoading ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="skeleton h-56 sm:h-60 rounded-2xl" />
               ))}
             </div>
+          ) : safetyContents.length === 0 ? (
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 py-20 sm:py-24 text-center">
+              <span className="text-4xl mb-4">🛡️</span>
+              <p className="text-white/30 text-sm">안전 콘텐츠를 준비 중입니다.</p>
+              <p className="mt-2 text-xs text-white/20 max-w-xs">
+                산업 안전 관리, SafeLyn 도입 사례, HSE 인사이트를 곧 공개합니다.
+              </p>
+              <Link
+                to="/solutions/safelyn"
+                className="mt-6 text-xs text-emerald-400/60 hover:text-emerald-400 transition-colors"
+              >
+                SafeLyn 솔루션 먼저 보기 →
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {safetyContents.slice(0, 6).map(content => (
+                <ContentCard key={content.id} content={content} />
+              ))}
+            </div>
+          )}
+
+          {safetyContents.length > 0 && (
+            <div className="mt-8 sm:hidden">
+              <Link
+                to="/content"
+                className="flex items-center justify-center gap-2 rounded-full border border-white/10 py-3 text-sm text-white/40 hover:border-white/20 hover:text-white/70 transition-all"
+              >
+                전체 안전 콘텐츠 보기 →
+              </Link>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ===== 바이칼 SERVICES ===== */}
+      <section className="relative py-24 sm:py-32 bg-[#080808]">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-blue-500/4 blur-[100px] pointer-events-none" />
+        <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+          <div className="reveal flex items-end justify-between mb-12 sm:mb-16">
+            <div>
+              <div className="flex items-center gap-3 mb-5 sm:mb-6">
+                <div className="h-px w-8 bg-blue-500/60" />
+                <span className="section-label">SERVICES</span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white lg:text-5xl">
+                바이칼 서비스
+              </h2>
+            </div>
+            <Link
+              to="/services"
+              className="hidden sm:flex items-center gap-2 text-sm text-white/30 transition-colors hover:text-white/70 group"
+            >
+              전체 보기 <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {HOME_SERVICES.map((s, idx) => (
+              <Link
+                key={s.title}
+                to={s.href}
+                className="glass-card rounded-2xl p-6 group relative overflow-hidden hover:border-white/15 transition-all duration-500 block"
+              >
+                <div className={`absolute -top-8 -right-8 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${s.glowClass}`} />
+                <div className="relative">
+                  <span className="text-4xl block transition-transform group-hover:scale-110 duration-300 mb-4">{s.icon}</span>
+                  <span className="font-mono text-[10px] text-white/15 tabular-nums block mb-2">{String(idx + 1).padStart(2, '0')}</span>
+                  <h3 className={`text-sm font-bold text-white transition-colors duration-300 mb-2 ${s.accentClass}`}>{s.title}</h3>
+                  <p className="text-xs leading-relaxed text-white/35 group-hover:text-white/45 transition-colors mb-4">{s.desc}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {s.tags.map(t => (
+                      <span key={t} className="rounded-full border border-white/[0.07] bg-white/[0.03] px-2.5 py-0.5 text-[11px] text-white/30 group-hover:border-white/[0.12] group-hover:text-white/40 transition-all">{t}</span>
+                    ))}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-8 sm:hidden">
+            <Link
+              to="/services"
+              className="flex items-center justify-center gap-2 rounded-full border border-white/10 py-3 text-sm text-white/40 hover:border-white/20 hover:text-white/70 transition-all"
+            >
+              전체 서비스 보기 →
+            </Link>
           </div>
         </div>
       </section>
@@ -236,7 +360,6 @@ export default function HomePage() {
       <section className="relative py-24 sm:py-32 bg-[#080808]">
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
         <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
-          {/* 섹션 헤더 */}
           <div className="reveal flex items-end justify-between mb-12 sm:mb-16">
             <div>
               <div className="flex items-center gap-3 mb-5 sm:mb-6">
@@ -288,58 +411,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== LATEST CONTENTS ===== */}
-      <section className="relative py-24 sm:py-32 bg-[#080808]">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-blue-500/5 blur-[100px] pointer-events-none" />
-        <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
-          <div className="reveal flex items-end justify-between mb-12 sm:mb-16">
-            <div>
-              <div className="flex items-center gap-3 mb-5 sm:mb-6">
-                <div className="h-px w-8 bg-blue-500/60" />
-                <span className="section-label">LATEST CONTENTS</span>
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white lg:text-5xl">
-                최신 콘텐츠
-              </h2>
-            </div>
-            <Link
-              to="/content"
-              className="hidden sm:flex items-center gap-2 text-sm text-white/30 transition-colors hover:text-white/70 group"
-            >
-              전체 보기 <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
-            </Link>
-          </div>
 
-          {contentsLoading ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="skeleton h-56 sm:h-60 rounded-2xl" />
-              ))}
-            </div>
-          ) : (contents ?? []).length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 py-20 sm:py-24 text-center">
-              <span className="text-4xl mb-4">📝</span>
-              <p className="text-white/30 text-sm">콘텐츠를 준비 중입니다</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {contents?.map(content => (
-                <ContentCard key={content.id} content={content} />
-              ))}
-            </div>
-          )}
-
-          <div className="mt-8 sm:hidden">
-            <Link
-              to="/content"
-              className="flex items-center justify-center gap-2 rounded-full border border-white/10 py-3 text-sm text-white/40 hover:border-white/20 hover:text-white/70 transition-all"
-            >
-              전체 콘텐츠 보기 →
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* ===== CTA ===== */}
       <section className="relative py-28 sm:py-40 bg-[#080808]" style={{overflow:'clip'}}>
@@ -349,10 +421,9 @@ export default function HomePage() {
           <div className="w-[800px] h-[400px] rounded-full bg-blue-500/8 blur-[120px]" />
         </div>
         <div className="absolute inset-0 grid-bg opacity-50" />
-        {/* 대형 장식 배경 텍스트 */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none">
           <span className="text-[clamp(5rem,18vw,16rem)] font-black text-white/[0.018] leading-none tracking-tight">
-            BUILD
+            PARTNER
           </span>
         </div>
 
@@ -363,26 +434,32 @@ export default function HomePage() {
             <div className="h-px w-8 bg-blue-500/60" />
           </div>
           <h2 className="text-4xl sm:text-5xl font-black leading-tight tracking-tight text-white lg:text-6xl">
-            AI 프로젝트를<br />
-            <span className="gradient-text">함께 만들어보세요</span>
+            AI 프로젝트 또는<br />
+            <span className="gradient-text">SafeLyn 도입 상담</span>
           </h2>
           <p className="mt-5 sm:mt-6 text-sm sm:text-base text-white/35 max-w-lg mx-auto">
-            MVP부터 프로덕션까지 — 아이디어를 실제 작동하는 AI 제품으로 만드는
-            전문 개발 파트너입니다.
+            AI MVP 개발 파트너가 필요하거나,<br className="hidden sm:block" />
+            SafeLyn 산업 안전 솔루션 도입을 검토 중이라면 먼저 문의해 주세요.
           </p>
           <div className="mt-10 sm:mt-12 flex flex-col items-center gap-3 sm:gap-4 sm:flex-row sm:justify-center">
             <Link
               to="/contact"
               className="group w-full sm:w-auto flex items-center justify-center gap-3 rounded-full bg-white px-7 sm:px-8 py-3.5 sm:py-4 text-sm font-semibold text-black transition-all duration-300 hover:bg-blue-50 hover:shadow-lg hover:shadow-blue-500/20"
             >
-              프로젝트 문의하기
+              문의하기
               <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+            </Link>
+            <Link
+              to="/solutions/safelyn"
+              className="w-full sm:w-auto flex items-center justify-center gap-3 rounded-full border border-white/10 px-7 sm:px-8 py-3.5 sm:py-4 text-sm font-semibold text-white/50 transition-all duration-300 hover:border-white/25 hover:text-white"
+            >
+              SafeLyn 알아보기
             </Link>
             <Link
               to="/services"
               className="w-full sm:w-auto flex items-center justify-center gap-3 rounded-full border border-white/10 px-7 sm:px-8 py-3.5 sm:py-4 text-sm font-semibold text-white/50 transition-all duration-300 hover:border-white/25 hover:text-white"
             >
-              서비스 알아보기
+              서비스 보기
             </Link>
           </div>
         </div>

@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router-dom'
 import SEOHead from '@/components/seo/SEOHead'
 
 const CONTACT_ITEMS = [
@@ -7,10 +8,52 @@ const CONTACT_ITEMS = [
   { icon: '🐦', label: 'X (Twitter)', value: '@baikalsys', href: 'https://x.com/baikalsys' },
 ]
 
+const INQUIRY_LABELS: Record<string, { title: string; subtitle: string; items: string[] }> = {
+  'demo-safelyn': {
+    title: 'SafeLyn 데모 신청',
+    subtitle: '아래 내용을 이메일로 보내주시면 데모 일정을 조율해 드립니다.',
+    items: [
+      '회사명 및 담당자 성함',
+      '현장 규모 (직원 수, 현장 수)',
+      '도입 희망 시기',
+      '현재 안전 관리 방식 간단 설명',
+    ],
+  },
+  'inquiry-safelyn': {
+    title: 'SafeLyn 도입 상담',
+    subtitle: '도입 전 궁금하신 사항을 이메일로 보내주시면 빠르게 답변드립니다.',
+    items: [
+      '회사명 및 담당자 성함',
+      '도입 검토 배경 또는 현재 문제점',
+      '예산·일정 등 참고 정보 (선택)',
+      '추가 문의 사항',
+    ],
+  },
+  'brochure-safelyn': {
+    title: 'SafeLyn 소개 자료 요청',
+    subtitle: '아래 정보를 이메일로 보내주시면 자료를 발송해 드립니다.',
+    items: [
+      '회사명 및 담당자 성함',
+      '연락처 (이메일 또는 전화)',
+      '관심 분야 (안전 점검 / 법정 서류 / 위험 관리 등)',
+    ],
+  },
+}
+
 export default function ContactPage() {
+  const [params] = useSearchParams()
+  const type = params.get('type') ?? ''
+  const solution = params.get('solution') ?? ''
+  const inquiryKey = type && solution ? `${type}-${solution}` : ''
+  const inquiry = inquiryKey ? INQUIRY_LABELS[inquiryKey] : null
+
   return (
     <>
-      <SEOHead title="문의" description="바이칼시스템즈에 프로젝트 문의하기" canonical="/contact" />
+      <SEOHead
+        title={inquiry ? inquiry.title : '문의'}
+        description={inquiry ? `바이칼시스템즈 ${inquiry.title}` : '바이칼시스템즈에 프로젝트 문의하기'}
+        canonical="/contact"
+      />
 
       {/* Hero */}
       <section className="relative bg-[#080808] py-24 overflow-hidden">
@@ -23,14 +66,27 @@ export default function ContactPage() {
             <span className="section-label">CONTACT</span>
             <div className="h-px w-8 bg-blue-500/60" />
           </div>
-          <h1 className="text-[clamp(2.5rem,6vw,6rem)] font-black tracking-[-0.02em] leading-[1.1] text-white">
-            프로젝트를<br />
-            <span className="gradient-text">함께 만들어요</span>
-          </h1>
-          <p className="mt-6 text-lg text-white/40 leading-relaxed">
-            AI 아이디어가 있으시면 먼저 연락해주세요.<br />
-            MVP 검토부터 프로덕션 론치까지 함께합니다.
-          </p>
+          {inquiry ? (
+            <>
+              <h1 className="text-[clamp(2rem,5vw,4.5rem)] font-black tracking-[-0.02em] leading-[1.1] text-white">
+                {inquiry.title}
+              </h1>
+              <p className="mt-6 text-lg text-white/40 leading-relaxed">
+                {inquiry.subtitle}
+              </p>
+            </>
+          ) : (
+            <>
+              <h1 className="text-[clamp(2.5rem,6vw,6rem)] font-black tracking-[-0.02em] leading-[1.1] text-white">
+                프로젝트를<br />
+                <span className="gradient-text">함께 만들어요</span>
+              </h1>
+              <p className="mt-6 text-lg text-white/40 leading-relaxed">
+                AI 아이디어가 있으시면 먼저 연락해주세요.<br />
+                MVP 검토부터 프로덕션 론치까지 함께합니다.
+              </p>
+            </>
+          )}
         </div>
       </section>
 
@@ -56,12 +112,26 @@ export default function ContactPage() {
 
           {/* Message prompt */}
           <div className="mt-10 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-8">
-            <h2 className="text-xl font-bold text-white mb-2">어떤 프로젝트를 원하세요?</h2>
-            <p className="text-sm text-white/30 leading-relaxed mb-6">이메일로 아래 내용을 포함해 연락주시면 빠르게 연락드립니다.</p>
+            <h2 className="text-xl font-bold text-white mb-2">
+              {inquiry ? inquiry.title : '어떤 프로젝트를 원하세요?'}
+            </h2>
+            <p className="text-sm text-white/30 leading-relaxed mb-6">
+              이메일로 아래 내용을 포함해 연락주시면 빠르게 연락드립니다.
+            </p>
             <ul className="space-y-2 text-sm text-white/30">
-              <li className="flex items-start gap-2"><span className="text-blue-400/60 mt-0.5">·</span> 원하는 AI 서비스 개요 (예: 커스텀 RAG 시스템)</li>
-              <li className="flex items-start gap-2"><span className="text-blue-400/60 mt-0.5">·</span> 대략적인 일정 및 예산</li>
-              <li className="flex items-start gap-2"><span className="text-blue-400/60 mt-0.5">·</span> 관련 자료나 레퍼런스 링크 (선택)</li>
+              {inquiry ? (
+                inquiry.items.map((item, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <span className="text-blue-400/60 mt-0.5">·</span> {item}
+                  </li>
+                ))
+              ) : (
+                <>
+                  <li className="flex items-start gap-2"><span className="text-blue-400/60 mt-0.5">·</span> 원하는 AI 서비스 개요 (예: 커스텀 RAG 시스템)</li>
+                  <li className="flex items-start gap-2"><span className="text-blue-400/60 mt-0.5">·</span> 대략적인 일정 및 예산</li>
+                  <li className="flex items-start gap-2"><span className="text-blue-400/60 mt-0.5">·</span> 관련 자료나 레퍼런스 링크 (선택)</li>
+                </>
+              )}
             </ul>
             <a
               href="mailto:jngdy@baikalsys.kr"
