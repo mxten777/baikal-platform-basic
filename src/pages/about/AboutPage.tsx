@@ -140,10 +140,10 @@ export default function AboutPage() {
             {/* 명함 이미지 */}
             <div className="space-y-4">
               <div className="overflow-hidden rounded-2xl border border-white/[0.06]">
-                <img src="/images/baikal_card2.jpg" alt="바이칼시스템즈 명함 앞면" className="w-full object-cover" />
+                <img src="/images/baikal_card2.png" alt="바이칼시스템즈 명함 앞면" className="w-full object-cover" />
               </div>
               <div className="overflow-hidden rounded-2xl border border-white/[0.06]">
-                <img src="/images/baikal_card3.jpg" alt="바이칼시스템즈 명함 뒷면" className="w-full object-cover" />
+                <img src="/images/baikal_card3.png" alt="바이칼시스템즈 명함 뒷면" className="w-full object-cover" />
               </div>
             </div>
             {/* 포트폴리오 다운로드 */}
@@ -170,11 +170,12 @@ export default function AboutPage() {
                 <dl className="space-y-3 text-sm">
                   {[
                     { label: '이메일', value: 'jngdy@baikalsys.kr' },
+                    { label: '이메일', value: 'jngdy@naver.com' },
                     { label: '전화', value: '010-2380-4691' },
                     { label: '웹사이트', value: 'www.baikalsys.kr' },
                     { label: '주소', value: '서울특별시 강남구 테헤란로82길 15, 227호 (대치동, 디아이타워) (06178)' },
-                  ].map(item => (
-                    <div key={item.label} className="flex gap-4">
+                  ].map((item, idx) => (
+                    <div key={idx} className="flex gap-4">
                       <dt className="w-16 flex-shrink-0 text-white/25 font-semibold">{item.label}</dt>
                       <dd className="text-white/60">{item.value}</dd>
                     </div>
