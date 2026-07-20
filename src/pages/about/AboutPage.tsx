@@ -172,7 +172,7 @@ export default function AboutPage() {
                     { label: '이메일', value: 'jngdy@baikalsys.kr' },
                     { label: '전화', value: '010-2380-4691' },
                     { label: '웹사이트', value: 'www.baikalsys.kr' },
-                    { label: '주소', value: '서울특별시 강남구 역삼로 138' },
+                    { label: '주소', value: '서울특별시 강남구 테헤란로82길 15, 227호 (대치동, 디아이타워) (06178)' },
                   ].map(item => (
                     <div key={item.label} className="flex gap-4">
                       <dt className="w-16 flex-shrink-0 text-white/25 font-semibold">{item.label}</dt>
