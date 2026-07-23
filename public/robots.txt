@@ -3,6 +3,7 @@ Allow: /
 
 # 관리자 페이지 차단
 Disallow: /admin/
+Allow: /api/sitemap.xml
 Disallow: /api/
 
 # Sitemap

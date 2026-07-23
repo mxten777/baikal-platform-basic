@@ -49,3 +49,6 @@ enable_confirmations = false   # 로컬 개발 시 이메일 확인 생략
 
 [analytics]
 enabled = false
+
+[functions.generate-sitemap]
+verify_jwt = false
