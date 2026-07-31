@@ -34,11 +34,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  const isAdmin = user?.user_metadata?.role === 'admin'
+  const isAdmin =
+    (user?.app_metadata?.role ?? user?.user_metadata?.role) === 'admin'
 
   async function signIn(email: string, password: string) {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) throw error
+    const role =
+      data.user?.app_metadata?.role ?? data.user?.user_metadata?.role
+    if (role !== 'admin') {
+      await supabase.auth.signOut()
+      throw new Error('관리자 권한이 없는 계정입니다.')
+    }
   }
 
   async function signOut() {

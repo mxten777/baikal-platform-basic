@@ -19,22 +19,22 @@ if (!rootEl) throw new Error('Root element #root not found in document')
 
 ReactDOM.createRoot(rootEl).render(
   <React.StrictMode>
-    <Sentry.ErrorBoundary
-      fallback={({ error, resetError }) => (
-        <ErrorFallback error={error} resetError={resetError} />
-      )}
-    >
-      <HelmetProvider>
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
+    <BrowserRouter>
+      <Sentry.ErrorBoundary
+        fallback={({ error, resetError }) => (
+          <ErrorFallback error={error} resetError={resetError} />
+        )}
+      >
+        <HelmetProvider>
+          <QueryClientProvider client={queryClient}>
             <AuthProvider>
               <App />
             </AuthProvider>
-          </BrowserRouter>
-          <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
-      </HelmetProvider>
-    </Sentry.ErrorBoundary>
+            <ReactQueryDevtools initialIsOpen={false} />
+          </QueryClientProvider>
+        </HelmetProvider>
+      </Sentry.ErrorBoundary>
+    </BrowserRouter>
   </React.StrictMode>
 )
 

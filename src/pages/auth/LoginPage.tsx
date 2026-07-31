@@ -23,8 +23,8 @@ export default function LoginPage() {
     try {
       await signIn(email, password)
       navigate('/admin')
-    } catch {
-      setError('로그인에 실패했습니다. 이메일과 비밀번호를 확인하세요.')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '로그인에 실패했습니다. 이메일과 비밀번호를 확인하세요.')
     } finally {
       setLoading(false)
     }
