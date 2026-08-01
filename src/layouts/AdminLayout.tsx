@@ -1,25 +1,37 @@
 import { useState } from 'react'
 import { Outlet, NavLink } from 'react-router-dom'
-import { useAuth } from '@/features/auth/AuthProvider'
+import { supabase } from '@/lib/supabase'
 import {
-  LayoutDashboard, FileText, FolderKanban, Rss,
-  RefreshCw, Image, Search, Settings, LogOut, Tag, Menu, X
+  LayoutDashboard, FileText, FolderKanban,
+  Image, LogOut, Tag, Menu, X, Globe2
 } from 'lucide-react'
 
-const navItems = [
-  { to: '/admin',           label: '대시보드',    icon: LayoutDashboard, end: true },
-  { to: '/admin/contents',  label: '콘텐츠',      icon: FileText },
-  { to: '/admin/projects',  label: '프로젝트',    icon: FolderKanban },
-  { to: '/admin/sources',   label: '수집 소스',   icon: Rss },
-  { to: '/admin/sync-jobs', label: '동기화 작업', icon: RefreshCw },
-  { to: '/admin/media',     label: '미디어',      icon: Image },
-  { to: '/admin/tags',      label: '태그',         icon: Tag },
-  { to: '/admin/seo',       label: 'SEO',         icon: Search },
-  { to: '/admin/settings',  label: '설정',        icon: Settings },
+type NavEntry =
+  | { type: 'section'; label: string }
+  | { type?: 'item'; to: string; label: string; icon: React.ElementType; end?: boolean }
+
+const navEntries: NavEntry[] = [
+  { type: 'section', label: '운영' },
+  { to: '/admin',          label: '대시보드',   icon: LayoutDashboard, end: true },
+  { to: '/admin/contents', label: '콘텐츠',     icon: FileText },
+  { to: '/admin/projects', label: '프로젝트',   icon: FolderKanban },
+  { to: '/admin/media',    label: '미디어',     icon: Image },
+  { to: '/admin/tags',     label: '태그',       icon: Tag },
+  { type: 'section', label: '시스템' },
+  { to: '/admin/external', label: '외부 콘텐츠', icon: Globe2 },
 ]
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
-  const { signOut } = useAuth()
+  async function handleLogout() {
+    try {
+      await supabase.auth.signOut({ scope: 'local' })
+    } catch {
+      // 로컬 세션 이미 삭제됨
+    } finally {
+      window.location.href = '/login'
+    }
+  }
+
   return (
     <div className="flex flex-col h-full">
       {/* 로고 */}
@@ -35,35 +47,43 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         )}
       </div>
       {/* 네비게이션 */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
-        <p className="px-3 pb-2 pt-1 text-[10px] font-semibold tracking-widest text-white/20 uppercase">메뉴</p>
-        {navItems.map(item => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.end}
-            onClick={onClose}
-            className={({ isActive }) =>
-              `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all ${
-                isActive
-                  ? 'bg-blue-600/15 text-blue-400 border border-blue-500/20'
-                  : 'text-white/40 hover:bg-white/[0.04] hover:text-white/80'
-              }`
-            }
-          >
-            {({ isActive }) => (
-              <>
-                <item.icon size={16} className={isActive ? 'text-blue-400' : 'text-white/30'} />
-                {item.label}
-              </>
-            )}
-          </NavLink>
-        ))}
+      <nav className="flex-1 overflow-y-auto px-3 py-4">
+        {navEntries.map((entry, i) => {
+          if (entry.type === 'section') {
+            return (
+              <p key={`s-${i}`} className="px-3 pb-1.5 pt-4 first:pt-1 text-[10px] font-semibold tracking-widest text-white/20 uppercase">
+                {entry.label}
+              </p>
+            )
+          }
+          return (
+            <NavLink
+              key={entry.to}
+              to={entry.to}
+              end={entry.end}
+              onClick={onClose}
+              className={({ isActive }) =>
+                `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all ${
+                  isActive
+                    ? 'bg-blue-600/15 text-blue-400 border border-blue-500/20'
+                    : 'text-white/40 hover:bg-white/[0.04] hover:text-white/80'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <entry.icon size={16} className={isActive ? 'text-blue-400' : 'text-white/30'} />
+                  {entry.label}
+                </>
+              )}
+            </NavLink>
+          )
+        })}
       </nav>
       {/* 하단 - 로그아웃 */}
       <div className="px-3 py-4 border-t border-white/[0.06]">
         <button
-          onClick={() => signOut()}
+          onClick={handleLogout}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/30 transition-all hover:bg-red-500/10 hover:text-red-400"
         >
           <LogOut size={16} />

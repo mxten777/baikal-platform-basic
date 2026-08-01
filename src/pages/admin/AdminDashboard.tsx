@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 import SEOHead from '@/components/seo/SEOHead'
 import { Link } from 'react-router-dom'
-import { FolderKanban, FileText, Clock, Rss, ArrowUpRight, TrendingUp, Eye, Users } from 'lucide-react'
+import { FolderKanban, FileText, Clock, Rss, ArrowUpRight, TrendingUp, Eye, Image } from 'lucide-react'
 
 interface DashboardStats {
   total_projects: number
@@ -124,175 +124,144 @@ export default function AdminDashboard() {
           <p className="mt-1 text-sm text-white/35">BAIKAL AI Content Platform 관리 현황</p>
         </div>
 
-        {isLoading ? (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="skeleton h-28 rounded-2xl" />
+        {/* 1. 오늘의 현황 */}
+        <section className="mb-8">
+          <p className="px-0.5 pb-2 text-[10px] font-semibold tracking-widest text-white/20 uppercase">오늘의 현황</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {(isLoading || analyticsLoading)
+              ? <>{Array.from({ length: 3 }).map((_, i) => <div key={i} className="skeleton h-24 rounded-2xl" />)}</>
+              : <>
+                  <StatCard label="승인 대기" value={stats?.pending_contents ?? 0} sub="검수 필요" href="/admin/contents" icon={Clock} color={stats?.pending_contents ? 'amber' : 'default'} highlight={!!stats?.pending_contents} index={0} />
+                  <div className="glass-card rounded-2xl border border-white/[0.07] p-5">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <Eye size={12} className="text-blue-400" />
+                      <span className="text-[10px] text-white/30 tracking-wider">오늘 PV</span>
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-black text-blue-400">{analytics?.today_views.toLocaleString() ?? '—'}</p>
+                    <p className="text-xs text-white/25 mt-1">{analytics ? `방문자 ${analytics.today_visitors}명` : '데이터 없음'}</p>
+                  </div>
+                  <div className="glass-card rounded-2xl border border-white/[0.07] p-5">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <TrendingUp size={12} className="text-green-400" />
+                      <span className="text-[10px] text-white/30 tracking-wider">7일 PV</span>
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-black text-green-400">{analytics?.week_views.toLocaleString() ?? '—'}</p>
+                    <p className="text-xs text-white/25 mt-1">{analytics ? `방문자 ${analytics.week_visitors}명` : '데이터 없음'}</p>
+                  </div>
+                </>
+            }
+          </div>
+        </section>
+
+        {/* 2. 주요 현황 */}
+        <section className="mb-8">
+          <p className="px-0.5 pb-2 text-[10px] font-semibold tracking-widest text-white/20 uppercase">주요 현황</p>
+          {isLoading
+            ? <div className="grid grid-cols-3 gap-3">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="skeleton h-28 rounded-2xl" />)}</div>
+            : stats && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <StatCard label="전체 프로젝트" value={stats.total_projects} sub={`운영 중 ${stats.active_projects}`} href="/admin/projects" icon={FolderKanban} color="blue" index={0} />
+                <StatCard label="전체 콘텐츠" value={stats.total_contents} sub={`게시됨 ${stats.published_contents}`} href="/admin/contents" icon={FileText} color="purple" index={1} />
+                <StatCard label="수집 소스" value={stats.active_sources} sub={`전체 ${stats.total_sources}`} href="/admin/external" icon={Rss} color="green" index={2} />
+              </div>
+            )
+          }
+        </section>
+
+        {/* 3. 빠른 작업 */}
+        <section className="mb-8">
+          <p className="px-0.5 pb-2 text-[10px] font-semibold tracking-widest text-white/20 uppercase">빠른 작업</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[
+              { label: '콘텐츠 등록',   href: '/admin/contents', icon: FileText },
+              { label: '프로젝트 등록', href: '/admin/projects', icon: FolderKanban },
+              { label: '미디어 업로드', href: '/admin/media',    icon: Image },
+              { label: '외부 콘텐츠',   href: '/admin/external', icon: Rss },
+            ].map(({ label, href, icon: Icon }) => (
+              <Link key={href} to={href} className="glass-card flex items-center gap-3 rounded-xl px-4 py-3.5 text-sm text-white/50 border border-white/[0.06] hover:bg-white/[0.04] hover:text-white/80 transition-all group">
+                <Icon size={15} className="text-white/30 group-hover:text-white/60 transition-colors" />
+                {label}
+                <ArrowUpRight size={13} className="ml-auto text-white/15 group-hover:text-white/40 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+              </Link>
             ))}
           </div>
-        ) : stats && (
-          <>
-            {/* Stat Cards */}
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 mb-8">
-              <StatCard
-                label="전체 프로젝트"
-                value={stats.total_projects}
-                sub={`운영 중 ${stats.active_projects}`}
-                href="/admin/projects"
-                icon={FolderKanban}
-                color="blue"
-                index={0}
-              />
-              <StatCard
-                label="전체 콘텐츠"
-                value={stats.total_contents}
-                sub={`게시됨 ${stats.published_contents}`}
-                href="/admin/contents"
-                icon={FileText}
-                color="purple"
-                index={1}
-              />
-              <StatCard
-                label="승인 대기"
-                value={stats.pending_contents}
-                sub="검수 필요"
-                href="/admin/contents"
-                icon={Clock}
-                color={stats.pending_contents > 0 ? 'amber' : 'default'}
-                highlight={stats.pending_contents > 0}
-                index={2}
-              />
-              <StatCard
-                label="수집 소스"
-                value={stats.active_sources}
-                sub={`전체 ${stats.total_sources}`}
-                href="/admin/sources"
-                icon={Rss}
-                color="green"
-                index={3}
-              />
-            </div>
+        </section>
 
-            {/* 최근 동기화 */}
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 mb-4">
-              {/* 방문 통계 */}
-              <div className="glass-card rounded-2xl p-6">
-                <div className="flex items-center justify-between mb-5">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp size={15} className="text-blue-400" />
-                    <h2 className="text-sm font-bold text-white">방문자 통계</h2>
-                  </div>
-                  <span className="text-[10px] text-white/25 tracking-widest uppercase">실시간 · 7일</span>
-                </div>
-
-                {analyticsLoading ? (
-                  <div className="grid grid-cols-2 gap-3">
-                    {Array.from({ length: 4 }).map((_, i) => (
-                      <div key={i} className="skeleton h-16 rounded-xl" />
-                    ))}
-                  </div>
-                ) : analytics ? (
-                  <>
-                    <div className="grid grid-cols-2 gap-3 mb-5">
-                      {[
-                        { icon: Eye,   label: '오늘 PV',    value: analytics.today_views,    color: 'text-blue-400' },
-                        { icon: Users, label: '오늘 방문자', value: analytics.today_visitors, color: 'text-purple-400' },
-                        { icon: Eye,   label: '7일 PV',     value: analytics.week_views,     color: 'text-green-400' },
-                        { icon: Users, label: '7일 방문자',  value: analytics.week_visitors,  color: 'text-amber-400' },
-                      ].map(item => (
-                        <div key={item.label} className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-3.5 group hover:border-white/10 transition-colors">
-                          <div className="flex items-center gap-1.5 mb-1.5">
-                            <item.icon size={12} className={item.color} />
-                            <span className="text-[10px] text-white/30 tracking-wider">{item.label}</span>
-                          </div>
-                          <p className={`text-2xl font-black ${item.color}`}>{item.value.toLocaleString()}</p>
-                        </div>
-                      ))}
+        {/* 4. 최근 활동 */}
+        <section>
+          <p className="px-0.5 pb-2 text-[10px] font-semibold tracking-widest text-white/20 uppercase">최근 활동</p>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 mb-4">
+            <div className="glass-card rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-sm font-bold text-white">최근 동기화</h2>
+                <Link to="/admin/external" className="flex items-center gap-1 text-xs text-blue-400/70 hover:text-blue-400 transition-colors">
+                  전체 보기 <ArrowUpRight size={12} />
+                </Link>
+              </div>
+              {!stats?.recent_jobs.length ? (
+                <p className="text-sm text-white/25 py-6 text-center">동기화 기록 없음</p>
+              ) : (
+                <div className="divide-y divide-white/[0.04]">
+                  {stats.recent_jobs.map(job => (
+                    <div key={job.id} className="flex items-center justify-between py-3">
+                      <div className="flex items-center gap-3">
+                        <span className={`h-1.5 w-1.5 rounded-full flex-shrink-0 ${
+                          job.status === 'completed' ? 'bg-green-400'
+                          : job.status === 'failed' ? 'bg-red-400'
+                          : 'bg-amber-400'
+                        }`} />
+                        <span className="text-sm text-white/70">{job.job_type}</span>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
+                          job.status === 'completed' ? 'bg-green-500/10 text-green-400'
+                          : job.status === 'failed' ? 'bg-red-500/10 text-red-400'
+                          : 'bg-amber-500/10 text-amber-400'
+                        }`}>
+                          {job.status === 'completed' ? '완료' : job.status === 'failed' ? '실패' : '진행 중'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-4 text-xs text-white/30">
+                        <span className="text-blue-400/60">+{job.items_new}개</span>
+                        <span>{new Date(job.started_at).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
                     </div>
-
-                    {/* 인기 페이지 */}
-                    {analytics.top_pages.length > 0 && (
-                      <div>
-                        <p className="text-[10px] font-semibold tracking-widest text-white/20 uppercase mb-2">인기 페이지 (7일)</p>
-                        <div className="space-y-1.5">
-                          {analytics.top_pages.map((p, i) => (
-                            <div key={p.path} className="flex items-center gap-2">
-                              <span className="text-[10px] text-white/20 w-4 text-right">{i + 1}</span>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between gap-2 mb-0.5">
-                                  <span className="text-xs text-white/50 truncate">{p.path}</span>
-                                  <span className="text-xs text-white/35 flex-shrink-0">{p.views}</span>
-                                </div>
-                                <div className="h-px bg-white/[0.06] rounded-full overflow-hidden">
-                                  <div
-                                    className="h-full bg-blue-500/40 rounded-full transition-all duration-700"
-                                    style={{ width: `${Math.round((p.views / analytics.top_pages[0].views) * 100)}%` }}
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="flex flex-col items-center justify-center py-8 text-center">
-                    <Eye size={24} className="text-white/10 mb-2" />
-                    <p className="text-sm text-white/25">방문 데이터 없음</p>
-                    <p className="text-xs text-white/15 mt-1">마이그레이션 실행 후 수집 시작</p>
-                  </div>
-                )}
-              </div>
-
-              {/* 최근 동기화 */}
-              <div className="glass-card rounded-2xl p-6">
-                <div className="flex items-center justify-between mb-5">
-                  <h2 className="text-sm font-bold text-white">최근 동기화 작업</h2>
-                  <Link
-                    to="/admin/sync-jobs"
-                    className="flex items-center gap-1 text-xs text-blue-400/70 hover:text-blue-400 transition-colors"
-                  >
-                    전체 보기
-                    <ArrowUpRight size={12} />
-                  </Link>
+                  ))}
                 </div>
-
-                {stats?.recent_jobs.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-10 text-center">
-                    <p className="text-sm text-white/25">동기화 기록이 없습니다</p>
-                  </div>
-                ) : (
-                  <div className="divide-y divide-white/[0.04]">
-                    {stats?.recent_jobs.map(job => (
-                      <div key={job.id} className="flex items-center justify-between py-3">
-                        <div className="flex items-center gap-3">
-                          <span className={`h-1.5 w-1.5 rounded-full flex-shrink-0 ${
-                            job.status === 'completed' ? 'bg-green-400'
-                            : job.status === 'failed' ? 'bg-red-400'
-                            : 'bg-amber-400'
-                          }`} />
-                          <span className="text-sm text-white/70">{job.job_type}</span>
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
-                            job.status === 'completed' ? 'bg-green-500/10 text-green-400'
-                            : job.status === 'failed' ? 'bg-red-500/10 text-red-400'
-                            : 'bg-amber-500/10 text-amber-400'
-                          }`}>
-                            {job.status === 'completed' ? '완료' : job.status === 'failed' ? '실패' : '진행 중'}
-                          </span>
+              )}
+            </div>
+            <div className="glass-card rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-sm font-bold text-white">인기 페이지</h2>
+                <span className="text-[10px] text-white/25 tracking-widest uppercase">7일</span>
+              </div>
+              {!analytics?.top_pages.length ? (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <Eye size={24} className="text-white/10 mb-2" />
+                  <p className="text-sm text-white/25">데이터 없음</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {analytics.top_pages.map((p, i) => (
+                    <div key={p.path} className="flex items-center gap-2">
+                      <span className="text-[10px] text-white/20 w-4 text-right">{i + 1}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2 mb-0.5">
+                          <span className="text-xs text-white/50 truncate">{p.path}</span>
+                          <span className="text-xs text-white/35 flex-shrink-0">{p.views}</span>
                         </div>
-                        <div className="flex items-center gap-4 text-xs text-white/30">
-                          <span className="text-blue-400/60">+{job.items_new}개</span>
-                          <span>{new Date(job.started_at).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
+                        <div className="h-px bg-white/[0.06] rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-blue-500/40 rounded-full transition-all duration-700"
+                            style={{ width: `${Math.round((p.views / analytics.top_pages[0].views) * 100)}%` }}
+                          />
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          </>
-        )}
+          </div>
+        </section>
       </div>
     </>
   )

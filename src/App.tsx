@@ -48,8 +48,7 @@ const AdminSources         = lazy(() => import('@/pages/admin/AdminSources'))
 const AdminSyncJobs        = lazy(() => import('@/pages/admin/AdminSyncJobs'))
 const AdminMedia           = lazy(() => import('@/pages/admin/AdminMedia'))
 const AdminTags            = lazy(() => import('@/pages/admin/AdminTags'))
-const AdminSEO             = lazy(() => import('@/pages/admin/AdminSEO'))
-const AdminSettings        = lazy(() => import('@/pages/admin/AdminSettings'))
+const AdminExternal        = lazy(() => import('@/pages/admin/AdminExternal'))
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -90,8 +89,7 @@ export default function App() {
         <Route path="sync-jobs" element={<AdminSyncJobs />} />
         <Route path="media" element={<AdminMedia />} />
         <Route path="tags" element={<AdminTags />} />
-        <Route path="seo" element={<AdminSEO />} />
-        <Route path="settings" element={<AdminSettings />} />
+        <Route path="external" element={<AdminExternal />} />
       </Route>
 
       {/* Public */}
