@@ -17,6 +17,7 @@ const ProjectDetailPage    = lazy(() => import('@/pages/projects/ProjectDetailPa
 const ProjectCategoryPage  = lazy(() => import('@/pages/projects/ProjectCategoryPage'))
 
 // Solutions
+const SolutionsPage        = lazy(() => import('@/pages/solutions/SolutionsPage'))
 const SolutionDetailPage   = lazy(() => import('@/pages/solutions/SolutionDetailPage'))
 
 // Lab
@@ -105,6 +106,7 @@ export default function App() {
         <Route path="/projects/:slug" element={<ProjectDetailPage />} />
 
         {/* Solutions */}
+        <Route path="/solutions" element={<SolutionsPage />} />
         <Route path="/solutions/:slug" element={<SolutionDetailPage />} />
 
         {/* Lab */}

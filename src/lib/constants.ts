@@ -1,6 +1,6 @@
 export const SITE_NAME = import.meta.env.VITE_SITE_NAME ?? '바이칼시스템즈'
 export const SITE_URL = import.meta.env.VITE_SITE_URL ?? 'https://www.baikalsys.kr'
-export const SITE_DESCRIPTION = 'AI 소프트웨어 개발 회사 바이칼시스템즈의 AI 개발 콘텐츠 플랫폼'
+export const SITE_DESCRIPTION = 'BAIKAL AI Platform Company — AI 엔진과 운영 플랫폼을 함께 제공하여 당신의 비즈니스가 AI를 직접 소유하도록 만듭니다.'
 
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.svg`
 

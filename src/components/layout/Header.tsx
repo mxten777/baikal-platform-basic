@@ -8,8 +8,8 @@ type NavItem = {
 }
 
 const nav: NavItem[] = [
-  { to: '/projects', label: 'PROJECTS' },
-  { to: '/solutions/safelyn', label: 'SOLUTIONS' },
+  { to: '/solutions', label: 'PRODUCTS' },
+  { to: '/projects',  label: 'PORTFOLIO' },
   {
     to: '/lab/articles',
     label: 'LAB',
@@ -20,10 +20,9 @@ const nav: NavItem[] = [
       { to: '/lab/research',    label: '연구 기록',   sub: 'Research'    },
     ],
   },
-  { to: '/content',  label: 'CONTENTS' },
-  { to: '/services', label: 'SERVICES' },
-  { to: '/media',    label: 'MEDIA'    },
-  { to: '/about',    label: 'ABOUT'    },
+  { to: '/content', label: 'CONTENTS' },
+  { to: '/media',   label: 'MEDIA'    },
+  { to: '/about',   label: 'ABOUT'    },
 ]
 
 export default function Header() {
@@ -194,11 +193,12 @@ export default function Header() {
                 <NavLink
                   key={item.to}
                   to={item.to}
-                  className={({ isActive }) =>
-                    `relative text-[11px] font-semibold tracking-[0.18em] transition-colors duration-200 hover-underline ${
-                      isActive ? 'text-white' : 'text-white/40 hover:text-white/80'
+                  className={({ isActive }) => {
+                    const solutionsActive = item.to === '/solutions' && location.pathname.startsWith('/solutions')
+                    return `relative text-[11px] font-semibold tracking-[0.18em] transition-colors duration-200 hover-underline ${
+                      isActive || solutionsActive ? 'text-white' : 'text-white/40 hover:text-white/80'
                     }`
-                  }
+                  }}
                 >
                   {item.label}
                 </NavLink>

@@ -24,43 +24,43 @@ const STATS = [
   { value: '∞', label: '가능성', color: 'text-amber-400', accent: '#f59e0b' },
 ]
 
-// 홈 서비스 요약 (상세는 /services)
-const HOME_SERVICES = [
+// Powered by BAIKAL — 제품 라인업
+const PRODUCTS = [
+  {
+    icon: '🔒',
+    title: 'Private AI',
+    desc: '폐쇄망에서도 작동하는 AI 문서검색·답변 플랫폼. 인터넷 단절 환경에 최적화.',
+    tags: ['공공기관', '군·금융', '온프레미스'],
+    href: '/solutions',
+    accentClass: 'group-hover:text-blue-400',
+    glowClass: 'bg-blue-500/15',
+  },
+  {
+    icon: '⚡',
+    title: 'AI Automation',
+    desc: '반복 업무를 AI 에이전트로 자동화. 회의록·보조금·RPA·재무 자동화 포함.',
+    tags: ['중소기업', '제조', '서비스'],
+    href: '/solutions',
+    accentClass: 'group-hover:text-purple-400',
+    glowClass: 'bg-purple-500/15',
+  },
   {
     icon: '🛡️',
-    title: 'SafeLyn 파트너십',
-    desc: '산업 안전 솔루션 도입 상담·맞춤 구축·운영 지원. SafeLyn 공식 파트너.',
-    tags: ['안전 관리', 'HSE', '도입 상담'],
+    title: 'SafeLyn',
+    desc: '시설 안전점검을 디지털로 전환. 모바일 체크리스트·보고서 자동화.',
+    tags: ['시설관리', '공공기관', 'HSE'],
     href: '/solutions/safelyn',
     accentClass: 'group-hover:text-emerald-400',
     glowClass: 'bg-emerald-500/15',
   },
   {
-    icon: '⚡',
-    title: 'AI MVP 개발',
-    desc: '아이디어를 2~4주 만에 작동하는 AI 제품으로. 빠른 검증과 시장 피드백에 집중.',
-    tags: ['LLM', 'RAG', 'AI 에이전트'],
-    href: '/services',
-    accentClass: 'group-hover:text-blue-400',
-    glowClass: 'bg-blue-500/15',
-  },
-  {
-    icon: '🔍',
-    title: 'RAG 시스템',
-    desc: '기업 내부 지식기반을 AI와 연결하는 검색 증강 생성 시스템.',
-    tags: ['Vector DB', '시맨틱 검색', 'LLM 통합'],
-    href: '/services',
-    accentClass: 'group-hover:text-purple-400',
-    glowClass: 'bg-purple-500/15',
-  },
-  {
-    icon: '🌐',
-    title: 'AI SaaS 플랫폼',
-    desc: '스케일링 가능한 AI 서비스 플랫폼 소프트웨어 개발 및 아키텍처 설계.',
-    tags: ['React', 'TypeScript', 'Supabase'],
-    href: '/services',
-    accentClass: 'group-hover:text-cyan-400',
-    glowClass: 'bg-cyan-500/15',
+    icon: '🎭',
+    title: 'THE LIT',
+    desc: '공연·전시·강좌·공간 예약을 통합 운영하는 복합문화공간 플랫폼.',
+    tags: ['문화공간', '지자체', '예약·결제'],
+    href: '/solutions',
+    accentClass: 'group-hover:text-amber-400',
+    glowClass: 'bg-amber-500/15',
   },
 ]
 
@@ -116,7 +116,7 @@ export default function HomePage() {
     '@type': 'Organization',
     name: '바이칼시스템즈',
     url: SITE_URL,
-    description: 'AI 소프트웨어 개발 및 산업 안전 솔루션 파트너',
+    description: 'BAIKAL AI Platform Company — AI 엔진과 운영 플랫폼을 함께 제공하여, 비즈니스가 AI를 직접 소유하도록 만드는 회사.',
     sameAs: [
       'https://x.com/baikalsys',
       'https://www.youtube.com/@baikalsys',
@@ -147,49 +147,45 @@ export default function HomePage() {
           {/* 어나운스먼트 배지 */}
           <div className="animate-fade-up mb-7 sm:mb-9">
             <Link
-              to="/solutions/safelyn"
-              className="inline-flex items-center gap-2.5 rounded-full border border-emerald-500/20 bg-emerald-500/[0.07] px-4 py-1.5 backdrop-blur-sm transition-all duration-300 hover:border-emerald-500/40 hover:bg-emerald-500/12 group"
+              to="/solutions"
+              className="inline-flex items-center gap-2.5 rounded-full border border-blue-500/20 bg-blue-500/[0.07] px-4 py-1.5 backdrop-blur-sm transition-all duration-300 hover:border-blue-500/40 hover:bg-blue-500/12 group"
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-badge-pulse flex-shrink-0" />
-              <span className="text-[11px] font-semibold tracking-wider text-emerald-300/80">SafeLyn 파트너 도입 상담 진행 중</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-badge-pulse flex-shrink-0" />
+              <span className="text-[11px] font-semibold tracking-wider text-blue-300/80">BAIKAL AI Platform Company</span>
               <span className="text-white/15 select-none">·</span>
-              <span className="text-[11px] text-white/35 group-hover:text-white/55 transition-colors">솔루션 보기 →</span>
+              <span className="text-[11px] text-white/35 group-hover:text-white/55 transition-colors">제품 보기 →</span>
             </Link>
           </div>
 
           {/* 메인 헤드라인 */}
           <h1 className="animate-fade-up animate-delay-100">
             <span className="block text-[clamp(2.4rem,7vw,7rem)] font-black leading-[1.1] tracking-[-0.02em] text-white">
-              AI를 만들고,
+              Your Business,
             </span>
             <span className="block text-[clamp(2.4rem,7vw,7rem)] font-black leading-[1.1] tracking-[-0.02em] gradient-text">
-              기록하고,
-            </span>
-            <span className="block text-[clamp(2.4rem,7vw,7rem)] font-black leading-[1.1] tracking-[-0.02em] text-white/25">
-              축적합니다.
+              AI-Powered.
             </span>
           </h1>
 
           {/* 서브 카피 + CTA */}
           <div className="animate-fade-up animate-delay-200 mt-10 sm:mt-12 flex flex-col gap-6 sm:gap-8 lg:flex-row lg:items-end lg:justify-between">
             <p className="max-w-md text-sm sm:text-base leading-relaxed text-white/40">
-              바이칼시스템즈는 AI MVP 개발을 지속하며,<br className="hidden sm:block" />
-              현재 산업 안전 관리 솔루션 <strong className="text-white/60">SafeLyn</strong>의
-              공식 파트너로서 도입 상담을 지원합니다.
+              BAIKAL은 AI 엔진부터 운영 플랫폼까지,<br className="hidden sm:block" />
+              당신의 비즈니스가 <strong className="text-white/60">AI를 직접 소유</strong>하도록 만듭니다.
             </p>
             <div className="flex items-center gap-3 sm:gap-4">
               <Link
-                to="/projects"
+                to="/solutions"
                 className="group flex items-center gap-2 sm:gap-3 rounded-full bg-white px-5 sm:px-7 py-3 sm:py-3.5 text-xs sm:text-sm font-semibold text-black transition-all duration-300 hover:bg-blue-50 hover:shadow-lg hover:shadow-blue-500/20"
               >
-                AI 프로젝트 보기
+                제품 보기
                 <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
               </Link>
               <Link
-                to="/solutions/safelyn"
+                to="/contact"
                 className="flex items-center gap-2 sm:gap-3 rounded-full border border-white/10 px-5 sm:px-7 py-3 sm:py-3.5 text-xs sm:text-sm font-semibold text-white/60 transition-all duration-300 hover:border-white/25 hover:text-white"
               >
-                SafeLyn 알아보기
+                도입 문의
               </Link>
             </div>
           </div>
@@ -228,6 +224,39 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* ===== WHAT WE DO ===== */}
+      <section className="relative py-24 sm:py-32 bg-[#080808]">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full bg-blue-500/5 blur-[100px] pointer-events-none" />
+        <div className="reveal mx-auto max-w-4xl px-5 sm:px-6 lg:px-8 text-center">
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="h-px w-8 bg-blue-500/60" />
+            <span className="section-label">WHAT WE DO</span>
+            <div className="h-px w-8 bg-blue-500/60" />
+          </div>
+          <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white lg:text-6xl leading-tight">
+            We Build AI Platforms,<br />
+            <span className="gradient-text">Not Just Software.</span>
+          </h2>
+          <p className="mt-6 text-sm sm:text-base text-white/40 max-w-2xl mx-auto leading-relaxed">
+            BAIKAL은 서비스를 납품하지 않습니다. AI 엔진과 운영 플랫폼을 함께 제공하여,
+            고객이 AI를 직접 소유하고 운영할 수 있게 합니다.
+          </p>
+          <div className="mt-10 grid grid-cols-3 gap-6 sm:gap-10 max-w-lg mx-auto">
+            {[
+              { label: 'BAIKAL AI Engine', desc: '핵심 AI 두뇌' },
+              { label: 'Admin Framework', desc: '운영 플랫폼' },
+              { label: 'Custom MVP', desc: '맞춤 개발' },
+            ].map(item => (
+              <div key={item.label} className="text-center">
+                <p className="text-xs font-bold text-white/60 tracking-wider">{item.label}</p>
+                <p className="mt-1 text-[11px] text-white/25">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ===== FEATURED SOLUTION ===== */}
       <FeaturedSolutionCard solution={FEATURED_SOLUTION} />
@@ -299,7 +328,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== 바이칼 SERVICES ===== */}
+      {/* ===== POWERED BY BAIKAL PRODUCTS ===== */}
       <section className="relative py-24 sm:py-32 bg-[#080808]">
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-blue-500/4 blur-[100px] pointer-events-none" />
@@ -308,14 +337,14 @@ export default function HomePage() {
             <div>
               <div className="flex items-center gap-3 mb-5 sm:mb-6">
                 <div className="h-px w-8 bg-blue-500/60" />
-                <span className="section-label">SERVICES</span>
+                <span className="section-label">POWERED BY BAIKAL</span>
               </div>
               <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white lg:text-5xl">
-                바이칼 서비스
+                제품 라인업
               </h2>
             </div>
             <Link
-              to="/services"
+              to="/solutions"
               className="hidden sm:flex items-center gap-2 text-sm text-white/30 transition-colors hover:text-white/70 group"
             >
               전체 보기 <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
@@ -323,7 +352,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {HOME_SERVICES.map((s, idx) => (
+            {PRODUCTS.map((s, idx) => (
               <Link
                 key={s.title}
                 to={s.href}
@@ -347,10 +376,10 @@ export default function HomePage() {
 
           <div className="mt-8 sm:hidden">
             <Link
-              to="/services"
+              to="/solutions"
               className="flex items-center justify-center gap-2 rounded-full border border-white/10 py-3 text-sm text-white/40 hover:border-white/20 hover:text-white/70 transition-all"
             >
-              전체 서비스 보기 →
+              전체 제품 보기 →
             </Link>
           </div>
         </div>
@@ -413,6 +442,36 @@ export default function HomePage() {
 
 
 
+      {/* ===== HOW IT WORKS ===== */}
+      <section className="relative py-24 sm:py-32 bg-[#080808]">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+        <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+          <div className="reveal text-center mb-16">
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <div className="h-px w-8 bg-blue-500/60" />
+              <span className="section-label">HOW IT WORKS</span>
+              <div className="h-px w-8 bg-blue-500/60" />
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white lg:text-5xl">
+              3단계로 AI 전환 완료
+            </h2>
+          </div>
+          <div className="reveal grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-4xl mx-auto">
+            {[
+              { step: '01', title: 'BAIKAL AI Engine 탑재', desc: 'LLM·RAG·에이전트 기반 AI 두뇌를 비즈니스에 연결합니다.', color: 'text-blue-400', border: 'border-blue-500/20' },
+              { step: '02', title: '맞춤 제품 도입', desc: 'Private AI·AI Automation·SafeLyn·THE LIT 중 최적 제품을 선택합니다.', color: 'text-purple-400', border: 'border-purple-500/20' },
+              { step: '03', title: '고객 비즈니스 운영', desc: 'AI를 직접 소유한 고객이 자체적으로 운영·확장합니다.', color: 'text-emerald-400', border: 'border-emerald-500/20' },
+            ].map(item => (
+              <div key={item.step} className={`glass-card rounded-2xl p-7 border ${item.border} relative`}>
+                <p className={`text-4xl font-black ${item.color} mb-4`}>{item.step}</p>
+                <h3 className="text-sm font-bold text-white mb-3">{item.title}</h3>
+                <p className="text-xs leading-relaxed text-white/35">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ===== CTA ===== */}
       <section className="relative py-28 sm:py-40 bg-[#080808]" style={{overflow:'clip'}}>
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
@@ -434,32 +493,32 @@ export default function HomePage() {
             <div className="h-px w-8 bg-blue-500/60" />
           </div>
           <h2 className="text-4xl sm:text-5xl font-black leading-tight tracking-tight text-white lg:text-6xl">
-            AI 프로젝트 또는<br />
-            <span className="gradient-text">SafeLyn 도입 상담</span>
+            AI를 직접 소유할<br />
+            <span className="gradient-text">준비가 되셨나요?</span>
           </h2>
           <p className="mt-5 sm:mt-6 text-sm sm:text-base text-white/35 max-w-lg mx-auto">
-            AI MVP 개발 파트너가 필요하거나,<br className="hidden sm:block" />
-            SafeLyn 산업 안전 솔루션 도입을 검토 중이라면 먼저 문의해 주세요.
+            BAIKAL AI Platform으로 당신의 비즈니스에<br className="hidden sm:block" />
+            AI 엔진과 운영 플랫폼을 함께 도입하세요.
           </p>
           <div className="mt-10 sm:mt-12 flex flex-col items-center gap-3 sm:gap-4 sm:flex-row sm:justify-center">
             <Link
               to="/contact"
               className="group w-full sm:w-auto flex items-center justify-center gap-3 rounded-full bg-white px-7 sm:px-8 py-3.5 sm:py-4 text-sm font-semibold text-black transition-all duration-300 hover:bg-blue-50 hover:shadow-lg hover:shadow-blue-500/20"
             >
-              문의하기
+              도입 문의하기
               <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
             </Link>
             <Link
-              to="/solutions/safelyn"
+              to="/solutions"
               className="w-full sm:w-auto flex items-center justify-center gap-3 rounded-full border border-white/10 px-7 sm:px-8 py-3.5 sm:py-4 text-sm font-semibold text-white/50 transition-all duration-300 hover:border-white/25 hover:text-white"
             >
-              SafeLyn 알아보기
+              제품 보기
             </Link>
             <Link
-              to="/services"
+              to="/projects"
               className="w-full sm:w-auto flex items-center justify-center gap-3 rounded-full border border-white/10 px-7 sm:px-8 py-3.5 sm:py-4 text-sm font-semibold text-white/50 transition-all duration-300 hover:border-white/25 hover:text-white"
             >
-              서비스 보기
+              포트폴리오 보기
             </Link>
           </div>
         </div>

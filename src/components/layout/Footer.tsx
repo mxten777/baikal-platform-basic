@@ -22,9 +22,9 @@ export default function Footer() {
               />
             </Link>
             <p className="text-sm leading-relaxed text-white/35 max-w-xs">
-              AI 소프트웨어 개발 회사.<br />
-              MVP부터 프로덕션까지,<br />
-              AI의 가능성을 현실로 만듭니다.
+              AI Platform Company.<br />
+              AI 엔진과 운영 플랫폼을 함께 제공하여,<br />
+              당신의 비즈니스가 AI를 직접 소유하게 합니다.
             </p>
             {/* SNS */}
             <div className="mt-6 sm:mt-8 flex gap-3 sm:gap-4">
@@ -49,14 +49,14 @@ export default function Footer() {
           {/* 링크 */}
           <div className="grid grid-cols-3 gap-6 sm:gap-8 md:col-span-7">
             <div>
-              <p className="mb-4 text-[10px] font-semibold tracking-[0.2em] text-white/25 uppercase">Platform</p>
+              <p className="mb-4 text-[10px] font-semibold tracking-[0.2em] text-white/25 uppercase">Products</p>
               <ul className="space-y-2.5 sm:space-y-3">
                 {[
-                  { to: '/projects', label: 'AI 프로젝트' },
-                  { to: '/lab/articles', label: 'BAIKAL Lab' },
-                  { to: '/content', label: '콘텐츠 허브' },
-                  { to: '/media', label: '미디어' },
-                  { to: '/topics', label: '토픽' },
+                  { to: '/solutions',         label: '제품 라인업' },
+                  { to: '/solutions/safelyn', label: 'SafeLyn' },
+                  { to: '/contact?solution=private-ai',    label: 'Private AI' },
+                  { to: '/contact?solution=ai-automation', label: 'AI Automation' },
+                  { to: '/contact?solution=the-lit',       label: 'THE LIT' },
                 ].map(l => (
                   <li key={l.to}>
                     <Link to={l.to} className="text-sm text-white/35 transition-colors duration-200 hover:text-white/80">
@@ -70,9 +70,10 @@ export default function Footer() {
               <p className="mb-4 text-[10px] font-semibold tracking-[0.2em] text-white/25 uppercase">Company</p>
               <ul className="space-y-2.5 sm:space-y-3">
                 {[
-                  { to: '/about', label: '회사 소개' },
-                  { to: '/services', label: '서비스' },
-                  { to: '/contact', label: '프로젝트 문의' },
+                  { to: '/projects', label: '포트폴리오' },
+                  { to: '/about',    label: '회사 소개' },
+                  { to: '/content',  label: '콘텐츠' },
+                  { to: '/contact',  label: '도입 문의' },
                 ].map(l => (
                   <li key={l.to}>
                     <Link to={l.to} className="text-sm text-white/35 transition-colors duration-200 hover:text-white/80">
@@ -111,7 +112,7 @@ export default function Footer() {
             © {year} 바이칼시스템즈. All rights reserved.
           </p>
           <p className="text-[11px] text-white/15 tracking-widest uppercase">
-            AI Software Development Company
+            AI Platform Company
           </p>
         </div>
       </div>

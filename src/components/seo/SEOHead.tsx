@@ -20,7 +20,7 @@ export default function SEOHead({
   structuredData,
   type = 'website',
 }: SEOHeadProps) {
-  const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} - AI 개발 플랫폼`
+  const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} — Your Business, AI-Powered.`
   const desc = description ?? SITE_DESCRIPTION
 
   return (
