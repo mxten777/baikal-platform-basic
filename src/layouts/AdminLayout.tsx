@@ -3,7 +3,7 @@ import { Outlet, NavLink } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import {
   LayoutDashboard, FileText, FolderKanban,
-  Image, LogOut, Tag, Menu, X, Globe2
+  Image, LogOut, Tag, Menu, X, Globe2, Sparkles
 } from 'lucide-react'
 
 type NavEntry =
@@ -17,6 +17,7 @@ const navEntries: NavEntry[] = [
   { to: '/admin/projects', label: '프로젝트',   icon: FolderKanban },
   { to: '/admin/media',    label: '미디어',     icon: Image },
   { to: '/admin/tags',     label: '태그',       icon: Tag },
+  { to: '/admin/marketing', label: 'AI 마케팅',  icon: Sparkles },
   { type: 'section', label: '시스템' },
   { to: '/admin/external', label: '외부 콘텐츠', icon: Globe2 },
 ]

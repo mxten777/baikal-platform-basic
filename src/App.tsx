@@ -50,6 +50,7 @@ const AdminSyncJobs        = lazy(() => import('@/pages/admin/AdminSyncJobs'))
 const AdminMedia           = lazy(() => import('@/pages/admin/AdminMedia'))
 const AdminTags            = lazy(() => import('@/pages/admin/AdminTags'))
 const AdminExternal        = lazy(() => import('@/pages/admin/AdminExternal'))
+const AdminMarketing       = lazy(() => import('@/pages/admin/AdminMarketing'))
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -91,6 +92,7 @@ export default function App() {
         <Route path="media" element={<AdminMedia />} />
         <Route path="tags" element={<AdminTags />} />
         <Route path="external" element={<AdminExternal />} />
+        <Route path="marketing" element={<AdminMarketing />} />
       </Route>
 
       {/* Public */}
