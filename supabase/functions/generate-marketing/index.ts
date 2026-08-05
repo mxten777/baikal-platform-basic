@@ -20,7 +20,7 @@ const BAIKAL_AI_API_KEY = Deno.env.get('BAIKAL_AI_API_KEY') ?? ''
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, baggage, sentry-trace',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
