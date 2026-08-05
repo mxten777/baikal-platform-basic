@@ -99,7 +99,7 @@ export async function getContentsByTag(
     .from('tags')
     .select('id')
     .eq('slug', tagSlug)
-    .single()
+    .maybeSingle()
 
   if (!tagData) return { data: [], count: 0, page, per_page: perPage, total_pages: 0 }
 
