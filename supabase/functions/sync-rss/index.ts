@@ -6,7 +6,7 @@
 // 트리거: Supabase Cron (매 30분) 또는 수동 호출
 // =============================================================================
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 import { parseStringPromise } from 'https://esm.sh/xml2js@0.6.2'
 import { crypto } from 'https://deno.land/std@0.177.0/crypto/mod.ts'
 
@@ -106,30 +106,13 @@ async function fetchAndParseRSS(
       ?? item.title
       ?? 'Untitled'
     )
-
-    // content:encoded (네이버 블로그 등 풀 HTML 본문)
-    const contentEncoded = String(
-      (item['content:encoded'] as { _: string } | undefined)?._
+    const summary = String(
+      item.description
+      ?? item.summary
       ?? (item['content:encoded'] as string | undefined)
       ?? ''
     )
-
-    // 썸네일: content:encoded에서 첫 번째 <img src> 추출
-    const thumbnailFromContent = (() => {
-      const match = contentEncoded.match(/<img[^>]+src=["']([^"']+)["']/i)
-      return match ? match[1] : null
-    })()
-
-    // 요약: description 우선, 없으면 content:encoded 텍스트화
-    const rawSummary = String(
-      item.description
-      ?? item.summary
-      ?? contentEncoded
-      ?? ''
-    )
-    const summary = rawSummary
-      .replace(/<[^>]+>/g, ' ')  // HTML 태그 → 공백
-      .replace(/\s{2,}/g, ' ')   // 연속 공백 정리
+      .replace(/<[^>]+>/g, '')  // HTML 태그 제거
       .trim()
       .slice(0, 500)
 
@@ -140,21 +123,12 @@ async function fetchAndParseRSS(
       ?? sourceUrl
     )
 
-    // 썸네일: media:thumbnail → media:content → content:encoded 추출 순
-    const mediaThumbnail = String(
-      (item['media:thumbnail'] as { $?: { url?: string } } | undefined)?.$?.url
-      ?? (item['media:content'] as { $?: { url?: string } } | undefined)?.$?.url
-      ?? thumbnailFromContent
-      ?? ''
-    ) || undefined
-
     return {
       external_id: externalId,
       title,
       summary,
       source_url: sourceUrl,
       published_at: String(item.pubDate ?? item.published ?? item.updated ?? ''),
-      thumbnail_url: mediaThumbnail,
       raw_data: item as Record<string, unknown>,
     }
   })
@@ -195,7 +169,7 @@ Deno.serve(async (req: Request) => {
       last_modified,
       source:content_sources!inner(id, name, is_active)
     `)
-    .eq('source.is_active', true)
+    .eq('content_sources.is_active', true)
 
   if (sourcesError) {
     console.error('RSS 소스 조회 실패:', sourcesError)
