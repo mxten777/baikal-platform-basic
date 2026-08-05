@@ -34,7 +34,16 @@ Edge Function → 관리자 브라우저 (JSON 응답 전달)
 
 ---
 
-## 3. Request / Response 규격
+## 3. 필요한 Supabase Secrets
+
+| Secret 이름 | 설명 |
+|---|---|
+| `BAIKAL_AI_URL` | Railway 배포 URL (예: `https://xxx.railway.app`) |
+| `BAIKAL_AI_API_KEY` | BAIKAL AI Engine X-API-Key 값 |
+
+---
+
+## 4. Request / Response 규격
 
 ### Request Body
 

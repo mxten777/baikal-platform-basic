@@ -2,7 +2,7 @@
 // Supabase Edge Function: generate-marketing
 // supabase/functions/generate-marketing/index.ts
 //
-// 역할: 로그인 사용자 JWT를 검증한 뒤 BAIKAL AI Engine을 호출하여
+// 역할: 로그인 사용자 JWT를 검증한 뒤 Railway BAIKAL AI Engine을 호출하여
 //       마케팅 콘텐츠를 생성하고 결과를 반환한다.
 // 트리거: 관리자 UI (Admin Marketing Page) 수동 호출
 //
@@ -123,10 +123,10 @@ Deno.serve(async (req: Request) => {
     )
   }
 
-  // ── BAIKAL AI Engine 호출 ────────────────────────────────────────────────
+  // ── Railway BAIKAL AI Engine 호출 ────────────────────────────────────────
   const aiUrl = `${BAIKAL_AI_URL.replace(/\/$/, '')}/marketing/generate`
   const payload = {
-    source_content: source_content.trim(),
+    source_content:         source_content.trim(),
     channel,
     purpose:                body.purpose               ?? 'promotion',
     tone:                   body.tone                  ?? 'professional',
@@ -137,26 +137,37 @@ Deno.serve(async (req: Request) => {
 
   console.log(`generate-marketing: 요청 시작 channel=${channel} user=${user.id}`)
 
-  let aiResponse: Response
-  try {
-    aiResponse = await fetch(aiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': BAIKAL_AI_API_KEY,
-      },
-      body: JSON.stringify(payload),
-    })
-  } catch (err) {
-    console.error('generate-marketing: AI Engine 연결 실패', String(err))
-    return jsonResponse(
-      { success: false, error: 'AI_ENGINE_UNREACHABLE', message: 'AI 엔진에 연결할 수 없습니다.' },
-      502,
-    )
+  // 429 rate-limit 시 최대 2회 재시도 (1s → 3s 대기)
+  const RETRY_DELAYS = [1000, 3000]
+  let aiResponse!: Response
+  let aiBody: unknown
+
+  for (let attempt = 0; attempt <= RETRY_DELAYS.length; attempt++) {
+    try {
+      aiResponse = await fetch(aiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': BAIKAL_AI_API_KEY,
+        },
+        body: JSON.stringify(payload),
+      })
+    } catch (err) {
+      console.error('generate-marketing: AI Engine 연결 실패', String(err))
+      return jsonResponse(
+        { success: false, error: 'AI_ENGINE_UNREACHABLE', message: 'AI 엔진에 연결할 수 없습니다.' },
+        502,
+      )
+    }
+
+    if (aiResponse.status !== 429 || attempt === RETRY_DELAYS.length) break
+
+    const delay = RETRY_DELAYS[attempt]
+    console.warn(`generate-marketing: 429 rate-limit, ${delay}ms 후 재시도 (attempt=${attempt + 1})`)
+    await new Promise(resolve => setTimeout(resolve, delay))
   }
 
   // ── AI Engine 응답 전달 ──────────────────────────────────────────────────
-  let aiBody: unknown
   try {
     aiBody = await aiResponse.json()
   } catch {
@@ -170,7 +181,9 @@ Deno.serve(async (req: Request) => {
   if (!aiResponse.ok) {
     const errBody = aiBody as Record<string, unknown>
     const errCode = (errBody?.error as Record<string, string> | undefined)?.code ?? 'AI_ENGINE_ERROR'
-    const errMsg  = (errBody?.error as Record<string, string> | undefined)?.message ?? 'AI 엔진 오류가 발생했습니다.'
+    const errMsg  = aiResponse.status === 429
+      ? 'LLM API 요청 한도를 초과했습니다. 잠시 후 다시 시도해 주세요.'
+      : ((errBody?.error as Record<string, string> | undefined)?.message ?? 'AI 엔진 오류가 발생했습니다.')
     console.error(`generate-marketing: AI Engine 오류 status=${aiResponse.status} code=${errCode}`)
     return jsonResponse(
       { success: false, error: errCode, message: errMsg },

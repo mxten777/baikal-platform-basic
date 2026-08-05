@@ -70,7 +70,10 @@ export function useMarketing() {
 
       const body = await res.json()
       if (!res.ok || !body.success) {
-        throw new Error(body.message ?? `HTTP ${res.status}`)
+        const msg = res.status === 429
+          ? 'LLM API 요청 한도를 초과했습니다. 잠시 후 다시 시도해 주세요.'
+          : (body.message ?? `HTTP ${res.status}`)
+        throw new Error(msg)
       }
       setResult(body.content as string)
     } catch (err) {
