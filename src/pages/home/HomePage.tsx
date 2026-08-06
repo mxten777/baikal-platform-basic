@@ -258,6 +258,89 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ===== FEATURED SUCCESS STORY ===== */}
+      <section className="relative py-24 sm:py-32 bg-[#080808]">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+        <div className="absolute top-1/2 -translate-y-1/2 right-0 w-[500px] h-[400px] rounded-full bg-amber-500/6 blur-[120px] pointer-events-none" />
+        <div className="relative mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+          <div className="reveal flex items-center gap-3 mb-12 sm:mb-16">
+            <div className="h-px w-8 bg-amber-500/60" />
+            <span className="section-label">FEATURED SUCCESS STORY</span>
+          </div>
+
+          <div className="reveal glass-card rounded-2xl overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-2">
+
+              {/* 비주얼 패널 */}
+              <div className="relative min-h-[240px] lg:min-h-[380px] flex items-center justify-center overflow-hidden bg-gradient-to-br from-amber-950/40 via-amber-900/20 to-[#0d0d0d]">
+                <div className="absolute inset-0 grid-bg opacity-20" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(245,158,11,0.12)_0%,transparent_70%)]" />
+                <div className="relative text-center px-8">
+                  <p className="text-[clamp(3rem,8vw,6rem)] font-black tracking-[-0.04em] leading-none text-amber-400/90 drop-shadow-[0_0_40px_rgba(245,158,11,0.3)]">
+                    THE LIT
+                  </p>
+                  <p className="mt-3 text-[11px] font-semibold tracking-[0.25em] uppercase text-amber-400/40">
+                    Culture Platform
+                  </p>
+                </div>
+              </div>
+
+              {/* 콘텐츠 */}
+              <div className="p-8 sm:p-10 lg:p-12 flex flex-col justify-center">
+                <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/[0.07] px-3 py-1 mb-6 w-fit">
+                  <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-badge-pulse flex-shrink-0" />
+                  <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-amber-300/70">
+                    Powered by BAIKAL AI Platform
+                  </span>
+                </div>
+
+                <h2 className="text-4xl sm:text-5xl font-black tracking-[-0.02em] leading-tight text-white">
+                  THE LIT
+                </h2>
+                <p className="mt-2 text-sm font-medium tracking-wider text-white/30 uppercase">
+                  K-POP · Drama · Commercial · Entertainment
+                </p>
+
+                <div className="mt-7 flex items-baseline gap-2">
+                  <span className="text-4xl sm:text-5xl font-black text-amber-400 tabular-nums">5,200만+</span>
+                  <span className="text-sm text-white/35">콘텐츠 노출</span>
+                </div>
+
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {['Website', 'AI Marketing Engine', 'Admin Framework', 'SEO'].map(tag => (
+                    <span
+                      key={tag}
+                      className="rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1 text-[11px] text-white/40"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                <p className="mt-7 text-sm leading-relaxed text-white/40 max-w-sm">
+                  Explore how BAIKAL transformed THE LIT into a modern AI-powered digital platform.
+                </p>
+
+                <div className="mt-5 flex flex-wrap items-center gap-4">
+                  <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/[0.07] px-3 py-1">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-badge-pulse flex-shrink-0" />
+                    <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-emerald-300/70">운영 중</span>
+                  </div>
+                  <a
+                    href="https://thelit.kr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-2 rounded-full border border-amber-500/25 bg-amber-500/10 px-5 py-2 text-sm font-semibold text-amber-300/80 transition-all duration-300 hover:border-amber-500/45 hover:bg-amber-500/20 hover:text-amber-200"
+                  >
+                    Explore THE LIT →
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ===== FEATURED SOLUTION ===== */}
       <FeaturedSolutionCard solution={FEATURED_SOLUTION} />
 
