@@ -19,6 +19,7 @@ const ProjectCategoryPage  = lazy(() => import('@/pages/projects/ProjectCategory
 // Solutions
 const SolutionsPage        = lazy(() => import('@/pages/solutions/SolutionsPage'))
 const SolutionDetailPage   = lazy(() => import('@/pages/solutions/SolutionDetailPage'))
+const BaikalAIEnginePage   = lazy(() => import('@/pages/solutions/BaikalAIEnginePage'))
 
 // Lab
 const ArticleListPage      = lazy(() => import('@/pages/lab/ArticleListPage'))
@@ -109,6 +110,7 @@ export default function App() {
 
         {/* Solutions */}
         <Route path="/solutions" element={<SolutionsPage />} />
+        <Route path="/solutions/baikal-ai-engine" element={<BaikalAIEnginePage />} />
         <Route path="/solutions/:slug" element={<SolutionDetailPage />} />
 
         {/* Lab */}

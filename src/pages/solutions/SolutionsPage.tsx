@@ -4,32 +4,19 @@ import { SITE_URL } from '@/lib/constants'
 
 const PRODUCTS = [
   {
-    icon: '🔒',
-    name: 'Private AI',
-    tagline: '폐쇄망에서도 작동하는 AI 플랫폼',
-    desc: '인터넷 단절 환경(폐쇄망)에 설치하는 RAG 기반 문서검색·AI 답변 시스템. 공공기관·군·금융 특화.',
-    tags: ['공공기관', '금융', '온프레미스', 'RAG'],
-    href: '/contact?solution=private-ai',
-    cta: '도입 문의',
+    icon: '🤖',
+    name: 'BAIKAL AI Engine',
+    tagline: 'BAIKAL 제품과 고객 서비스를 구동하는 공통 AI 실행 엔진',
+    desc: 'FastAPI·Docker 기반으로 콘텐츠 생성, 문서 처리, 자동화 기능을 제공하는 BAIKAL의 핵심 AI 인프라',
+    tags: ['FastAPI', 'Docker', 'AI API', 'Multi Project'],
+    href: '/solutions/baikal-ai-engine',
+    cta: '자세히 보기',
     accentColor: 'blue',
     border: 'border-blue-500/20',
     glow: 'bg-blue-500/10',
     label: 'text-blue-400',
-    available: false,
-  },
-  {
-    icon: '⚡',
-    name: 'AI Automation',
-    tagline: '반복 업무를 AI 에이전트로 자동화',
-    desc: 'RPA·회의록·보조금 신청·재무 자동화까지. BAIKAL AI Engine 기반 업무 자동화 플랫폼.',
-    tags: ['중소기업', '제조', 'RPA', 'AI Agent'],
-    href: '/contact?solution=ai-automation',
-    cta: '도입 문의',
-    accentColor: 'purple',
-    border: 'border-purple-500/20',
-    glow: 'bg-purple-500/10',
-    label: 'text-purple-400',
-    available: false,
+    available: true,
+    external: false,
   },
   {
     icon: '🛡️',
@@ -44,6 +31,7 @@ const PRODUCTS = [
     glow: 'bg-emerald-500/10',
     label: 'text-emerald-400',
     available: true,
+    external: false,
   },
   {
     icon: '🎭',
@@ -51,13 +39,44 @@ const PRODUCTS = [
     tagline: '공간 운영 올인원 플랫폼',
     desc: '공연·전시·강좌·공간 예약을 통합 운영하는 복합문화공간 플랫폼.',
     tags: ['문화공간', '지자체', '예약·결제', '공연'],
-    href: '/contact?solution=the-lit',
-    cta: '도입 문의',
+    href: 'https://thelit.kr',
+    cta: '사이트 방문',
     accentColor: 'amber',
     border: 'border-amber-500/20',
     glow: 'bg-amber-500/10',
     label: 'text-amber-400',
+    available: true,
+    external: true,
+  },
+  {
+    icon: '🔒',
+    name: 'Private AI',
+    tagline: '폐쇄망에서도 작동하는 AI 플랫폼',
+    desc: '인터넷 단절 환경(폐쇄망)에 설치하는 RAG 기반 문서검색·AI 답변 시스템. 공공기관·군·금융 특화.',
+    tags: ['공공기관', '금융', '온프레미스', 'RAG'],
+    href: '/contact?solution=private-ai',
+    cta: '도입 문의',
+    accentColor: 'blue',
+    border: 'border-blue-500/20',
+    glow: 'bg-blue-500/10',
+    label: 'text-blue-400',
     available: false,
+    external: false,
+  },
+  {
+    icon: '⚡',
+    name: 'AI Automation',
+    tagline: '반복 업무를 AI 에이전트로 자동화',
+    desc: 'RPA·회의록·보조금 신청·재무 자동화까지. BAIKAL AI Engine 기반 업무 자동화 플랫폼.',
+    tags: ['중소기업', '제조', 'RPA', 'AI Agent'],
+    href: '/contact?solution=ai-automation',
+    cta: '도입 문의',
+    accentColor: 'purple',
+    border: 'border-purple-500/20',
+    glow: 'bg-purple-500/10',
+    label: 'text-purple-400',
+    available: false,
+    external: false,
   },
 ]
 
@@ -79,7 +98,7 @@ export default function SolutionsPage() {
     <>
       <SEOHead
         title="제품 — Powered by BAIKAL"
-        description="BAIKAL AI Platform이 제공하는 4개 제품 라인업. Private AI, AI Automation, SafeLyn, THE LIT."
+        description="BAIKAL AI Platform이 제공하는 5개 제품 라인업. BAIKAL AI Engine, SafeLyn, THE LIT, Private AI, AI Automation."
         canonical="/solutions"
         structuredData={structuredData}
       />
@@ -98,7 +117,7 @@ export default function SolutionsPage() {
             제품 라인업
           </h1>
           <p className="mt-5 text-sm sm:text-base text-white/40 max-w-xl">
-            BAIKAL AI Engine과 Admin Framework를 기반으로 구축된 4개 제품.
+            BAIKAL AI Engine과 Admin Framework를 기반으로 구축된 5개 제품.
             모든 제품은 고객이 AI를 직접 소유하고 운영할 수 있도록 설계되었습니다.
           </p>
         </div>
@@ -148,13 +167,25 @@ export default function SolutionsPage() {
                     ))}
                   </div>
 
-                  <Link
-                    to={p.href}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/15 px-5 py-2.5 text-xs font-semibold text-white/60 transition-all duration-300 hover:border-white/30 hover:text-white group/btn"
-                  >
-                    {p.cta}
-                    <span className="transition-transform duration-300 group-hover/btn:translate-x-1">→</span>
-                  </Link>
+                  {p.external ? (
+                    <a
+                      href={p.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full border border-white/15 px-5 py-2.5 text-xs font-semibold text-white/60 transition-all duration-300 hover:border-white/30 hover:text-white group/btn"
+                    >
+                      {p.cta}
+                      <span className="transition-transform duration-300 group-hover/btn:translate-x-1">→</span>
+                    </a>
+                  ) : (
+                    <Link
+                      to={p.href}
+                      className="inline-flex items-center gap-2 rounded-full border border-white/15 px-5 py-2.5 text-xs font-semibold text-white/60 transition-all duration-300 hover:border-white/30 hover:text-white group/btn"
+                    >
+                      {p.cta}
+                      <span className="transition-transform duration-300 group-hover/btn:translate-x-1">→</span>
+                    </Link>
+                  )}
                 </div>
               </div>
             ))}
