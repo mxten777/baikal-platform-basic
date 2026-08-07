@@ -24,7 +24,7 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
-const ALLOWED_CHANNELS = ['instagram', 'threads', 'naver_blog']
+const ALLOWED_CHANNELS = ['instagram', 'threads', 'naver_blog', 'reels']
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -133,6 +133,48 @@ Deno.serve(async (req: Request) => {
     language:               body.language              ?? 'ko',
     brand:                  body.brand                 ?? 'BAIKAL',
     additional_instruction: body.additional_instruction ?? '',
+  }
+
+  // Reels: Railway Pydantic이 허용하는 channel로 교체하고 대본 형식을 additional_instruction에 주입
+  if (channel === 'reels') {
+    payload.channel = 'instagram'
+    const reelsInstruction = [
+      '다음 형식으로 Reels 영상 대본을 작성하세요. 마케팅 홍보 문구 대신 실제 영상 제작용 대본을 작성합니다.',
+      '',
+      'HOOK',
+      '(첫 3초에 시청자의 시선을 끌는 강렬한 문구)',
+      '',
+      'CONCEPT',
+      '(영상 전체 콘셉트 한 줄 요약)',
+      '',
+      'SCENES',
+      '',
+      'Scene 1',
+      '화면: (화면 연출 방식)',
+      '내레이션: (음성으로 읽을 텍스트)',
+      '자막: (화면에 표시할 텍스트)',
+      '',
+      'Scene 2',
+      '화면:',
+      '내레이션:',
+      '자막:',
+      '',
+      'Scene 3',
+      '화면:',
+      '내레이션:',
+      '자막:',
+      '',
+      'CAPTION',
+      '(Instagram 게시물 본문)',
+      '',
+      'HASHTAGS',
+      '(관련 해시태그)',
+      '',
+      'DURATION',
+      '(권장 영상 길이)',
+    ].join('\n')
+    payload.additional_instruction = reelsInstruction +
+      (payload.additional_instruction ? '\n\n' + payload.additional_instruction : '')
   }
 
   console.log(`generate-marketing: 요청 시작 channel=${channel} user=${user.id}`)

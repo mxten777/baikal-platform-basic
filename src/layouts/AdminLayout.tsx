@@ -15,9 +15,9 @@ const navEntries: NavEntry[] = [
   { to: '/admin',          label: '대시보드',   icon: LayoutDashboard, end: true },
   { to: '/admin/contents', label: '콘텐츠',     icon: FileText },
   { to: '/admin/projects', label: '프로젝트',   icon: FolderKanban },
-  { to: '/admin/media',    label: '미디어',     icon: Image },
-  { to: '/admin/tags',     label: '태그',       icon: Tag },
-  { to: '/admin/marketing', label: 'AI 마케팅',  icon: Sparkles },
+  { to: '/admin/media',     label: '미디어',    icon: Image },
+  { to: '/admin/tags',      label: '태그',      icon: Tag },
+  { to: '/admin/ai-content', label: 'AI 콘텐츠', icon: Sparkles },
   { type: 'section', label: '시스템' },
   { to: '/admin/external', label: '외부 콘텐츠', icon: Globe2 },
 ]

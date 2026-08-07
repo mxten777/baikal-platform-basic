@@ -282,3 +282,43 @@ export interface ProjectFilters {
   featured?: boolean
   status?: ProjectStatus
 }
+
+// =============================================================================
+// AI Content Engine
+// =============================================================================
+
+export type AIContentSourceType = 'direct' | 'blog' | 'project'
+export type AIContentStatus = 'draft' | 'ready'
+export type AIOutputStatus = 'draft' | 'approved' | 'published'
+
+export interface AIContent {
+  id: string
+  title: string
+  body?: string
+  content_kind: string
+  source_type: AIContentSourceType
+  source_content_id?: string
+  source_project_id?: string
+  media_asset_id?: string
+  brand: string
+  status: AIContentStatus
+  created_by: string
+  created_at: string
+  updated_at: string
+  source_content?: Pick<Content, 'id' | 'title' | 'summary'>
+  source_project?: Pick<Project, 'id' | 'title' | 'subtitle'>
+}
+
+export interface AIContentOutput {
+  id: string
+  ai_content_id: string
+  channel: string
+  purpose: string
+  tone: string
+  output_text?: string
+  edited_text?: string
+  status: AIOutputStatus
+  created_by: string
+  created_at: string
+  ai_content?: Pick<AIContent, 'id' | 'title' | 'source_type' | 'content_kind'>
+}
