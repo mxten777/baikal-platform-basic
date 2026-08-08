@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Blue: top-left (182deg to 268deg) -->
+  <path d="M 2.01 15.51 A 14 14 0 0 1 15.51 2.01 L 15.65 6.01 A 10 10 0 0 0 6.01 15.65 Z" fill="#0D2CC8"/>
+  <!-- Green: top-right (272deg to 358deg) -->
+  <path d="M 16.49 2.01 A 14 14 0 0 1 29.99 15.51 L 25.99 15.65 A 10 10 0 0 0 16.35 6.01 Z" fill="#7BD5A5"/>
+  <!-- Yellow: bottom-right (2deg to 88deg) -->
+  <path d="M 29.99 16.49 A 14 14 0 0 1 16.49 29.99 L 16.35 25.99 A 10 10 0 0 0 25.99 16.35 Z" fill="#FFC107"/>
+  <!-- Orange: bottom-left (92deg to 178deg) -->
+  <path d="M 15.51 29.99 A 14 14 0 0 1 2.01 16.49 L 6.01 16.35 A 10 10 0 0 0 15.65 25.99 Z" fill="#F15A24"/>
+  <!-- Bold B, centered -->
+  <text x="16" y="16"
+        font-family="'Arial Black', Arial, sans-serif"
+        font-weight="900"
+        font-size="16"
+        text-anchor="middle"
+        dominant-baseline="central"
+        fill="#111111">B</text>
+</svg>
