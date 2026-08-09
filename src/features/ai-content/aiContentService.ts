@@ -95,6 +95,8 @@ export async function publishOutput(row: AIHistoryRow): Promise<void> {
   const title = row.ai_content?.title ?? '(제목 없음)'
   const body = row.edited_text ?? row.output_text ?? ''
   const slug = `${toSlug(title)}-${Date.now()}`
+  // 줄바꿈·연속 공백 제거 후 앞 120자를 카드 미리보기용 summary로 저장
+  const summary = body.replace(/\s+/g, ' ').trim().slice(0, 120) || null
 
   const { error: insertError } = await supabase
     .from('contents')
@@ -102,6 +104,7 @@ export async function publishOutput(row: AIHistoryRow): Promise<void> {
       slug,
       title,
       body,
+      summary,
       content_type: contentType,
       status: 'published',
       published_at: new Date().toISOString(),

@@ -40,8 +40,12 @@ export default function ArticleDetailPage() {
     note:       { path: '/lab/notes',       label: '개발 노트'   },
     experiment: { path: '/lab/experiments', label: '실험 기록'   },
     research:   { path: '/lab/research',    label: '연구 기록'   },
+    instagram:  { path: '/content',         label: '콘텐츠 허브' },
+    threads:    { path: '/content',         label: '콘텐츠 허브' },
+    rss:        { path: '/content',         label: '콘텐츠 허브' },
+    facebook:   { path: '/content',         label: '콘텐츠 허브' },
   }
-  const breadcrumb = BREADCRUMB[content.content_type] ?? BREADCRUMB['article']!
+  const breadcrumb = BREADCRUMB[content.content_type] ?? { path: '/content', label: '콘텐츠 허브' }
 
   return (
     <>

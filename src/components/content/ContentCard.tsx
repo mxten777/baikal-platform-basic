@@ -62,6 +62,7 @@ export default function ContentCard({ content, variant = 'default', className }:
     : `/content/${content.slug}`
 
   const isExternal = ['rss', 'x_post', 'instagram', 'youtube', 'external_link'].includes(content.content_type)
+    && !!content.source_url
   const dot = CHANNEL_DOT[content.content_type] ?? 'bg-white/20'
   const placeholderIcon = PLACEHOLDER_ICON[content.content_type] ?? '◇'
   const placeholderAccent = PLACEHOLDER_ACCENT[content.content_type] ?? 'rgba(255,255,255,0.15)'

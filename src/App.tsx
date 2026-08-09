@@ -125,6 +125,7 @@ export default function App() {
 
         {/* Content Hub */}
         <Route path="/content" element={<ContentHubPage />} />
+        <Route path="/content/:slug" element={<ArticleDetailPage />} />
         <Route path="/content/:channel" element={<ContentChannelPage />} />
 
         {/* Media */}
