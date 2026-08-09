@@ -122,6 +122,7 @@ export default function HomePage() {
       'https://www.youtube.com/@BAIKALAI',
       'https://www.instagram.com/baikal.ai/',
       'https://www.threads.net/@baikal.ai',
+      'https://www.facebook.com/profile.php?id=61592854179097',
     ],
   }
 

@@ -34,6 +34,7 @@ export default function Footer() {
                 { href: 'https://www.instagram.com/baikal.ai/',         label: 'IG' },
                 { href: 'https://www.threads.net/@baikal.ai',           label: 'TH' },
                 { href: 'https://blog.naver.com/jngdy',                 label: 'NB' },
+                { href: 'https://www.facebook.com/profile.php?id=61592854179097', label: 'FB' },
               ].map(s => (
                 <a
                   key={s.label}
