@@ -484,7 +484,7 @@ export default function AdminAIContent() {
                     <p className="text-sm text-red-400">{actionError}</p>
                   </div>
                 )}
-              <table className="w-full text-sm">
+              <table className="hidden md:table w-full text-sm">
                 <thead>
                   <tr className="border-b border-white/[0.06]">
                     {['제목', '원본 유형', '채널', '상태', '생성일', ''].map(h => (
@@ -552,6 +552,64 @@ export default function AdminAIContent() {
                   })}
                 </tbody>
               </table>
+
+              {/* 모바일 카드 목록 — md 미만에서만 표시 */}
+              <div className="md:hidden divide-y divide-white/[0.04]">
+                {history.map(row => {
+                  const isActioning = actioningId === row.id
+                  const canPublish = row.status === 'approved' && PUBLISHABLE_CHANNELS.has(row.channel)
+                  return (
+                    <div key={row.id} className="px-4 py-3.5">
+                      <p className="text-sm font-medium text-white/80 line-clamp-2 mb-1">
+                        {row.ai_content?.title ?? '—'}
+                      </p>
+                      <p className="text-xs text-white/35">
+                        {row.ai_content
+                          ? SOURCE_LABEL[row.ai_content.source_type] ?? row.ai_content.source_type
+                          : '—'}
+                        {' · '}
+                        {CHANNEL_LABEL[row.channel] ?? row.channel}
+                      </p>
+                      <p className="text-xs text-white/25 mb-3">{formatDateShort(row.created_at)}</p>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${
+                          row.status === 'published'
+                            ? 'bg-green-500/15 text-green-400'
+                            : row.status === 'approved'
+                            ? 'bg-blue-500/15 text-blue-400'
+                            : 'bg-white/[0.06] text-white/30'
+                        }`}>
+                          {STATUS_LABEL[row.status] ?? row.status}
+                        </span>
+                        <div>
+                          {row.status === 'draft' && (
+                            <button
+                              onClick={() => handleApprove(row.id)}
+                              disabled={isActioning}
+                              className="rounded-lg px-4 py-1.5 text-xs font-medium border border-blue-500/30 text-blue-400 hover:bg-blue-600/15 disabled:opacity-40 transition-all"
+                            >
+                              {isActioning ? <Loader2 size={12} className="animate-spin" /> : '승인'}
+                            </button>
+                          )}
+                          {row.status === 'approved' && (
+                            <button
+                              onClick={() => handlePublish(row)}
+                              disabled={isActioning || !canPublish}
+                              title={!canPublish ? '이 채널은 Content Hub 공개를 지원하지 않습니다' : undefined}
+                              className="rounded-lg px-4 py-1.5 text-xs font-medium border border-green-500/30 text-green-400 hover:bg-green-600/15 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                            >
+                              {isActioning ? <Loader2 size={12} className="animate-spin" /> : '공개'}
+                            </button>
+                          )}
+                          {row.status === 'published' && (
+                            <span className="text-xs text-white/20">공개 완료</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
               </>
             )}
           </div>
