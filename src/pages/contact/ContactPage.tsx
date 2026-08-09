@@ -5,7 +5,7 @@ const CONTACT_ITEMS = [
   { icon: '📧', label: '업무 이메일', value: 'jngdy@baikalsys.kr', href: 'mailto:jngdy@baikalsys.kr' },
   { icon: '📩', label: '네이버 메일', value: 'jngdy@naver.com', href: 'mailto:jngdy@naver.com' },
   { icon: '🌐', label: '웹사이트', value: 'www.baikalsys.kr', href: 'https://www.baikalsys.kr' },
-  { icon: '🐦', label: 'X (Twitter)', value: '@baikalsys', href: 'https://x.com/baikalsys' },
+  { icon: '🐦', label: 'X (Twitter)', value: '@baikal_ai', href: 'https://x.com/baikal_ai' },
 ]
 
 const INQUIRY_LABELS: Record<string, { title: string; subtitle: string; items: string[] }> = {

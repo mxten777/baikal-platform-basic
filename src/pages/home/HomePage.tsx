@@ -118,8 +118,10 @@ export default function HomePage() {
     url: SITE_URL,
     description: 'BAIKAL AI Platform Company — AI 엔진과 운영 플랫폼을 함께 제공하여, 비즈니스가 AI를 직접 소유하도록 만드는 회사.',
     sameAs: [
-      'https://x.com/baikalsys',
-      'https://www.youtube.com/@baikalsys',
+      'https://x.com/baikal_ai',
+      'https://www.youtube.com/@BAIKALAI',
+      'https://www.instagram.com/baikal.ai/',
+      'https://www.threads.net/@baikal.ai',
     ],
   }
 

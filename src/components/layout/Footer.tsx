@@ -29,9 +29,11 @@ export default function Footer() {
             {/* SNS */}
             <div className="mt-6 sm:mt-8 flex gap-3 sm:gap-4">
               {[
-                { href: 'https://x.com/baikalsys', label: 'X' },
-                { href: 'https://www.youtube.com/@baikalsys', label: 'YT' },
-                { href: 'https://www.instagram.com/baikalsys', label: 'IG' },
+                { href: 'https://x.com/baikal_ai',                  label: 'X'  },
+                { href: 'https://www.youtube.com/@BAIKALAI',            label: 'YT' },
+                { href: 'https://www.instagram.com/baikal.ai/',         label: 'IG' },
+                { href: 'https://www.threads.net/@baikal.ai',           label: 'TH' },
+                { href: 'https://blog.naver.com/jngdy',                 label: 'NB' },
               ].map(s => (
                 <a
                   key={s.label}
