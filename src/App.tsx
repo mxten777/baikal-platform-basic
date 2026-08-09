@@ -27,7 +27,6 @@ const ArticleDetailPage    = lazy(() => import('@/pages/lab/ArticleDetailPage'))
 
 // Content Hub
 const ContentHubPage       = lazy(() => import('@/pages/content/ContentHubPage'))
-const ContentChannelPage   = lazy(() => import('@/pages/content/ContentChannelPage'))
 
 // Media
 const MediaPage            = lazy(() => import('@/pages/media/MediaPage'))
@@ -46,8 +45,6 @@ const LoginPage            = lazy(() => import('@/pages/auth/LoginPage'))
 const AdminDashboard       = lazy(() => import('@/pages/admin/AdminDashboard'))
 const AdminContents        = lazy(() => import('@/pages/admin/AdminContents'))
 const AdminProjects        = lazy(() => import('@/pages/admin/AdminProjects'))
-const AdminSources         = lazy(() => import('@/pages/admin/AdminSources'))
-const AdminSyncJobs        = lazy(() => import('@/pages/admin/AdminSyncJobs'))
 const AdminMedia           = lazy(() => import('@/pages/admin/AdminMedia'))
 const AdminTags            = lazy(() => import('@/pages/admin/AdminTags'))
 const AdminExternal        = lazy(() => import('@/pages/admin/AdminExternal'))
@@ -88,8 +85,6 @@ export default function App() {
         <Route index element={<AdminDashboard />} />
         <Route path="contents" element={<AdminContents />} />
         <Route path="projects" element={<AdminProjects />} />
-        <Route path="sources" element={<AdminSources />} />
-        <Route path="sync-jobs" element={<AdminSyncJobs />} />
         <Route path="media" element={<AdminMedia />} />
         <Route path="tags" element={<AdminTags />} />
         <Route path="external" element={<AdminExternal />} />
@@ -126,7 +121,6 @@ export default function App() {
         {/* Content Hub */}
         <Route path="/content" element={<ContentHubPage />} />
         <Route path="/content/:slug" element={<ArticleDetailPage />} />
-        <Route path="/content/:channel" element={<ContentChannelPage />} />
 
         {/* Media */}
         <Route path="/media" element={<MediaPage />} />

@@ -291,7 +291,7 @@ export interface ProjectFilters {
 
 export type AIContentSourceType = 'direct' | 'blog' | 'project'
 export type AIContentStatus = 'draft' | 'ready'
-export type AIOutputStatus = 'draft' | 'approved' | 'published'
+export type AIOutputStatus = 'draft' | 'approved' | 'published' | 'hidden'
 
 export interface AIContent {
   id: string
