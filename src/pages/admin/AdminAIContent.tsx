@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Sparkles, Copy, Check, Loader2, History, Plus, FolderKanban, FileText } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import SEOHead from '@/components/seo/SEOHead'
 import { useAIContent } from '@/features/ai-content/useAIContent'
 import type { AIChannel } from '@/features/ai-content/useAIContent'
-import { getAIContentHistory } from '@/features/ai-content/aiContentService'
+import { getAIContentHistory, approveOutput, publishOutput } from '@/features/ai-content/aiContentService'
 import type { AIHistoryRow } from '@/features/ai-content/aiContentService'
 import { useAdminContents } from '@/features/contents/useContents'
 import { useAdminProjects } from '@/features/projects/useProjects'
@@ -67,9 +67,16 @@ function Label({ children }: { children: React.ReactNode }) {
   return <label className="block text-xs font-medium text-white/40 mb-1.5">{children}</label>
 }
 
+// 공개 가능한 채널 (채널 매핑이 정의된 것만)
+const PUBLISHABLE_CHANNELS = new Set(['instagram', 'threads', 'naver_blog'])
+
 export default function AdminAIContent() {
   const [tab, setTab] = useState<'create' | 'history'>('create')
   const [copied, setCopied] = useState(false)
+  const [actioningId, setActioningId] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
+
+  const queryClient = useQueryClient()
 
   const { form, setField, reset, result, isLoading, error, generate } = useAIContent()
 
@@ -85,6 +92,32 @@ export default function AdminAIContent() {
     enabled: tab === 'history',
   })
   const history: AIHistoryRow[] = historyData ?? []
+
+  async function handleApprove(id: string) {
+    setActioningId(id)
+    setActionError(null)
+    try {
+      await approveOutput(id)
+      await queryClient.invalidateQueries({ queryKey: ['ai-content-history'] })
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : '승인에 실패했습니다.')
+    } finally {
+      setActioningId(null)
+    }
+  }
+
+  async function handlePublish(row: AIHistoryRow) {
+    setActioningId(row.id)
+    setActionError(null)
+    try {
+      await publishOutput(row)
+      await queryClient.invalidateQueries({ queryKey: ['ai-content-history'] })
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : '공개에 실패했습니다.')
+    } finally {
+      setActioningId(null)
+    }
+  }
 
   function handleSourceTypeChange(st: AIContentSourceType) {
     setField('sourceType', st)
@@ -445,10 +478,16 @@ export default function AdminAIContent() {
             ) : history.length === 0 ? (
               <div className="py-16 text-center text-sm text-white/20">생성 이력이 없습니다</div>
             ) : (
+              <>
+                {actionError && (
+                  <div className="mx-5 mt-4 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-2.5">
+                    <p className="text-sm text-red-400">{actionError}</p>
+                  </div>
+                )}
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-white/[0.06]">
-                    {['제목', '원본 유형', '채널', '상태', '생성일'].map(h => (
+                    {['제목', '원본 유형', '채널', '상태', '생성일', ''].map(h => (
                       <th key={h} className="px-5 py-3 text-left text-[11px] font-semibold tracking-widest text-white/20 uppercase">
                         {h}
                       </th>
@@ -456,7 +495,10 @@ export default function AdminAIContent() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/[0.04]">
-                  {history.map(row => (
+                  {history.map(row => {
+                    const isActioning = actioningId === row.id
+                    const canPublish = row.status === 'approved' && PUBLISHABLE_CHANNELS.has(row.channel)
+                    return (
                     <tr key={row.id} className="hover:bg-white/[0.02] transition-colors">
                       <td className="px-5 py-3 text-white/70 max-w-[200px] truncate">
                         {row.ai_content?.title ?? '—'}
@@ -481,10 +523,36 @@ export default function AdminAIContent() {
                       <td className="px-5 py-3 text-white/30 text-[12px]">
                         {formatDateShort(row.created_at)}
                       </td>
+                      <td className="px-5 py-3">
+                        {row.status === 'draft' && (
+                          <button
+                            onClick={() => handleApprove(row.id)}
+                            disabled={isActioning}
+                            className="rounded-lg px-3 py-1 text-[11px] font-medium border border-blue-500/30 text-blue-400 hover:bg-blue-600/15 disabled:opacity-40 transition-all"
+                          >
+                            {isActioning ? <Loader2 size={11} className="animate-spin" /> : '승인'}
+                          </button>
+                        )}
+                        {row.status === 'approved' && (
+                          <button
+                            onClick={() => handlePublish(row)}
+                            disabled={isActioning || !canPublish}
+                            title={!canPublish ? '이 채널은 Content Hub 공개를 지원하지 않습니다' : undefined}
+                            className="rounded-lg px-3 py-1 text-[11px] font-medium border border-green-500/30 text-green-400 hover:bg-green-600/15 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                          >
+                            {isActioning ? <Loader2 size={11} className="animate-spin" /> : '공개'}
+                          </button>
+                        )}
+                        {row.status === 'published' && (
+                          <span className="text-[11px] text-white/20">공개 완료</span>
+                        )}
+                      </td>
                     </tr>
-                  ))}
+                    )
+                  })}
                 </tbody>
               </table>
+              </>
             )}
           </div>
         )}
