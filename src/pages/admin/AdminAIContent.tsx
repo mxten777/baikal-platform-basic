@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { Sparkles, Copy, Check, Loader2, History, Plus, FolderKanban, FileText } from 'lucide-react'
+import { Sparkles, Copy, Check, Loader2, History, Plus, FolderKanban, FileText, EyeOff } from 'lucide-react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import SEOHead from '@/components/seo/SEOHead'
 import { useAIContent } from '@/features/ai-content/useAIContent'
 import type { AIChannel } from '@/features/ai-content/useAIContent'
-import { getAIContentHistory, approveOutput, publishOutput } from '@/features/ai-content/aiContentService'
+import { getAIContentHistory, approveOutput, publishOutput, hideOutput, restoreOutput } from '@/features/ai-content/aiContentService'
 import type { AIHistoryRow } from '@/features/ai-content/aiContentService'
 import { useAdminContents } from '@/features/contents/useContents'
 import { useAdminProjects } from '@/features/projects/useProjects'
@@ -61,6 +61,7 @@ const STATUS_LABEL: Record<string, string> = {
   draft:     '초안',
   approved:  '승인',
   published: '게시됨',
+  hidden:    '숨김됨',
 }
 
 function Label({ children }: { children: React.ReactNode }) {
@@ -75,6 +76,8 @@ export default function AdminAIContent() {
   const [copied, setCopied] = useState(false)
   const [actioningId, setActioningId] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
+  const [showHidden, setShowHidden] = useState(false)
+  const [hideConfirmRow, setHideConfirmRow] = useState<AIHistoryRow | null>(null)
 
   const queryClient = useQueryClient()
 
@@ -87,8 +90,8 @@ export default function AdminAIContent() {
   const projects: Project[] = projectsData ?? []
 
   const { data: historyData, isLoading: historyLoading } = useQuery({
-    queryKey: ['ai-content-history'],
-    queryFn: getAIContentHistory,
+    queryKey: ['ai-content-history', showHidden],
+    queryFn: () => getAIContentHistory(showHidden),
     enabled: tab === 'history',
   })
   const history: AIHistoryRow[] = historyData ?? []
@@ -114,6 +117,33 @@ export default function AdminAIContent() {
       await queryClient.invalidateQueries({ queryKey: ['ai-content-history'] })
     } catch (e) {
       setActionError(e instanceof Error ? e.message : '공개에 실패했습니다.')
+    } finally {
+      setActioningId(null)
+    }
+  }
+
+  async function confirmHide(row: AIHistoryRow) {
+    setActioningId(row.id)
+    setActionError(null)
+    try {
+      await hideOutput(row)
+      setHideConfirmRow(null)
+      await queryClient.invalidateQueries({ queryKey: ['ai-content-history'] })
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : '숨김에 실패했습니다.')
+    } finally {
+      setActioningId(null)
+    }
+  }
+
+  async function handleRestore(row: AIHistoryRow) {
+    setActioningId(row.id)
+    setActionError(null)
+    try {
+      await restoreOutput(row)
+      await queryClient.invalidateQueries({ queryKey: ['ai-content-history'] })
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : '복원에 실패했습니다.')
     } finally {
       setActioningId(null)
     }
@@ -470,6 +500,20 @@ export default function AdminAIContent() {
         {/* ── 생성 이력 탭 ── */}
         {tab === 'history' && (
           <div className="glass-card rounded-2xl overflow-hidden">
+            {/* 숨김 콘텐츠 보기 토글 */}
+            <div className="flex items-center justify-end px-5 pt-4 pb-2">
+              <button
+                onClick={() => setShowHidden(v => !v)}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium border transition-all ${
+                  showHidden
+                    ? 'bg-white/[0.08] text-white/70 border-white/20'
+                    : 'text-white/30 border-white/[0.08] hover:text-white/50 hover:border-white/15'
+                }`}
+              >
+                <EyeOff size={12} />
+                숨김 콘텐츠 보기
+              </button>
+            </div>
             {historyLoading ? (
               <div className="flex items-center justify-center gap-3 py-16 text-white/30">
                 <Loader2 size={20} className="animate-spin" />
@@ -480,7 +524,7 @@ export default function AdminAIContent() {
             ) : (
               <>
                 {actionError && (
-                  <div className="mx-5 mt-4 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-2.5">
+                  <div className="mx-5 mt-2 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-2.5">
                     <p className="text-sm text-red-400">{actionError}</p>
                   </div>
                 )}
@@ -498,8 +542,9 @@ export default function AdminAIContent() {
                   {history.map(row => {
                     const isActioning = actioningId === row.id
                     const canPublish = row.status === 'approved' && PUBLISHABLE_CHANNELS.has(row.channel)
+                    const isHidden = row.status === 'hidden'
                     return (
-                    <tr key={row.id} className="hover:bg-white/[0.02] transition-colors">
+                    <tr key={row.id} className={`transition-colors ${isHidden ? 'opacity-50' : 'hover:bg-white/[0.02]'}`}>
                       <td className="px-5 py-3 text-white/70 max-w-[200px] truncate">
                         {row.ai_content?.title ?? '—'}
                       </td>
@@ -515,6 +560,8 @@ export default function AdminAIContent() {
                             ? 'bg-green-500/15 text-green-400'
                             : row.status === 'approved'
                             ? 'bg-blue-500/15 text-blue-400'
+                            : row.status === 'hidden'
+                            ? 'bg-white/[0.06] text-white/20'
                             : 'bg-white/[0.06] text-white/30'
                         }`}>
                           {STATUS_LABEL[row.status] ?? row.status}
@@ -524,28 +571,45 @@ export default function AdminAIContent() {
                         {formatDateShort(row.created_at)}
                       </td>
                       <td className="px-5 py-3">
-                        {row.status === 'draft' && (
-                          <button
-                            onClick={() => handleApprove(row.id)}
-                            disabled={isActioning}
-                            className="rounded-lg px-3 py-1 text-[11px] font-medium border border-blue-500/30 text-blue-400 hover:bg-blue-600/15 disabled:opacity-40 transition-all"
-                          >
-                            {isActioning ? <Loader2 size={11} className="animate-spin" /> : '승인'}
-                          </button>
-                        )}
-                        {row.status === 'approved' && (
-                          <button
-                            onClick={() => handlePublish(row)}
-                            disabled={isActioning || !canPublish}
-                            title={!canPublish ? '이 채널은 Content Hub 공개를 지원하지 않습니다' : undefined}
-                            className="rounded-lg px-3 py-1 text-[11px] font-medium border border-green-500/30 text-green-400 hover:bg-green-600/15 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                          >
-                            {isActioning ? <Loader2 size={11} className="animate-spin" /> : '공개'}
-                          </button>
-                        )}
-                        {row.status === 'published' && (
-                          <span className="text-[11px] text-white/20">공개 완료</span>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {row.status === 'draft' && (
+                            <button
+                              onClick={() => handleApprove(row.id)}
+                              disabled={isActioning}
+                              className="rounded-lg px-3 py-1 text-[11px] font-medium border border-blue-500/30 text-blue-400 hover:bg-blue-600/15 disabled:opacity-40 transition-all"
+                            >
+                              {isActioning ? <Loader2 size={11} className="animate-spin" /> : '승인'}
+                            </button>
+                          )}
+                          {row.status === 'approved' && (
+                            <button
+                              onClick={() => handlePublish(row)}
+                              disabled={isActioning || !canPublish}
+                              title={!canPublish ? '이 채널은 Content Hub 공개를 지원하지 않습니다' : undefined}
+                              className="rounded-lg px-3 py-1 text-[11px] font-medium border border-green-500/30 text-green-400 hover:bg-green-600/15 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                            >
+                              {isActioning ? <Loader2 size={11} className="animate-spin" /> : '공개'}
+                            </button>
+                          )}
+                          {row.status === 'hidden' && (
+                            <button
+                              onClick={() => handleRestore(row)}
+                              disabled={isActioning}
+                              className="rounded-lg px-3 py-1 text-[11px] font-medium border border-white/20 text-white/40 hover:text-white/70 hover:border-white/30 disabled:opacity-40 transition-all"
+                            >
+                              {isActioning ? <Loader2 size={11} className="animate-spin" /> : '복원'}
+                            </button>
+                          )}
+                          {row.status !== 'hidden' && (
+                            <button
+                              onClick={() => setHideConfirmRow(row)}
+                              disabled={isActioning}
+                              className="rounded-lg px-3 py-1 text-[11px] font-medium border border-white/[0.08] text-white/25 hover:text-white/50 hover:border-white/20 disabled:opacity-40 transition-all"
+                            >
+                              숨김
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                     )
@@ -559,7 +623,7 @@ export default function AdminAIContent() {
                   const isActioning = actioningId === row.id
                   const canPublish = row.status === 'approved' && PUBLISHABLE_CHANNELS.has(row.channel)
                   return (
-                    <div key={row.id} className="px-4 py-3.5">
+                    <div key={row.id} className={`px-4 py-3.5 ${row.status === 'hidden' ? 'opacity-50' : ''}`}>
                       <p className="text-sm font-medium text-white/80 line-clamp-2 mb-1">
                         {row.ai_content?.title ?? '—'}
                       </p>
@@ -577,11 +641,13 @@ export default function AdminAIContent() {
                             ? 'bg-green-500/15 text-green-400'
                             : row.status === 'approved'
                             ? 'bg-blue-500/15 text-blue-400'
+                            : row.status === 'hidden'
+                            ? 'bg-white/[0.06] text-white/20'
                             : 'bg-white/[0.06] text-white/30'
                         }`}>
                           {STATUS_LABEL[row.status] ?? row.status}
                         </span>
-                        <div>
+                        <div className="flex items-center gap-2">
                           {row.status === 'draft' && (
                             <button
                               onClick={() => handleApprove(row.id)}
@@ -601,8 +667,23 @@ export default function AdminAIContent() {
                               {isActioning ? <Loader2 size={12} className="animate-spin" /> : '공개'}
                             </button>
                           )}
-                          {row.status === 'published' && (
-                            <span className="text-xs text-white/20">공개 완료</span>
+                          {row.status === 'hidden' && (
+                            <button
+                              onClick={() => handleRestore(row)}
+                              disabled={isActioning}
+                              className="rounded-lg px-4 py-1.5 text-xs font-medium border border-white/20 text-white/40 hover:text-white/70 hover:border-white/30 disabled:opacity-40 transition-all"
+                            >
+                              {isActioning ? <Loader2 size={12} className="animate-spin" /> : '복원'}
+                            </button>
+                          )}
+                          {row.status !== 'hidden' && (
+                            <button
+                              onClick={() => setHideConfirmRow(row)}
+                              disabled={isActioning}
+                              className="rounded-lg px-4 py-1.5 text-xs font-medium border border-white/[0.08] text-white/25 hover:text-white/50 hover:border-white/20 disabled:opacity-40 transition-all"
+                            >
+                              숨김
+                            </button>
                           )}
                         </div>
                       </div>
@@ -615,6 +696,43 @@ export default function AdminAIContent() {
           </div>
         )}
       </div>
+
+      {/* 숨김 확인 다이얼로그 */}
+      {hideConfirmRow && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+          <div className="w-full max-w-sm rounded-2xl bg-[#111827] border border-white/[0.08] p-6 space-y-4 shadow-2xl">
+            <h3 className="text-base font-semibold text-white">이 콘텐츠를 숨기시겠습니까?</h3>
+            <div className="space-y-2">
+              <p className="text-sm text-white/50 leading-relaxed">
+                숨김 처리하면 관리자 기본 목록과 Content Hub에서 표시되지 않습니다.
+              </p>
+              {hideConfirmRow.status === 'published' && !hideConfirmRow.published_content_id && (
+                <p className="text-sm text-yellow-400/80 leading-relaxed">
+                  ⚠ 이 레코드는 공개 연결 정보가 없어 Content Hub에서 계속 표시될 수 있습니다.
+                </p>
+              )}
+              <p className="text-sm text-white/40 leading-relaxed">
+                데이터는 삭제되지 않으며 다시 복원할 수 있습니다.
+              </p>
+            </div>
+            <div className="flex gap-3 justify-end pt-1">
+              <button
+                onClick={() => setHideConfirmRow(null)}
+                className="rounded-lg px-4 py-2 text-sm text-white/50 border border-white/[0.08] hover:text-white/80 hover:border-white/20 transition-all"
+              >
+                취소
+              </button>
+              <button
+                onClick={() => confirmHide(hideConfirmRow)}
+                disabled={actioningId === hideConfirmRow.id}
+                className="rounded-lg px-4 py-2 text-sm font-medium bg-white/[0.06] border border-white/20 text-white/60 hover:bg-white/[0.10] disabled:opacity-40 transition-all"
+              >
+                {actioningId === hideConfirmRow.id ? <Loader2 size={14} className="animate-spin" /> : '숨김'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
