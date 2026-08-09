@@ -59,6 +59,15 @@ export default function ArticleDetailPage() {
       />
 
       <div className="mx-auto max-w-3xl px-6 py-12 lg:px-8">
+        {/* Back button */}
+        <Link
+          to={breadcrumb.path}
+          className="mb-8 inline-flex items-center gap-2 text-sm text-white/40 hover:text-white/80 transition-colors"
+        >
+          <span>←</span>
+          <span>{breadcrumb.label}</span>
+        </Link>
+
         {/* Breadcrumb */}
         <nav className="mb-10 flex items-center gap-2 text-xs text-white/25">
           <Link to="/" className="hover:text-white/60 transition-colors">홈</Link>
