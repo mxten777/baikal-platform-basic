@@ -12,6 +12,8 @@ export type ContentType =
   | 'rss'
   | 'x_post'
   | 'instagram'
+  | 'threads'
+  | 'facebook'
   | 'youtube'
   | 'external_link'
   | 'curated'

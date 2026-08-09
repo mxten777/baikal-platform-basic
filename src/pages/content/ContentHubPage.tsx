@@ -9,8 +9,10 @@ const CHANNEL_TABS: { label: string; type?: ContentType | ContentType[] }[] = [
   { label: '아티클', type: 'article' },
   { label: 'YouTube', type: 'youtube' },
   { label: '블로그', type: 'rss' },
-  { label: 'X (Twitter)', type: 'x_post' },
+  { label: 'X', type: 'x_post' },
   { label: 'Instagram', type: 'instagram' },
+  { label: 'Threads', type: 'threads' },
+  { label: 'Facebook', type: 'facebook' },
   { label: '연구/실험', type: ['experiment', 'research'] },
 ]
 
