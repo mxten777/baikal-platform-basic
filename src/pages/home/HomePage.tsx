@@ -131,7 +131,7 @@ export default function HomePage() {
       <SEOHead canonical="/" structuredData={structuredData} />
 
       {/* ===== HERO ===== */}
-      <section className="relative min-h-screen bg-[#080808] flex flex-col justify-center -mt-16" style={{overflow:'clip'}}>
+      <section className="relative min-h-screen bg-[#080808] flex flex-col justify-center -mt-[100px]" style={{overflow:'clip'}}>
         {/* 프리미엄 배경 레이어 */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-950/20 via-purple-950/10 to-[#080808]" />
         <div className="absolute inset-0 grid-bg opacity-40" />
@@ -329,14 +329,12 @@ export default function HomePage() {
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-badge-pulse flex-shrink-0" />
                     <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-emerald-300/70">운영 중</span>
                   </div>
-                  <a
-                    href="https://thelit.kr"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    to="/projects/the-lit-digital-renewal"
                     className="group flex items-center gap-2 rounded-full border border-amber-500/25 bg-amber-500/10 px-5 py-2 text-sm font-semibold text-amber-300/80 transition-all duration-300 hover:border-amber-500/45 hover:bg-amber-500/20 hover:text-amber-200"
                   >
                     Explore THE LIT →
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

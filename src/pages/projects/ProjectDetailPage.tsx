@@ -202,6 +202,38 @@ export default function ProjectDetailPage() {
             </div>
           </section>
         )}
+
+        {/* Contact CTA */}
+        <div className="mt-20 border-t border-white/[0.06] pt-14">
+          <div className="glass-card rounded-2xl p-8 sm:p-10 text-center">
+            <h2 className="text-xl sm:text-2xl font-black text-white leading-tight">
+              홈페이지를 넘어,{' '}
+              <span className="gradient-text">운영되는 디지털 플랫폼으로.</span>
+            </h2>
+            <p className="mt-4 text-sm text-white/40 max-w-md mx-auto leading-relaxed">
+              BAIKAL은 기업과 브랜드의 웹사이트를 콘텐츠·SNS·AI가 연결되는 디지털 플랫폼으로 구축합니다.
+            </p>
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link
+                to="/contact"
+                className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition-all hover:bg-blue-50"
+              >
+                BAIKAL에 프로젝트 문의하기
+                <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+              </Link>
+              {project.demo_url && (
+                <a
+                  href={project.demo_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 px-6 py-3 text-sm font-semibold text-white/50 transition-all hover:border-white/20 hover:text-white"
+                >
+                  공식 사이트 방문 ↗
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </>
   )
