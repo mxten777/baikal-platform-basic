@@ -104,15 +104,15 @@ export default function Header() {
         >
           <span className="hidden sm:inline">
             <span className="font-semibold tracking-[0.15em] text-amber-400/80">NEW PROJECT · THE LIT</span>
-            <span className="mx-3 text-white/15">|</span>
-            <span className="text-white/35">복합문화공간 THE LIT 공식 웹사이트 리뉴얼 오픈</span>
-            <span className="ml-3 text-amber-400/60">프로젝트 보기 →</span>
+            <span className="mx-3 text-white/25">|</span>
+            <span className="text-neutral-200/80">복합문화공간 THE LIT 공식 웹사이트 리뉴얼 오픈</span>
+            <span className="ml-3 text-amber-400/80 hover:text-amber-300">프로젝트 보기 →</span>
           </span>
           <span className="sm:hidden">
             <span className="font-semibold tracking-[0.12em] text-amber-400/80">NEW PROJECT · THE LIT</span>
-            <span className="mx-2 text-white/15">|</span>
-            <span className="text-white/35">리뉴얼 오픈</span>
-            <span className="ml-2 text-amber-400/60">→</span>
+            <span className="mx-2 text-white/25">|</span>
+            <span className="text-neutral-200/80">리뉴얼 오픈</span>
+            <span className="ml-2 text-amber-400/80">→</span>
           </span>
         </Link>
 
