@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import SEOHead from '@/components/seo/SEOHead'
 import { supabase } from '@/lib/supabase'
-import { Upload, Copy, Trash2, Check, Image as ImageIcon, FileText, Film } from 'lucide-react'
+import { Upload, Copy, Trash2, Check, Image as ImageIcon, FileText } from 'lucide-react'
 import { MEDIA_BUCKET as BUCKET } from '@/lib/constants'
 import { toSlug } from '@/utils/slug'
 
@@ -284,10 +284,12 @@ export default function AdminMedia() {
                       <span className="text-[10px] text-white/30">PDF</span>
                     </a>
                   ) : f.type === 'video/mp4' ? (
-                    <div className="flex h-full w-full flex-col items-center justify-center gap-2">
-                      <Film size={32} className="text-violet-400/70" />
-                      <span className="text-[10px] text-white/30">MP4</span>
-                    </div>
+                    <video
+                      src={f.url}
+                      controls
+                      muted
+                      className="h-full w-full object-contain"
+                    />
                   ) : (
                     <img
                       src={f.url}
