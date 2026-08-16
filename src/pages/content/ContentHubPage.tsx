@@ -51,6 +51,8 @@ export default function ContentHubPage() {
     setPage(1)
   }
 
+  const isReelsOnly = activeType === 'reels'
+
   return (
     <>
       <SEOHead
@@ -135,14 +137,14 @@ export default function ContentHubPage() {
 
           {/* Content Grid */}
           {isLoading ? (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className={`grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3${isReelsOnly ? ' max-w-4xl mx-auto' : ''}`}>
               {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} className="skeleton h-60 rounded-2xl" />
+                <div key={i} className={`skeleton rounded-2xl ${isReelsOnly ? 'h-[28rem]' : 'h-60'}`} />
               ))}
             </div>
           ) : data && data.data.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              <div className={`grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3${isReelsOnly ? ' max-w-4xl mx-auto' : ''}`}>
                 {data.data.map(content => (
                   <ContentCard key={content.id} content={content} />
                 ))}

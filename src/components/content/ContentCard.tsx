@@ -105,20 +105,66 @@ export default function ContentCard({ content, variant = 'default', className }:
     )
   }
 
+  if (isReels) {
+    return (
+      <div className={cn('glass-card group overflow-hidden rounded-2xl', className)}>
+        <div className="overflow-hidden bg-black" style={{ aspectRatio: '9/16' }}>
+          {content.source_url ? (
+            <video
+              src={content.source_url}
+              controls
+              playsInline
+              preload="metadata"
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="h-full w-full flex items-center justify-center">
+              <span className="text-4xl" style={{ color: '#8b5cf6', filter: 'drop-shadow(0 0 12px #8b5cf6)' }}>▶</span>
+            </div>
+          )}
+        </div>
+        <div className="px-4 pt-3 pb-4">
+          <div className="flex items-center gap-1.5 mb-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-violet-500 flex-shrink-0" />
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-white/30">Reels</span>
+          </div>
+          <h3 className="text-sm font-bold text-white/80 line-clamp-2 leading-snug group-hover:text-white transition-colors">
+            {content.title}
+          </h3>
+          {content.published_at && (
+            <p className="mt-1.5 text-xs text-white/25">{formatDateShort(content.published_at)}</p>
+          )}
+          {(reelsInstagramUrl || reelsYoutubeUrl) && (
+            <div className="mt-3 flex gap-1.5 flex-wrap">
+              {reelsInstagramUrl && (
+                <a
+                  href={reelsInstagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 rounded-full bg-pink-500/10 px-2.5 py-1 text-[11px] font-semibold text-pink-400 hover:bg-pink-500/20 transition-colors"
+                >
+                  ◈ Instagram
+                </a>
+              )}
+              {reelsYoutubeUrl && (
+                <a
+                  href={reelsYoutubeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2.5 py-1 text-[11px] font-semibold text-red-400 hover:bg-red-500/20 transition-colors"
+                >
+                  ▶ YouTube Shorts
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={cn('glass-card group overflow-hidden rounded-2xl', className)}>
-      {/* Thumbnail / Video */}
-      {isReels && content.source_url ? (
-        <div className="mx-auto overflow-hidden bg-black" style={{ aspectRatio: '9/16', maxHeight: 480 }}>
-          <video
-            src={content.source_url}
-            controls
-            playsInline
-            preload="metadata"
-            className="h-full w-full object-contain"
-          />
-        </div>
-      ) : (
       <div className="aspect-video overflow-hidden bg-white/[0.03]">
         {content.thumbnail_url ? (
           <img
@@ -148,7 +194,6 @@ export default function ContentCard({ content, variant = 'default', className }:
           </div>
         )}
       </div>
-      )}
 
       <div className="p-7">
         {/* Channel badge */}
@@ -173,31 +218,6 @@ export default function ContentCard({ content, variant = 'default', className }:
           <p className="mt-3 text-sm leading-relaxed text-white/40 line-clamp-2">
             {content.summary}
           </p>
-        )}
-
-        {isReels && (reelsInstagramUrl || reelsYoutubeUrl) && (
-          <div className="mt-4 flex gap-2 flex-wrap">
-            {reelsInstagramUrl && (
-              <a
-                href={reelsInstagramUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-full bg-pink-500/10 px-3 py-1.5 text-xs font-semibold text-pink-400 hover:bg-pink-500/20 transition-colors"
-              >
-                ◈ Instagram 보기
-              </a>
-            )}
-            {reelsYoutubeUrl && (
-              <a
-                href={reelsYoutubeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-full bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-400 hover:bg-red-500/20 transition-colors"
-              >
-                ▶ YouTube Shorts 보기
-              </a>
-            )}
-          </div>
         )}
 
         <div className="mt-5 flex items-center justify-between">
