@@ -8,6 +8,7 @@ const CHANNEL_TABS: { label: string; type?: ContentType | ContentType[] }[] = [
   { label: '전체' },
   { label: '아티클', type: 'article' },
   { label: 'YouTube', type: 'youtube' },
+  { label: 'Reels', type: 'reels' },
   { label: '블로그', type: 'rss' },
   { label: 'X', type: 'x_post' },
   { label: 'Instagram', type: 'instagram' },

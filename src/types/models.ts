@@ -15,6 +15,7 @@ export type ContentType =
   | 'threads'
   | 'facebook'
   | 'youtube'
+  | 'reels'
   | 'external_link'
   | 'curated'
 export type ContentStatus = 'pending' | 'approved' | 'published' | 'rejected' | 'archived'

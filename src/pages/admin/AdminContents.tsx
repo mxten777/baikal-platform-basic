@@ -24,7 +24,7 @@ const STATUS_BADGE: Record<string, string> = {
 
 const CONTENT_TYPE_OPTIONS: ContentType[] = [
   'article', 'note', 'experiment', 'research',
-  'rss', 'x_post', 'instagram', 'youtube', 'external_link', 'curated',
+  'rss', 'x_post', 'instagram', 'threads', 'facebook', 'youtube', 'reels', 'external_link', 'curated',
 ]
 
 const STATUS_OPTIONS: ContentStatus[] = ['pending', 'published', 'rejected', 'archived']

@@ -13,6 +13,7 @@ export const CONTENT_TYPES_KO: Record<string, string> = {
   x_post:       'X(Twitter)',
   instagram:    'Instagram',
   youtube:      'YouTube',
+  reels:        'Reels',
   external_link: '외부 링크',
   curated:      '큐레이션',
 }

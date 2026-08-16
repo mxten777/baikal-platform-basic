@@ -1,8 +1,9 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import SEOHead from '@/components/seo/SEOHead'
 import { supabase } from '@/lib/supabase'
-import { Upload, Copy, Trash2, Check, Image as ImageIcon, FileText } from 'lucide-react'
+import { Upload, Copy, Trash2, Check, Image as ImageIcon, FileText, Film } from 'lucide-react'
 import { MEDIA_BUCKET as BUCKET } from '@/lib/constants'
+import { toSlug } from '@/utils/slug'
 
 function getMimeType(file: File): string {
   if (file.type) return file.type
@@ -11,13 +12,14 @@ function getMimeType(file: File): string {
     jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png',
     gif: 'image/gif', webp: 'image/webp', svg: 'image/svg+xml',
     pdf: 'application/pdf',
+    mp4: 'video/mp4',
   }
   return map[ext] ?? ''
 }
 
 const ALLOWED_TYPES = [
   'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
-  'application/pdf',
+  'application/pdf', 'video/mp4',
 ]
 
 interface UploadedFile {
@@ -42,6 +44,62 @@ export default function AdminMedia() {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Reels 등록
+  const [reelsTitle, setReelsTitle] = useState('')
+  const [reelsFile, setReelsFile] = useState<File | null>(null)
+  const [reelsUploading, setReelsUploading] = useState(false)
+  const [reelsError, setReelsError] = useState<string | null>(null)
+  const [reelsSuccess, setReelsSuccess] = useState<string | null>(null)
+  const reelsFileRef = useRef<HTMLInputElement>(null)
+
+  async function handleReelsSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!reelsFile || !reelsTitle.trim()) return
+    setReelsUploading(true)
+    setReelsError(null)
+    setReelsSuccess(null)
+
+    const ext = 'mp4'
+    const fileName = `reels-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+    const { error: uploadError } = await supabase.storage
+      .from(BUCKET)
+      .upload(fileName, reelsFile, { cacheControl: '3600', upsert: false, metadata: { original_name: reelsFile.name } })
+
+    if (uploadError) {
+      setReelsError(`업로드 실패: ${uploadError.message}`)
+      setReelsUploading(false)
+      return
+    }
+
+    const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(fileName)
+    await supabase.from('media_files').upsert({ storage_key: fileName, original_name: reelsFile.name })
+
+    const title = reelsTitle.trim()
+    const slug = `${toSlug(title)}-${Date.now()}`
+    const { error: contentError } = await supabase.from('contents').insert({
+      slug,
+      title,
+      content_type: 'reels',
+      source_url: urlData.publicUrl,
+      status: 'pending',
+      lang: 'ko',
+      is_featured: false,
+      is_pinned: false,
+      view_count: 0,
+    })
+
+    if (contentError) {
+      setReelsError(`콘텐츠 등록 실패: ${contentError.message}`)
+    } else {
+      setReelsSuccess(`'승인 대기' 상태로 등록되었습니다. Admin → 콘텐츠에서 승인/게시하세요.`)
+      setReelsTitle('')
+      setReelsFile(null)
+      if (reelsFileRef.current) reelsFileRef.current.value = ''
+      loadFiles()
+    }
+    setReelsUploading(false)
+  }
 
   async function loadFiles() {
     setLoadingFiles(true)
@@ -177,7 +235,7 @@ export default function AdminMedia() {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*,application/pdf"
+            accept="image/*,application/pdf,video/mp4"
             multiple
             className="hidden"
             onChange={e => e.target.files && uploadFiles(e.target.files)}
@@ -188,7 +246,7 @@ export default function AdminMedia() {
             <>
               <Upload size={28} className="text-white/20" />
               <p className="text-sm text-white/40">파일을 드래그하거나 클릭해서 업로드</p>
-              <p className="text-xs text-white/20">이미지 (JPG, PNG, GIF, WebP, SVG) · PDF</p>
+              <p className="text-xs text-white/20">이미지 (JPG, PNG, GIF, WebP, SVG) · PDF · MP4</p>
             </>
           )}
         </div>
@@ -225,6 +283,11 @@ export default function AdminMedia() {
                       <FileText size={32} className="text-red-400/70" />
                       <span className="text-[10px] text-white/30">PDF</span>
                     </a>
+                  ) : f.type === 'video/mp4' ? (
+                    <div className="flex h-full w-full flex-col items-center justify-center gap-2">
+                      <Film size={32} className="text-violet-400/70" />
+                      <span className="text-[10px] text-white/30">MP4</span>
+                    </div>
                   ) : (
                     <img
                       src={f.url}
@@ -276,6 +339,53 @@ export default function AdminMedia() {
             ))}
           </div>
         )}
+
+        {/* Reels 등록 */}
+        <div className="mt-10">
+          <h2 className="text-lg font-bold text-white mb-1">Reels 등록</h2>
+          <p className="text-sm text-white/35 mb-5">MP4 업로드 후 콘텐츠 허브 Reels 탭에 노출됩니다 (승인 후 게시)</p>
+          <form onSubmit={handleReelsSubmit} className="glass-card rounded-2xl p-6 flex flex-col gap-4 max-w-lg">
+            <div>
+              <label className="block text-xs font-semibold text-white/50 mb-1.5">제목 *</label>
+              <input
+                type="text"
+                value={reelsTitle}
+                onChange={e => setReelsTitle(e.target.value)}
+                placeholder="영상 제목을 입력하세요"
+                required
+                maxLength={200}
+                className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm text-white placeholder-white/20 focus:border-blue-500/40 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-white/50 mb-1.5">MP4 파일 *</label>
+              <input
+                ref={reelsFileRef}
+                type="file"
+                accept="video/mp4"
+                required
+                className="block w-full text-sm text-white/50 file:mr-3 file:rounded-lg file:border-0 file:bg-white/[0.08] file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white/60 hover:file:bg-white/[0.12]"
+                onChange={e => setReelsFile(e.target.files?.[0] ?? null)}
+              />
+              {reelsFile && (
+                <p className="mt-1 text-xs text-white/30">{reelsFile.name} · {formatBytes(reelsFile.size)}</p>
+              )}
+            </div>
+            {reelsError && (
+              <p className="text-sm text-red-400">{reelsError}</p>
+            )}
+            {reelsSuccess && (
+              <p className="text-sm text-green-400">{reelsSuccess}</p>
+            )}
+            <button
+              type="submit"
+              disabled={reelsUploading || !reelsFile || !reelsTitle.trim()}
+              className="self-start rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {reelsUploading ? '업로드 중…' : 'Reels 등록'}
+            </button>
+          </form>
+        </div>
       </div>
     </>
   )

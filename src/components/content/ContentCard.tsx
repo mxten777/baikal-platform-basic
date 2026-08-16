@@ -19,6 +19,7 @@ const CHANNEL_DOT: Record<string, string> = {
   youtube: 'bg-red-500',
   x_post: 'bg-white/40',
   instagram: 'bg-pink-500',
+  reels: 'bg-violet-500',
   rss: 'bg-orange-400',
   article: 'bg-blue-400',
   research: 'bg-purple-400',
@@ -30,6 +31,7 @@ const PLACEHOLDER_ICON: Record<string, string> = {
   youtube:     '▶',
   x_post:      '𝕏',
   instagram:   '◈',
+  reels:       '▶',
   rss:         '◉',
   article:     '✦',
   research:    '◈',
@@ -41,6 +43,7 @@ const PLACEHOLDER_ACCENT: Record<string, string> = {
   youtube:    '#ef4444',
   x_post:     'rgba(255,255,255,0.25)',
   instagram:  '#ec4899',
+  reels:      '#8b5cf6',
   rss:        '#fb923c',
   article:    '#60a5fa',
   research:   '#a78bfa',
@@ -61,6 +64,7 @@ export default function ContentCard({ content, variant = 'default', className }:
     ? `/lab/${labPath}/${content.slug}`
     : `/content/${content.slug}`
 
+  const isReels = content.content_type === 'reels'
   const isExternal = ['rss', 'x_post', 'instagram', 'youtube', 'external_link'].includes(content.content_type)
     && !!content.source_url
   const dot = CHANNEL_DOT[content.content_type] ?? 'bg-white/20'
@@ -101,7 +105,18 @@ export default function ContentCard({ content, variant = 'default', className }:
 
   return (
     <div className={cn('glass-card group overflow-hidden rounded-2xl', className)}>
-      {/* Thumbnail */}
+      {/* Thumbnail / Video */}
+      {isReels && content.source_url ? (
+        <div className="mx-auto overflow-hidden bg-black" style={{ aspectRatio: '9/16', maxHeight: 480 }}>
+          <video
+            src={content.source_url}
+            controls
+            playsInline
+            preload="metadata"
+            className="h-full w-full object-contain"
+          />
+        </div>
+      ) : (
       <div className="aspect-video overflow-hidden bg-white/[0.03]">
         {content.thumbnail_url ? (
           <img
@@ -131,6 +146,7 @@ export default function ContentCard({ content, variant = 'default', className }:
           </div>
         )}
       </div>
+      )}
 
       <div className="p-7">
         {/* Channel badge */}
