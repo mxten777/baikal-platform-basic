@@ -123,12 +123,6 @@ function ContentFormModal({ initial, onClose }: ContentFormModalProps) {
     }))
   }
 
-  function handleSlugRegenerate() {
-    if (!form.title.trim()) return
-    if (form.id && !confirm('슬러그를 재생성하면 기존 URL이 변경됩니다. 계속할까요?')) return
-    set('slug', toSlug(form.title))
-  }
-
   function validate(): string | null {
     const title = form.title.trim()
     if (!title) return '제목을 입력해 주세요.'
@@ -143,8 +137,9 @@ function ContentFormModal({ initial, onClose }: ContentFormModalProps) {
       if (!isValidHttpUrl(form.instagram_url)) return 'Instagram Reels URL 형식이 올바르지 않습니다. (http/https)'
       if (!isValidHttpUrl(form.youtube_url)) return 'YouTube Shorts URL 형식이 올바르지 않습니다. (http/https)'
     }
+    // 편집은 기존 slug 유지, 신규는 toSlug 결과가 비어 있으면 차단
     const slug = (form.slug || toSlug(form.title)).trim()
-    if (!/^[a-z0-9-]+$/.test(slug)) return '슬러그는 소문자 영문/숫자/하이픈만 사용해 주세요.'
+    if (!form.id && !slug) return '제목에서 슬러그를 자동 생성할 수 없습니다. 제목을 확인해 주세요.'
     return null
   }
 
@@ -205,27 +200,6 @@ function ContentFormModal({ initial, onClose }: ContentFormModalProps) {
               onChange={e => handleTitleChange(e.target.value)}
               required
             />
-          </div>
-
-          {/* 슬러그 */}
-          <div>
-            <label className="block mb-1.5 text-xs font-semibold text-white/50 uppercase tracking-wider">슬러그</label>
-            <div className="flex gap-2">
-              <input
-                className="admin-input flex-1 font-mono text-xs"
-                placeholder="url-slug"
-                value={form.slug}
-                onChange={e => set('slug', e.target.value)}
-              />
-              <button
-                type="button"
-                onClick={handleSlugRegenerate}
-                className="rounded-xl border border-white/[0.08] px-3 text-xs text-white/60 hover:text-white hover:border-white/20 transition-colors"
-                title="제목으로부터 슬러그 재생성"
-              >
-                재생성
-              </button>
-            </div>
           </div>
 
           {/* 유형 + 상태 */}
