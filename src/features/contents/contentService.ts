@@ -15,7 +15,7 @@ export async function getContents(
     .select(`
       id, slug, title, summary, content_type,
       thumbnail_url, published_at, is_featured, is_pinned,
-      source_url, embed_html, view_count, lang,
+      source_url, source_raw, embed_html, view_count, lang,
       tags:content_tag_map(tag:tags(*)),
       source:content_sources(id, name, source_type)
     `, { count: 'exact' })
@@ -145,7 +145,7 @@ export async function adminGetContents(statusFilter?: string): Promise<Content[]
     .from('contents')
     .select(`
       id, slug, title, summary, content_type, status,
-      thumbnail_url, published_at, created_at,
+      thumbnail_url, published_at, created_at, source_raw,
       source:content_sources(name, source_type)
     `)
     .order('created_at', { ascending: false })

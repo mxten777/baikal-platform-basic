@@ -65,6 +65,8 @@ export default function ContentCard({ content, variant = 'default', className }:
     : `/content/${content.slug}`
 
   const isReels = content.content_type === 'reels'
+  const reelsInstagramUrl = isReels ? (content.source_raw?.instagram_url as string | undefined) || null : null
+  const reelsYoutubeUrl = isReels ? (content.source_raw?.youtube_url as string | undefined) || null : null
   const isExternal = ['rss', 'x_post', 'instagram', 'youtube', 'external_link'].includes(content.content_type)
     && !!content.source_url
   const dot = CHANNEL_DOT[content.content_type] ?? 'bg-white/20'
@@ -171,6 +173,31 @@ export default function ContentCard({ content, variant = 'default', className }:
           <p className="mt-3 text-sm leading-relaxed text-white/40 line-clamp-2">
             {content.summary}
           </p>
+        )}
+
+        {isReels && (reelsInstagramUrl || reelsYoutubeUrl) && (
+          <div className="mt-4 flex gap-2 flex-wrap">
+            {reelsInstagramUrl && (
+              <a
+                href={reelsInstagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full bg-pink-500/10 px-3 py-1.5 text-xs font-semibold text-pink-400 hover:bg-pink-500/20 transition-colors"
+              >
+                ◈ Instagram 보기
+              </a>
+            )}
+            {reelsYoutubeUrl && (
+              <a
+                href={reelsYoutubeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-400 hover:bg-red-500/20 transition-colors"
+              >
+                ▶ YouTube Shorts 보기
+              </a>
+            )}
+          </div>
         )}
 
         <div className="mt-5 flex items-center justify-between">

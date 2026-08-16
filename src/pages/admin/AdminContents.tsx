@@ -59,6 +59,8 @@ interface FormState {
   is_pinned: boolean
   thumbnail_url: string
   source_url: string
+  instagram_url: string
+  youtube_url: string
   meta_title: string
   meta_desc: string
   canonical_url: string
@@ -71,6 +73,7 @@ const EMPTY_FORM: FormState = {
   published_at: new Date().toISOString().slice(0, 16),
   is_featured: false, is_pinned: false,
   thumbnail_url: '', source_url: '',
+  instagram_url: '', youtube_url: '',
   meta_title: '', meta_desc: '', canonical_url: '', lang: 'ko',
 }
 
@@ -88,6 +91,8 @@ function toFormState(c: Content): FormState {
     is_pinned: c.is_pinned,
     thumbnail_url: c.thumbnail_url ?? '',
     source_url: c.source_url ?? '',
+    instagram_url: (c.source_raw?.instagram_url as string | undefined) ?? '',
+    youtube_url: (c.source_raw?.youtube_url as string | undefined) ?? '',
     meta_title: c.meta_title ?? '',
     meta_desc: c.meta_desc ?? '',
     canonical_url: c.canonical_url ?? '',
@@ -134,6 +139,10 @@ function ContentFormModal({ initial, onClose }: ContentFormModalProps) {
     if (!isValidHttpUrl(form.thumbnail_url)) return '썸네일 URL 형식이 올바르지 않습니다. (http/https)'
     if (!isValidHttpUrl(form.source_url)) return '소스 URL 형식이 올바르지 않습니다.'
     if (!isValidHttpUrl(form.canonical_url)) return 'Canonical URL 형식이 올바르지 않습니다.'
+    if (form.content_type === 'reels') {
+      if (!isValidHttpUrl(form.instagram_url)) return 'Instagram Reels URL 형식이 올바르지 않습니다. (http/https)'
+      if (!isValidHttpUrl(form.youtube_url)) return 'YouTube Shorts URL 형식이 올바르지 않습니다. (http/https)'
+    }
     const slug = (form.slug || toSlug(form.title)).trim()
     if (!/^[a-z0-9-]+$/.test(slug)) return '슬러그는 소문자 영문/숫자/하이픈만 사용해 주세요.'
     return null
@@ -164,6 +173,13 @@ function ContentFormModal({ initial, onClose }: ContentFormModalProps) {
       meta_desc: form.meta_desc || undefined,
       canonical_url: form.canonical_url || undefined,
       lang: form.lang || 'ko',
+      ...(form.content_type === 'reels' && {
+        source_raw: {
+          ...(initial?.source_raw ?? {}),
+          instagram_url: form.instagram_url || null,
+          youtube_url: form.youtube_url || null,
+        },
+      }),
     })
     onClose()
   }
@@ -352,6 +368,31 @@ function ContentFormModal({ initial, onClose }: ContentFormModalProps) {
               onChange={e => set('canonical_url', e.target.value)}
             />
           </div>
+
+          {/* Reels SNS 게시 URL — reels 유형일 때만 표시 */}
+          {form.content_type === 'reels' && (
+            <div className="border-t border-white/[0.06] pt-4 space-y-3">
+              <p className="text-xs font-semibold text-white/30 uppercase tracking-wider">SNS 게시 URL (선택)</p>
+              <div>
+                <label className="block mb-1.5 text-xs font-semibold text-white/50 uppercase tracking-wider">Instagram Reels URL</label>
+                <input
+                  className="admin-input w-full"
+                  placeholder="https://www.instagram.com/reels/..."
+                  value={form.instagram_url}
+                  onChange={e => set('instagram_url', e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block mb-1.5 text-xs font-semibold text-white/50 uppercase tracking-wider">YouTube Shorts URL</label>
+                <input
+                  className="admin-input w-full"
+                  placeholder="https://www.youtube.com/shorts/..."
+                  value={form.youtube_url}
+                  onChange={e => set('youtube_url', e.target.value)}
+                />
+              </div>
+            </div>
+          )}
 
           {formError && (
             <p className="text-xs text-red-400">{formError}</p>
