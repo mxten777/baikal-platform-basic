@@ -145,7 +145,7 @@ export async function adminGetContents(statusFilter?: string): Promise<Content[]
     .from('contents')
     .select(`
       id, slug, title, summary, content_type, status,
-      thumbnail_url, published_at, created_at, source_raw,
+      thumbnail_url, source_url, published_at, created_at, source_raw,
       source:content_sources(name, source_type)
     `)
     .order('created_at', { ascending: false })
@@ -183,12 +183,24 @@ export async function adminDeleteContent(id: string): Promise<void> {
 export async function adminUpsertContent(
   content: Partial<Content> & { slug: string; title: string; content_type: string }
 ): Promise<Content> {
+  if (content.id) {
+    // id가 있으면 PK로 UPDATE — upsert dual-unique-constraint 409 방지
+    const { id, ...fields } = content
+    const { data, error } = await supabase
+      .from('contents')
+      .update(fields)
+      .eq('id', id)
+      .select()
+      .single()
+    if (error) throw error
+    return data as Content
+  }
+
   const { data, error } = await supabase
     .from('contents')
-    .upsert(content, { onConflict: 'slug' })
+    .insert(content)
     .select()
     .single()
-
   if (error) throw error
   return data as Content
 }
