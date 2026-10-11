@@ -81,7 +81,11 @@ export default function AdminAIContent() {
 
   const queryClient = useQueryClient()
 
-  const { form, setField, reset, result, isLoading, error, generate } = useAIContent()
+  const {
+    form, setField, reset, result, isLoading, error, generate,
+    outputId, outputTitle, editedText, setEditedText, discardEdits, loadOutput, saveEdits,
+    isSaving, saveError, saveMessage, hasUnsavedEdits,
+  } = useAIContent()
 
   const { data: contentsData, isLoading: contentsLoading } = useAdminContents('published')
   const contents: Content[] = contentsData ?? []
@@ -89,7 +93,7 @@ export default function AdminAIContent() {
   const { data: projectsData, isLoading: projectsLoading } = useAdminProjects()
   const projects: Project[] = projectsData ?? []
 
-  const { data: historyData, isLoading: historyLoading } = useQuery({
+  const { data: historyData, isLoading: historyLoading, error: historyError } = useQuery({
     queryKey: ['ai-content-history', showHidden],
     queryFn: () => getAIContentHistory(showHidden),
     enabled: tab === 'history',
@@ -169,10 +173,101 @@ export default function AdminAIContent() {
   }
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(result)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    setActionError(null)
+    try {
+      await navigator.clipboard.writeText(editedText)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : '복사에 실패했습니다.')
+    }
   }
+
+  async function handleSaveEdits() {
+    setActionError(null)
+    if (await saveEdits()) {
+      try {
+        await queryClient.invalidateQueries({ queryKey: ['ai-content-history'] }, { throwOnError: true })
+      } catch (e) {
+        setActionError(e instanceof Error ? e.message : '생성 이력 재조회에 실패했습니다.')
+      }
+    }
+  }
+
+  function handleLoadOutput(row: AIHistoryRow) {
+    loadOutput(row)
+    setCopied(false)
+    setActionError(null)
+  }
+
+  const hasOutput = Boolean(result || outputId)
+  const outputEditor = (
+    <div className="glass-card rounded-2xl p-6 flex flex-col">
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-xs font-semibold tracking-widest text-white/20 uppercase">생성 결과</p>
+        {hasOutput && (
+          <button
+            onClick={handleCopy}
+            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all border border-white/[0.08] hover:border-white/20 text-white/40 hover:text-white"
+          >
+            {copied ? <><Check size={13} className="text-green-400" /> 복사됨</> : <><Copy size={13} /> 복사</>}
+          </button>
+        )}
+      </div>
+      {isLoading && (
+        <div className="flex flex-1 items-center justify-center gap-3 text-white/30 py-16">
+          <Loader2 size={20} className="animate-spin" />
+          <span className="text-sm">AI가 콘텐츠를 생성하고 있습니다...</span>
+        </div>
+      )}
+      {!isLoading && !hasOutput && (
+        <div className="flex flex-1 items-center justify-center py-16">
+          <p className="text-sm text-white/20">생성된 콘텐츠가 여기에 표시됩니다</p>
+        </div>
+      )}
+      {!isLoading && hasOutput && (
+        <>
+          <p className="mb-3 text-sm text-white/60">{outputTitle}</p>
+          <textarea
+            aria-label="생성 콘텐츠 수정"
+            className="admin-input w-full min-h-72 flex-1 resize-y text-sm leading-relaxed"
+            value={editedText}
+            onChange={e => {
+              setEditedText(e.target.value)
+              setCopied(false)
+            }}
+            disabled={isSaving}
+          />
+          <p className="mt-2 text-xs text-white/35">
+            수정본은 AI 생성 이력에 저장됩니다. 이미 공개된 Content Hub 본문은 변경하지 않습니다.
+          </p>
+          {hasUnsavedEdits && <p className="mt-2 text-xs text-yellow-400">저장하지 않은 수정 내용이 있습니다. 승인 전에 저장해 주세요.</p>}
+          {saveError && <p role="alert" className="mt-2 text-sm text-red-400">{saveError}</p>}
+          {saveMessage && <p role="status" className="mt-2 text-sm text-green-400">{saveMessage}</p>}
+          <button
+            onClick={handleSaveEdits}
+            disabled={!outputId || isSaving || actioningId !== null || !hasUnsavedEdits || !editedText.trim()}
+            className="mt-4 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSaving ? '저장 중...' : '수정본 저장'}
+          </button>
+          {hasUnsavedEdits && (
+            <button
+              onClick={() => {
+                discardEdits()
+                setCopied(false)
+              }}
+              disabled={isSaving}
+              className="mt-2 rounded-xl border border-white/20 px-4 py-2 text-sm text-white/50 hover:text-white disabled:opacity-50"
+            >
+              수정 취소
+            </button>
+          )}
+        </>
+      )}
+      {tab === 'create' && actionError && <p role="alert" className="mt-2 text-sm text-red-400">{actionError}</p>}
+    </div>
+  )
 
   const sourceTypes: { value: AIContentSourceType; label: string; icon: React.ElementType }[] = [
     { value: 'direct',  label: '직접 입력', icon: FileText },
@@ -194,6 +289,7 @@ export default function AdminAIContent() {
           <div className="flex items-center gap-1 rounded-xl bg-white/[0.04] p-1 border border-white/[0.06]">
             <button
               onClick={() => setTab('create')}
+              disabled={isSaving || isLoading}
               className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${
                 tab === 'create'
                   ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20'
@@ -204,6 +300,7 @@ export default function AdminAIContent() {
             </button>
             <button
               onClick={() => setTab('history')}
+              disabled={isSaving || isLoading}
               className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${
                 tab === 'history'
                   ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20'
@@ -247,12 +344,12 @@ export default function AdminAIContent() {
               {form.sourceType === 'direct' && (
                 <>
                   <div>
-                    <Label>제목 <span className="text-white/20 font-normal">*필수</span></Label>
+                    <Label>{form.contentKind === 'product' ? '제목 (제품명)' : '제목'} <span className="text-white/20 font-normal">*필수</span></Label>
                     <input
                       className="admin-input w-full"
                       value={form.title}
                       onChange={e => setField('title', e.target.value)}
-                      placeholder="콘텐츠 제목"
+                      placeholder={form.contentKind === 'product' ? '제품명 (저장 제목으로도 사용)' : '콘텐츠 제목'}
                       maxLength={200}
                     />
                   </div>
@@ -442,8 +539,12 @@ export default function AdminAIContent() {
               {/* 버튼 영역 */}
               <div className="flex gap-3">
                 <button
-                  onClick={generate}
-                  disabled={isLoading}
+                  onClick={() => {
+                    setCopied(false)
+                    setActionError(null)
+                    void generate()
+                  }}
+                  disabled={isLoading || isSaving || hasUnsavedEdits}
                   className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
@@ -454,7 +555,12 @@ export default function AdminAIContent() {
                 </button>
                 {(result || error) && (
                   <button
-                    onClick={reset}
+                    onClick={() => {
+                      reset()
+                      setCopied(false)
+                      setActionError(null)
+                    }}
+                    disabled={isLoading || isSaving || hasUnsavedEdits}
                     className="rounded-xl px-4 py-3 text-sm font-medium text-white/40 border border-white/[0.08] hover:text-white/70 hover:border-white/20 transition-all"
                   >
                     초기화
@@ -464,42 +570,21 @@ export default function AdminAIContent() {
             </div>
 
             {/* 생성 결과 */}
-            <div className="glass-card rounded-2xl p-6 flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-xs font-semibold tracking-widest text-white/20 uppercase">생성 결과</p>
-                {result && (
-                  <button
-                    onClick={handleCopy}
-                    className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all border border-white/[0.08] hover:border-white/20 text-white/40 hover:text-white"
-                  >
-                    {copied ? <><Check size={13} className="text-green-400" /> 복사됨</> : <><Copy size={13} /> 복사</>}
-                  </button>
-                )}
-              </div>
-
-              {isLoading && (
-                <div className="flex flex-1 items-center justify-center gap-3 text-white/30 py-16">
-                  <Loader2 size={20} className="animate-spin" />
-                  <span className="text-sm">AI가 콘텐츠를 생성하고 있습니다...</span>
-                </div>
-              )}
-              {!isLoading && !result && (
-                <div className="flex flex-1 items-center justify-center py-16">
-                  <p className="text-sm text-white/20">생성된 콘텐츠가 여기에 표시됩니다</p>
-                </div>
-              )}
-              {!isLoading && result && (
-                <pre className="flex-1 whitespace-pre-wrap text-sm text-white/80 leading-relaxed font-sans overflow-auto">
-                  {result}
-                </pre>
-              )}
-            </div>
+            {outputEditor}
           </div>
         )}
 
         {/* ── 생성 이력 탭 ── */}
         {tab === 'history' && (
+          <>
+          {hasOutput && <div className="mb-6">{outputEditor}</div>}
           <div className="glass-card rounded-2xl overflow-hidden">
+            {historyError && <p role="alert" className="px-5 pt-4 text-sm text-red-400">{historyError.message}</p>}
+            {actionError && (
+              <div role="alert" className="mx-5 mt-2 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-2.5">
+                <p className="text-sm text-red-400">{actionError}</p>
+              </div>
+            )}
             {/* 숨김 콘텐츠 보기 토글 */}
             <div className="flex items-center justify-end px-5 pt-4 pb-2">
               <button
@@ -523,11 +608,6 @@ export default function AdminAIContent() {
               <div className="py-16 text-center text-sm text-white/20">생성 이력이 없습니다</div>
             ) : (
               <>
-                {actionError && (
-                  <div className="mx-5 mt-2 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-2.5">
-                    <p className="text-sm text-red-400">{actionError}</p>
-                  </div>
-                )}
               <table className="hidden md:table w-full text-sm">
                 <thead>
                   <tr className="border-b border-white/[0.06]">
@@ -541,6 +621,7 @@ export default function AdminAIContent() {
                 <tbody className="divide-y divide-white/[0.04]">
                   {history.map(row => {
                     const isActioning = actioningId === row.id
+                    const editsPending = isSaving || (outputId === row.id && hasUnsavedEdits)
                     const canPublish = row.status === 'approved' && PUBLISHABLE_CHANNELS.has(row.channel)
                     const isHidden = row.status === 'hidden'
                     return (
@@ -572,10 +653,17 @@ export default function AdminAIContent() {
                       </td>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleLoadOutput(row)}
+                            disabled={isSaving || hasUnsavedEdits || actioningId !== null}
+                            className="rounded-lg px-3 py-1 text-[11px] font-medium border border-white/20 text-white/60 hover:text-white disabled:opacity-40"
+                          >
+                            보기·수정
+                          </button>
                           {row.status === 'draft' && (
                             <button
                               onClick={() => handleApprove(row.id)}
-                              disabled={isActioning}
+                              disabled={isActioning || editsPending}
                               className="rounded-lg px-3 py-1 text-[11px] font-medium border border-blue-500/30 text-blue-400 hover:bg-blue-600/15 disabled:opacity-40 transition-all"
                             >
                               {isActioning ? <Loader2 size={11} className="animate-spin" /> : '승인'}
@@ -584,7 +672,7 @@ export default function AdminAIContent() {
                           {row.status === 'approved' && (
                             <button
                               onClick={() => handlePublish(row)}
-                              disabled={isActioning || !canPublish}
+                              disabled={isActioning || editsPending || !canPublish}
                               title={!canPublish ? '이 채널은 Content Hub 공개를 지원하지 않습니다' : undefined}
                               className="rounded-lg px-3 py-1 text-[11px] font-medium border border-green-500/30 text-green-400 hover:bg-green-600/15 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                             >
@@ -594,7 +682,7 @@ export default function AdminAIContent() {
                           {row.status === 'hidden' && (
                             <button
                               onClick={() => handleRestore(row)}
-                              disabled={isActioning}
+                              disabled={isActioning || editsPending}
                               className="rounded-lg px-3 py-1 text-[11px] font-medium border border-white/20 text-white/40 hover:text-white/70 hover:border-white/30 disabled:opacity-40 transition-all"
                             >
                               {isActioning ? <Loader2 size={11} className="animate-spin" /> : '복원'}
@@ -603,7 +691,7 @@ export default function AdminAIContent() {
                           {row.status !== 'hidden' && (
                             <button
                               onClick={() => setHideConfirmRow(row)}
-                              disabled={isActioning}
+                              disabled={isActioning || editsPending}
                               className="rounded-lg px-3 py-1 text-[11px] font-medium border border-white/[0.08] text-white/25 hover:text-white/50 hover:border-white/20 disabled:opacity-40 transition-all"
                             >
                               숨김
@@ -621,6 +709,7 @@ export default function AdminAIContent() {
               <div className="md:hidden divide-y divide-white/[0.04]">
                 {history.map(row => {
                   const isActioning = actioningId === row.id
+                  const editsPending = isSaving || (outputId === row.id && hasUnsavedEdits)
                   const canPublish = row.status === 'approved' && PUBLISHABLE_CHANNELS.has(row.channel)
                   return (
                     <div key={row.id} className={`px-4 py-3.5 ${row.status === 'hidden' ? 'opacity-50' : ''}`}>
@@ -648,10 +737,17 @@ export default function AdminAIContent() {
                           {STATUS_LABEL[row.status] ?? row.status}
                         </span>
                         <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleLoadOutput(row)}
+                            disabled={isSaving || hasUnsavedEdits || actioningId !== null}
+                            className="rounded-lg px-3 py-1 text-[11px] font-medium border border-white/20 text-white/60 hover:text-white disabled:opacity-40"
+                          >
+                            보기·수정
+                          </button>
                           {row.status === 'draft' && (
                             <button
                               onClick={() => handleApprove(row.id)}
-                              disabled={isActioning}
+                              disabled={isActioning || editsPending}
                               className="rounded-lg px-4 py-1.5 text-xs font-medium border border-blue-500/30 text-blue-400 hover:bg-blue-600/15 disabled:opacity-40 transition-all"
                             >
                               {isActioning ? <Loader2 size={12} className="animate-spin" /> : '승인'}
@@ -660,7 +756,7 @@ export default function AdminAIContent() {
                           {row.status === 'approved' && (
                             <button
                               onClick={() => handlePublish(row)}
-                              disabled={isActioning || !canPublish}
+                              disabled={isActioning || editsPending || !canPublish}
                               title={!canPublish ? '이 채널은 Content Hub 공개를 지원하지 않습니다' : undefined}
                               className="rounded-lg px-4 py-1.5 text-xs font-medium border border-green-500/30 text-green-400 hover:bg-green-600/15 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                             >
@@ -670,7 +766,7 @@ export default function AdminAIContent() {
                           {row.status === 'hidden' && (
                             <button
                               onClick={() => handleRestore(row)}
-                              disabled={isActioning}
+                              disabled={isActioning || editsPending}
                               className="rounded-lg px-4 py-1.5 text-xs font-medium border border-white/20 text-white/40 hover:text-white/70 hover:border-white/30 disabled:opacity-40 transition-all"
                             >
                               {isActioning ? <Loader2 size={12} className="animate-spin" /> : '복원'}
@@ -679,7 +775,7 @@ export default function AdminAIContent() {
                           {row.status !== 'hidden' && (
                             <button
                               onClick={() => setHideConfirmRow(row)}
-                              disabled={isActioning}
+                              disabled={isActioning || editsPending}
                               className="rounded-lg px-4 py-1.5 text-xs font-medium border border-white/[0.08] text-white/25 hover:text-white/50 hover:border-white/20 disabled:opacity-40 transition-all"
                             >
                               숨김
@@ -694,6 +790,7 @@ export default function AdminAIContent() {
               </>
             )}
           </div>
+          </>
         )}
       </div>
 

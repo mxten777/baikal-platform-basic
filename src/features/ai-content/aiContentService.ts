@@ -42,6 +42,17 @@ export async function createAIContentOutput(input: CreateAIContentOutputInput): 
   return data as AIContentOutput
 }
 
+export async function saveAIContentEditedText(id: string, editedText: string): Promise<void> {
+  if (!editedText.trim()) throw new Error('수정 내용을 입력해 주세요.')
+  const { error } = await supabase
+    .from('ai_content_outputs')
+    .update({ edited_text: editedText })
+    .eq('id', id)
+    .select('id')
+    .single()
+  if (error) throw error
+}
+
 // 채널 → content_type 매핑 (지원 채널만)
 const CHANNEL_CONTENT_TYPE_MAP: Record<string, string> = {
   instagram: 'instagram',

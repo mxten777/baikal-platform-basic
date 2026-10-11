@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { createAIContent, createAIContentOutput } from './aiContentService'
-import type { CreateAIContentInput } from './aiContentService'
+import { createAIContent, createAIContentOutput, saveAIContentEditedText } from './aiContentService'
+import type { AIHistoryRow, CreateAIContentInput } from './aiContentService'
 import type { AIContentSourceType, Content, Project } from '@/types/models'
 
 export type AIChannel = 'instagram' | 'threads' | 'naver_blog' | 'reels'
@@ -37,6 +37,62 @@ export function useAIContent() {
   const [result, setResult] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [outputId, setOutputId] = useState<string | null>(null)
+  const [outputTitle, setOutputTitle] = useState('')
+  const [editedText, setEditedTextValue] = useState('')
+  const [savedText, setSavedText] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [saveMessage, setSaveMessage] = useState<string | null>(null)
+
+  function setEditedText(value: string) {
+    setEditedTextValue(value)
+    setSaveError(null)
+    setSaveMessage(null)
+  }
+
+  function discardEdits() {
+    setEditedText(savedText)
+  }
+
+  function loadOutput(row: AIHistoryRow) {
+    const text = row.edited_text ?? row.output_text ?? ''
+    setOutputId(row.id)
+    setOutputTitle(row.ai_content?.title ?? '(제목 없음)')
+    setResult(row.output_text ?? '')
+    setEditedTextValue(text)
+    setSavedText(text)
+    setError(null)
+    setSaveError(null)
+    setSaveMessage(null)
+  }
+
+  async function saveEdits(): Promise<boolean> {
+    setSaveError(null)
+    setSaveMessage(null)
+    if (!outputId) {
+      setSaveError('저장된 생성 이력이 없습니다. 콘텐츠를 다시 생성해 주세요.')
+      return false
+    }
+    if (!editedText.trim()) {
+      setSaveError('수정 내용을 입력해 주세요.')
+      return false
+    }
+    setIsSaving(true)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('로그인 세션이 없습니다. 다시 로그인해 주세요.')
+      await saveAIContentEditedText(outputId, editedText)
+      setSavedText(editedText)
+      setSaveMessage('수정본을 저장했습니다.')
+      return true
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : '수정본 저장에 실패했습니다.')
+      return false
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   function setField<K extends keyof AIContentForm>(key: K, value: AIContentForm[K]) {
     setForm(prev => ({ ...prev, [key]: value }))
@@ -46,11 +102,23 @@ export function useAIContent() {
     setForm(INITIAL_FORM)
     setResult('')
     setError(null)
+    setOutputId(null)
+    setOutputTitle('')
+    setEditedTextValue('')
+    setSavedText('')
+    setSaveError(null)
+    setSaveMessage(null)
   }
 
   async function generate() {
     setError(null)
     setResult('')
+    setOutputId(null)
+    setOutputTitle('')
+    setEditedTextValue('')
+    setSavedText('')
+    setSaveError(null)
+    setSaveMessage(null)
 
     if (!form.title.trim()) {
       setError('제목을 입력해 주세요.')
@@ -110,7 +178,8 @@ export function useAIContent() {
             tone: form.tone,
             language: 'ko',
             brand: form.brand,
-            additional_instruction: `콘텐츠 유형: ${form.contentKind}`,
+            content_kind: form.contentKind,
+            ...(form.contentKind === 'product' ? { product_name: form.title.trim() } : {}),
           }),
         },
       )
@@ -125,6 +194,9 @@ export function useAIContent() {
 
       const outputText = body.content as string
       setResult(outputText)
+      setEditedTextValue(outputText)
+      setSavedText(outputText)
+      setOutputTitle(form.title.trim())
 
       // ai_contents 저장
       const contentInput: CreateAIContentInput = {
@@ -144,7 +216,7 @@ export function useAIContent() {
       const contentRow = await createAIContent(contentInput)
 
       // ai_content_outputs 저장
-      await createAIContentOutput({
+      const outputRow = await createAIContentOutput({
         ai_content_id: contentRow.id,
         channel: form.channel,
         purpose: form.purpose,
@@ -152,6 +224,7 @@ export function useAIContent() {
         output_text: outputText,
         created_by: session.user.id,
       })
+      setOutputId(outputRow.id)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'AI 콘텐츠 생성에 실패했습니다.')
     } finally {
@@ -159,5 +232,9 @@ export function useAIContent() {
     }
   }
 
-  return { form, setField, reset, result, isLoading, error, generate }
+  return {
+    form, setField, reset, result, isLoading, error, generate,
+    outputId, outputTitle, editedText, setEditedText, discardEdits, loadOutput, saveEdits,
+    isSaving, saveError, saveMessage, hasUnsavedEdits: editedText !== savedText,
+  }
 }
