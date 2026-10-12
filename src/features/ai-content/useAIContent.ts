@@ -17,6 +17,7 @@ export interface AIContentForm {
   purpose: string
   tone: string
   brand: string
+  additionalInstruction: string
 }
 
 const INITIAL_FORM: AIContentForm = {
@@ -30,6 +31,7 @@ const INITIAL_FORM: AIContentForm = {
   purpose: 'promotion',
   tone: 'professional',
   brand: 'BAIKAL',
+  additionalInstruction: '',
 }
 
 export function useAIContent() {
@@ -137,7 +139,7 @@ export function useAIContent() {
         setError('Blog 콘텐츠를 선택해 주세요.')
         return
       }
-      sourceText = [form.selectedContent.title, form.selectedContent.summary]
+      sourceText = [form.selectedContent.title, form.selectedContent.summary, form.selectedContent.body]
         .filter(Boolean).join('\n\n')
     } else {
       if (!form.selectedProject) {
@@ -178,6 +180,7 @@ export function useAIContent() {
             tone: form.tone,
             language: 'ko',
             brand: form.brand,
+            additional_instruction: form.additionalInstruction,
             content_kind: form.contentKind,
             ...(form.contentKind === 'product' ? { product_name: form.title.trim() } : {}),
           }),

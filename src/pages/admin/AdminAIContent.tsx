@@ -529,6 +529,20 @@ export default function AdminAIContent() {
                 </div>
               </div>
 
+              <div>
+                <Label>추가 지시사항 (선택)</Label>
+                <textarea
+                  className="admin-input w-full h-20 resize-y"
+                  value={form.additionalInstruction}
+                  onChange={e => setField('additionalInstruction', e.target.value)}
+                  placeholder="원하는 세부 방향이 있을 때만 입력하세요"
+                  maxLength={1000}
+                />
+                <p className="mt-1 text-right text-[11px] text-white/20">
+                  {form.additionalInstruction.length} / 1000
+                </p>
+              </div>
+
               {/* 오류 */}
               {error && (
                 <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3">
