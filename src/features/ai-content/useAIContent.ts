@@ -141,6 +141,9 @@ export function useAIContent() {
       }
       sourceText = [form.selectedContent.title, form.selectedContent.summary, form.selectedContent.body]
         .filter(Boolean).join('\n\n')
+      if (form.selectedContent.content_type === 'rss' && !form.selectedContent.body?.trim()) {
+        sourceText = `RSS 요약 기반 콘텐츠입니다. 전체 원문이 아닌 제목·요약만 제공됩니다.\n\n${sourceText}`
+      }
     } else {
       if (!form.selectedProject) {
         setError('프로젝트를 선택해 주세요.')

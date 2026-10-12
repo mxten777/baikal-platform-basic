@@ -87,10 +87,10 @@ export default function AdminAIContent() {
     isSaving, saveError, saveMessage, hasUnsavedEdits,
   } = useAIContent()
 
-  const { data: contentsData, isLoading: contentsLoading } = useAdminContents('published')
+  const { data: contentsData, isLoading: contentsLoading, error: contentsError } = useAdminContents('published')
   const contents: Content[] = contentsData ?? []
 
-  const { data: projectsData, isLoading: projectsLoading } = useAdminProjects()
+  const { data: projectsData, isLoading: projectsLoading, error: projectsError } = useAdminProjects()
   const projects: Project[] = projectsData ?? []
 
   const { data: historyData, isLoading: historyLoading, error: historyError } = useQuery({
@@ -386,6 +386,10 @@ export default function AdminAIContent() {
                     <div className="flex items-center gap-2 text-white/30 text-sm py-4">
                       <Loader2 size={14} className="animate-spin" /> 블로그 목록 로딩 중...
                     </div>
+                  ) : contentsError ? (
+                    <p role="alert" className="text-sm text-red-400">
+                      Blog 목록 조회에 실패했습니다: {contentsError.message}
+                    </p>
                   ) : (
                     <div>
                       <Label>Blog 콘텐츠 선택 <span className="text-white/20 font-normal">*필수</span></Label>
@@ -404,6 +408,9 @@ export default function AdminAIContent() {
                               }`}
                             >
                               <p className="font-medium truncate">{c.title}</p>
+                              {c.content_type === 'rss' && !c.body?.trim() && (
+                                <p className="text-[11px] text-amber-400 mt-0.5">RSS 요약 기반 · 전체 원문 없음</p>
+                              )}
                               {c.summary && (
                                 <p className="text-[11px] text-white/30 truncate mt-0.5">{c.summary}</p>
                               )}
@@ -415,6 +422,11 @@ export default function AdminAIContent() {
                   )}
                   {form.selectedContent && (
                     <div>
+                      {form.selectedContent.content_type === 'rss' && !form.selectedContent.body?.trim() && (
+                        <p className="text-xs text-amber-400 mb-2">
+                          전체 원문 없이 저장된 제목·요약을 기반으로 생성합니다.
+                        </p>
+                      )}
                       <Label>제목</Label>
                       <input
                         className="admin-input w-full"
@@ -434,6 +446,10 @@ export default function AdminAIContent() {
                     <div className="flex items-center gap-2 text-white/30 text-sm py-4">
                       <Loader2 size={14} className="animate-spin" /> 프로젝트 목록 로딩 중...
                     </div>
+                  ) : projectsError ? (
+                    <p role="alert" className="text-sm text-red-400">
+                      프로젝트 목록 조회에 실패했습니다: {projectsError.message}
+                    </p>
                   ) : (
                     <div>
                       <Label>프로젝트 선택 <span className="text-white/20 font-normal">*필수</span></Label>

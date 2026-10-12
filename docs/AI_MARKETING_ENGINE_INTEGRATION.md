@@ -69,6 +69,13 @@ Edge Function → 관리자 브라우저 (JSON 응답 전달)
 | `brand` | ❌ | `BAIKAL` | 문자열 |
 | `additional_instruction` | ❌ | `""` | 문자열 |
 
+### STEP 15-B — Blog 원문 전달
+
+- 관리자에서 기존 Blog 콘텐츠를 선택하면 제목·요약과 사용 가능한 본문을 원본으로 전달한다.
+  목록 조회에 DB의 `body`를 포함하며, 본문이 없거나 공백뿐인 RSS 콘텐츠는 화면과
+  `source_content`에 요약 기반(전체 원문 없음)임을 표시한다. RSS 원문 추가 수집은 하지 않는다.
+  Blog·프로젝트 목록 조회 오류는 실제 빈 목록과 구분하여 화면에 표시한다.
+
 ### 성공 Response (200)
 
 ```json

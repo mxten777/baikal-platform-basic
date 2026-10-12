@@ -144,7 +144,7 @@ export async function adminGetContents(statusFilter?: string): Promise<Content[]
   let query = supabase
     .from('contents')
     .select(`
-      id, slug, title, summary, content_type, status,
+      id, slug, title, summary, body, content_type, status,
       thumbnail_url, source_url, published_at, created_at, source_raw,
       source:content_sources(name, source_type)
     `)
