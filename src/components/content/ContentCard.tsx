@@ -27,30 +27,6 @@ const CHANNEL_DOT: Record<string, string> = {
   note: 'bg-green-400',
 }
 
-const PLACEHOLDER_ICON: Record<string, string> = {
-  youtube:     '▶',
-  x_post:      '𝕏',
-  instagram:   '◈',
-  reels:       '▶',
-  rss:         '◉',
-  article:     '✦',
-  research:    '◈',
-  experiment:  '⊕',
-  note:        '◇',
-}
-
-const PLACEHOLDER_ACCENT: Record<string, string> = {
-  youtube:    '#ef4444',
-  x_post:     'rgba(255,255,255,0.25)',
-  instagram:  '#ec4899',
-  reels:      '#8b5cf6',
-  rss:        '#fb923c',
-  article:    '#60a5fa',
-  research:   '#a78bfa',
-  experiment: '#2dd4bf',
-  note:       '#4ade80',
-}
-
 const LAB_PATH: Partial<Record<string, string>> = {
   article: 'articles',
   note: 'notes',
@@ -70,8 +46,6 @@ export default function ContentCard({ content, variant = 'default', className }:
   const isExternal = ['rss', 'x_post', 'instagram', 'youtube', 'external_link'].includes(content.content_type)
     && !!content.source_url
   const dot = CHANNEL_DOT[content.content_type] ?? 'bg-white/20'
-  const placeholderIcon = PLACEHOLDER_ICON[content.content_type] ?? '◇'
-  const placeholderAccent = PLACEHOLDER_ACCENT[content.content_type] ?? 'rgba(255,255,255,0.15)'
   const linkProps = isExternal
     ? { href: content.source_url ?? href, target: '_blank', rel: 'noopener noreferrer' }
     : { href }
@@ -174,21 +148,8 @@ export default function ContentCard({ content, variant = 'default', className }:
             loading="lazy"
           />
         ) : (
-          <div className="relative h-full w-full flex flex-col items-center justify-center gap-3 bg-[#0a0a0a]">
-            {/* 타입 컬러 글로우 */}
-            <div
-              className="absolute inset-0 opacity-10"
-              style={{ background: `radial-gradient(ellipse at center, ${placeholderAccent} 0%, transparent 70%)` }}
-            />
-            {/* 아이콘 */}
-            <span
-              className="relative text-3xl select-none leading-none"
-              style={{ color: placeholderAccent, filter: `drop-shadow(0 0 12px ${placeholderAccent})` }}
-            >
-              {placeholderIcon}
-            </span>
-            {/* 타입명 */}
-            <span className="relative text-[10px] font-semibold tracking-[0.2em] uppercase" style={{ color: placeholderAccent, opacity: 0.6 }}>
+          <div className="h-full w-full flex items-end bg-[#0d1b30] border-b border-white/10 p-5">
+            <span className="text-xs font-semibold tracking-[0.2em] uppercase text-blue-300/70">
               {CONTENT_TYPES_KO[content.content_type] ?? content.content_type}
             </span>
           </div>

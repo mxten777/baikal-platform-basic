@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 
 type NavItem = {
@@ -66,8 +66,8 @@ export default function Header() {
       }
       if (buttonRef.current) {
         const rect = buttonRef.current.getBoundingClientRect()
-        if (rect.top !== 46) {
-          buttonRef.current.style.top = '46px'
+        if (rect.top !== 10) {
+          buttonRef.current.style.top = '10px'
         }
       }
     }
@@ -96,26 +96,6 @@ export default function Header() {
             : 'bg-[#080808] border-b border-white/[0.04]'
         }`}
       >
-        {/* Announcement Bar — THE LIT Digital Renewal */}
-        <Link
-          to="/projects/the-lit-digital-renewal"
-          className="block border-b border-white/[0.05] bg-[#080808]/80 py-2 text-center text-[11px] transition-colors hover:bg-white/[0.02] focus:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/50"
-          aria-label="NEW PROJECT — THE LIT 복합문화공간 공식 웹사이트 리뉴얼 오픈, 프로젝트 보기"
-        >
-          <span className="hidden sm:inline">
-            <span className="font-semibold tracking-[0.15em] text-amber-400/80">NEW PROJECT · THE LIT</span>
-            <span className="mx-3 text-white/25">|</span>
-            <span className="text-neutral-200/80">복합문화공간 THE LIT 공식 웹사이트 리뉴얼 오픈</span>
-            <span className="ml-3 text-amber-400/80 hover:text-amber-300">프로젝트 보기 →</span>
-          </span>
-          <span className="sm:hidden">
-            <span className="font-semibold tracking-[0.12em] text-amber-400/80">NEW PROJECT · THE LIT</span>
-            <span className="mx-2 text-white/25">|</span>
-            <span className="text-neutral-200/80">리뉴얼 오픈</span>
-            <span className="ml-2 text-amber-400/80">→</span>
-          </span>
-        </Link>
-
         {/* 모바일 햄버거 메뉴 버튼 */}
         <div
           ref={buttonRef}
@@ -126,7 +106,7 @@ export default function Header() {
           className="hamburger-menu-btn"
           style={{
             position: 'fixed',
-            top: '46px',
+            top: '10px',
             right: '16px',
             width: '44px',
             height: '44px',

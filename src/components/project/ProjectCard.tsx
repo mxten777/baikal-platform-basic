@@ -7,46 +7,22 @@ interface ProjectCardProps {
   className?: string
 }
 
-const CATEGORY_STYLES: Record<string, { bg: string; border: string; text: string; glow: string; icon: string }> = {
-  'AI Platform':     { bg: 'from-blue-950/80 to-[#080808]',    border: 'border-blue-500/25',   text: 'text-blue-400',   glow: 'bg-blue-500/20',    icon: '🤖' },
-  'AI Agent':        { bg: 'from-violet-950/80 to-[#080808]',  border: 'border-violet-500/25', text: 'text-violet-400', glow: 'bg-violet-500/20',  icon: '⚡' },
-  'SaaS / MVP':      { bg: 'from-emerald-950/80 to-[#080808]', border: 'border-emerald-500/25',text: 'text-emerald-400',glow: 'bg-emerald-500/20', icon: '🚀' },
-  'Platform / Infra':{ bg: 'from-amber-950/80 to-[#080808]',  border: 'border-amber-500/25',  text: 'text-amber-400',  glow: 'bg-amber-500/20',   icon: '⚙️' },
-  'Website':         { bg: 'from-rose-950/80 to-[#080808]',   border: 'border-rose-500/25',   text: 'text-rose-400',   glow: 'bg-rose-500/20',    icon: '🌐' },
-}
-
 export default function ProjectCard({ project, className }: ProjectCardProps) {
-  const style = CATEGORY_STYLES[project.category ?? ''] ?? CATEGORY_STYLES['AI Platform']
-
   return (
     <Link
       to={`/projects/${project.slug}`}
-      className={cn('glass-card group block overflow-hidden rounded-2xl relative', className)}
+      className={cn('group block overflow-hidden rounded-xl border border-white/10 bg-[#0d1b30] transition-colors hover:border-blue-400/40', className)}
     >
-      {/* 상단 컬러 라인 */}
-      <div className={cn('absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent to-transparent via-current opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10', style.text)} />
-
-      {/* 카테고리 배너 */}
-      <div className={cn('relative flex items-center justify-between overflow-hidden px-5 py-4 bg-gradient-to-br', style.bg)}>
-        {/* 배경 글로우 */}
-        <div className={cn('absolute -top-4 -right-4 w-24 h-24 rounded-full blur-2xl opacity-40', style.glow)} />
-        {/* 카테고리 배지 */}
-        <span className={cn('relative z-10 flex items-center gap-2 text-xs font-bold uppercase tracking-widest', style.text)}>
-          <span className="text-base">{style.icon}</span>
+      <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-300/80">
           {project.category}
         </span>
-        {/* sort_order 번호 or featured 배지 */}
-        {project.featured ? (
-          <span className="relative z-10 flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase text-amber-400/90">
-            ★ FEATURED
-          </span>
-        ) : (
-          <span className="relative z-10 font-mono text-xs text-white/15 tabular-nums">
-            #{String(project.sort_order ?? 0).padStart(2, '0')}
+        {project.featured && (
+          <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/40">
+            Featured
           </span>
         )}
       </div>
-
       <div className="p-5 sm:p-7">
         <h3 className="text-lg sm:text-xl font-bold leading-snug text-white/85 line-clamp-2 transition-colors duration-300 group-hover:text-white">
           {project.title}
