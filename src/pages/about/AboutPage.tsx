@@ -1,9 +1,6 @@
 import SEOHead from '@/components/seo/SEOHead'
 import { Link } from 'react-router-dom'
-import { Download } from 'lucide-react'
-
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
-const PDF_URL = `${SUPABASE_URL}/storage/v1/object/public/public-media/%ED%8F%AC%ED%8A%B8%ED%8F%B4%EB%A6%AC%EC%98%A4_%ED%95%B5%EC%8B%AC%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8_35%EC%A2%85_2%EC%9B%94%EC%B6%94%EA%B0%80%EB%B6%84.pdf`
+import { ArrowRight } from 'lucide-react'
 
 const VALUES = [
   { num: '01', title: '만들며 배운다', desc: 'AI MVP를 직접 개발하면서 얻는 실전 노하우를 축적합니다.' },
@@ -146,7 +143,7 @@ export default function AboutPage() {
                 <img src="/images/baikal_card3.png" alt="바이칼시스템즈 명함 뒷면" className="w-full object-cover" />
               </div>
             </div>
-            {/* 포트폴리오 다운로드 */}
+            {/* 포트폴리오 */}
             <div className="flex flex-col gap-6">
               <div className="glass-card rounded-2xl p-8">
                 <h3 className="text-xl font-bold text-white mb-2">회사 포트폴리오</h3>
@@ -154,16 +151,13 @@ export default function AboutPage() {
                   바이칼시스템즈의 핵심 프로젝트 35종을 담은 포트폴리오입니다.<br />
                   AI MVP 개발 사례와 기술 역량을 확인하실 수 있습니다.
                 </p>
-                <a
-                  href={PDF_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  download
+                <Link
+                  to="/projects"
                   className="inline-flex items-center gap-2.5 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
                 >
-                  <Download size={16} />
-                  포트폴리오 PDF 다운로드
-                </a>
+                  <ArrowRight size={16} />
+                  구축 사례 살펴보기
+                </Link>
               </div>
               <div className="glass-card rounded-2xl p-8">
                 <h3 className="text-lg font-bold text-white mb-4">연락처</h3>
