@@ -92,11 +92,12 @@ export default function HomePage() {
                 BAIKAL AI Platform Company
               </p>
               <h1 className="animate-fade-up animate-delay-100 mt-6 text-[clamp(2rem,4.6vw,4rem)] font-bold leading-[1.2] tracking-[-0.02em] text-white break-keep">
-                공공·기업 업무시스템을<br />
-                AI로 구축합니다
+                AI 기술과 시스템 설계 전문성으로,<br />
+                공공·기업의 업무 혁신을 실현합니다.
               </h1>
               <p className="animate-fade-up animate-delay-200 mt-7 max-w-xl text-base sm:text-lg leading-relaxed text-slate-300 break-keep">
-                업무 분석부터 설계, AI 기능 개발, 운영 플랫폼까지 한 팀이 책임지고 수행하는 시스템 구축 파트너입니다.
+                업무 분석부터 시스템 설계·개발·연동까지.<br />
+                AI 기반 개발 방식과 검증된 기술을 결합해 현장에 필요한 업무시스템을 구축합니다.
               </p>
               <div className="animate-fade-up animate-delay-300 mt-10 flex flex-wrap items-center gap-3 sm:gap-4">
                 <Link
