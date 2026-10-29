@@ -17,7 +17,7 @@
 3. Supabase Auth 인증 통과 시 `/admin/dashboard` 자동 이동
 4. 미인증 상태에서 `/admin/*` 접근 시 `/login`으로 자동 리다이렉트
 
-> **보안**: 관리자 계정은 Supabase Dashboard에서 직접 생성. `user_metadata.role = "admin"` 설정 필수.
+> **보안**: 관리자 권한은 서버에서 관리하는 `app_metadata.role = "admin"`만 사용합니다. 사용자가 수정할 수 있는 `user_metadata.role`은 관리자 판정에 사용하지 않습니다. 권한 변경 후에는 재로그인하여 새 세션을 발급받습니다.
 
 ### 1.2 관리자 메뉴 구성
 
