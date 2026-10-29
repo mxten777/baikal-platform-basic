@@ -42,7 +42,8 @@ async function publicRequest(init: RequestInit): Promise<unknown> {
   try { body = await r.json() }
   catch { throw new Error('접수 응답을 확인하지 못했습니다. 입력을 바꾸지 않고 같은 접수를 재시도해 주세요.') }
   if (!r.ok || !isRecord(body) || body.success !== true || !('data' in body)) {
-    if (r.status === 429) throw new Error(`요청이 많습니다. ${r.headers.get('retry-after') || '600'}초 후 다시 시도해 주세요.`)
+    if (r.status === 429) throw new Error(`접수 한도에 도달했습니다. ${r.headers.get('retry-after') || '600'}초 후 다시 시도하거나 공식 이메일 jngdy@baikalsys.kr로 문의해 주세요.`)
+    if (r.status === 503) throw new Error('웹 접수를 사용할 수 없습니다. 공식 이메일 jngdy@baikalsys.kr로 문의해 주세요.')
     if (r.status === 409) throw new Error('같은 접수의 입력이 변경됐습니다. 원래 입력으로 재시도하거나 새 문의를 작성해 주세요.')
     throw new Error('접수를 완료하지 못했습니다. 동의 내용·입력·보안 확인을 다시 확인하거나 이메일로 문의해 주세요.')
   }

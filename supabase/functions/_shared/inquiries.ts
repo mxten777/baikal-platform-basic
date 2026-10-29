@@ -23,14 +23,12 @@ export function configuration(env: Env) {
     }
   } catch { /* Invalid policy must leave intake closed. */ }
   const origin = env('INQUIRY_ALLOWED_ORIGIN') || ''
-  const ipHeader = env('INQUIRY_TRUSTED_IP_HEADER') || ''
   const enabled = env('CONTACT_INTAKE_ENABLED') === 'true' &&
     env('INQUIRY_POLICY_APPROVED') === 'true' && Boolean(policy) &&
-    /^https:\/\/[^/]+$/.test(origin) && env('INQUIRY_IP_HEADER_VERIFIED') === 'true' &&
-    ['x-real-ip', 'cf-connecting-ip'].includes(ipHeader) &&
+    /^https:\/\/[^/]+$/.test(origin) &&
     Boolean(env('TURNSTILE_SECRET_KEY')) && Boolean(env('TURNSTILE_SITE_KEY')) &&
     (env('INQUIRY_HMAC_KEY')?.length ?? 0) >= 32
-  return { enabled, policy, origin, ipHeader }
+  return { enabled, policy, origin }
 }
 
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
@@ -120,17 +118,14 @@ export function createSubmitHandler(env: Env, rpc: Rpc, send: Fetch = fetch) {
         version: config.policy.version, text: config.policy.text, privacyText: config.policy.privacyText,
         siteKey: env('TURNSTILE_SITE_KEY'),
       } }, 200)
-      const ip = req.headers.get(config.ipHeader) || ''
-      if (!ip || ip.length > 64 || !/^[0-9a-f:.]+$/i.test(ip)) throw new InquiryError('CLIENT_ADDRESS_UNAVAILABLE', 503)
-      const rateKey = await hmac(env('INQUIRY_HMAC_KEY')!, `ip/${new Date().toISOString().slice(0, 10)}/${ip}`)
-      if (!await rpc<boolean>('consume_contact_rate', { p_ip_key: rateKey })) {
-        headers['Retry-After'] = '600'
+      if (!await rpc<boolean>('consume_contact_challenge_budget', {})) {
+        headers['Retry-After'] = '60'
         throw new InquiryError('RATE_LIMITED', 429)
       }
       const key = req.headers.get('idempotency-key') || ''
       if (!uuid.test(key)) throw new InquiryError('INVALID_REQUEST', 400)
       const body = validateInput(await readJson(req), config.policy.version)
-      let verified: { success?: boolean; hostname?: string; action?: string }
+      let verified: unknown
       try {
         const check = await send('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -140,7 +135,10 @@ export function createSubmitHandler(env: Env, rpc: Rpc, send: Fetch = fetch) {
         if (!check.ok) throw new Error('Challenge unavailable')
         verified = await check.json()
       } catch { throw new InquiryError('CHALLENGE_UNAVAILABLE', 503) }
-      if (!verified?.success || verified.hostname !== new URL(config.origin).hostname || verified.action !== 'contact') {
+      if (!verified || typeof verified !== 'object' ||
+        !('success' in verified) || verified.success !== true ||
+        !('hostname' in verified) || verified.hostname !== new URL(config.origin).hostname ||
+        !('action' in verified) || verified.action !== 'contact') {
         throw new InquiryError('CHALLENGE_FAILED', 403)
       }
       const { token: _token, ...payload } = body
@@ -150,14 +148,16 @@ export function createSubmitHandler(env: Env, rpc: Rpc, send: Fetch = fetch) {
         p_project_slug: body.project_slug, p_type: body.inquiry_type, p_solution: body.solution,
         p_consent_version: config.policy.version, p_retention_version: config.policy.retentionVersion,
         p_retention_days: config.policy.retentionDays,
+        p_email_hmac: await hmac(env('INQUIRY_HMAC_KEY')!, `email/${body.email.toLowerCase()}`),
       })
       return response({ success: true, data: { receipt_number: result.receipt_number, received_at: result.received_at } }, result.replayed ? 200 : 201)
     } catch (error) {
       const known = error instanceof InquiryError
       const code = known ? error.code : 'SERVICE_UNAVAILABLE'
+      if (code === 'RATE_LIMITED' && !headers['Retry-After']) headers['Retry-After'] = '600'
       const requestId = crypto.randomUUID()
       console.warn('contact-submit', { requestId, code })
-      return response({ success: false, error: { code, message: '접수를 완료하지 못했습니다. 입력·설정을 확인하거나 이메일로 문의해 주세요.' }, request_id: requestId }, known ? error.status : 503)
+      return response({ success: false, error: { code, message: '접수를 완료하지 못했습니다. 다시 확인하거나 공식 이메일 jngdy@baikalsys.kr로 문의해 주세요.' }, request_id: requestId }, known ? error.status : 503)
     }
   }
 }
@@ -175,6 +175,7 @@ export function databaseRpc(env: Env, send: Fetch = fetch): Rpc {
       const problem: { message?: string } = await r.json().catch(() => ({}))
       if (problem.message === 'IDEMPOTENCY_CONFLICT') throw new InquiryError('IDEMPOTENCY_CONFLICT', 409)
       if (problem.message === 'INVALID_PROJECT') throw new InquiryError('INVALID_PROJECT')
+      if (problem.message === 'RATE_LIMITED') throw new InquiryError('RATE_LIMITED', 429)
       throw new InquiryError('DATABASE_UNAVAILABLE', 503)
     }
     return await r.json() as T

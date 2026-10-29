@@ -16,7 +16,7 @@ const policy = { version: 'LOCAL-TEST-ONLY', text: 'Local test policy, not appro
   privacyText: 'Local test privacy policy, not approved for production.', retentionVersion: 'local', retentionDays: 2 }
 const settings = {
   CONTACT_INTAKE_ENABLED: 'true', INQUIRY_POLICY_APPROVED: 'true', INQUIRY_POLICY_JSON: JSON.stringify(policy),
-  INQUIRY_ALLOWED_ORIGIN: 'https://local.example', INQUIRY_IP_HEADER_VERIFIED: 'true', INQUIRY_TRUSTED_IP_HEADER: 'x-real-ip',
+  INQUIRY_ALLOWED_ORIGIN: 'https://local.example',
   TURNSTILE_SECRET_KEY: 'test-secret', TURNSTILE_SITE_KEY: 'test-site', INQUIRY_HMAC_KEY: 'local-only-hmac-key'.repeat(3),
   INQUIRY_JOB_SECRET: 'local-only-job-key'.repeat(3), INQUIRY_NOTIFICATIONS_ENABLED: 'true', INQUIRY_CLEANUP_ENABLED: 'true',
   RESEND_API_KEY: 'mock-not-real', INQUIRY_MAIL_FROM: 'test@example.com', INQUIRY_MAIL_TO: 'test@example.com',
@@ -55,10 +55,14 @@ test('browser API validates policy and receipt shapes, HTTP status, and disabled
     await assert.rejects(api.submitInquiry({}, 'mock'), /접수번호를 확인하지 못했습니다/)
   }
   const wrongStatus = browserService(Response.json({ success: true, data: { receipt_number: 'BQ-test', received_at: new Date().toISOString() } }, { status: 503 }))
-  await assert.rejects(wrongStatus.submitInquiry({}, 'mock'), /접수를 완료하지 못했습니다/)
+  await assert.rejects(wrongStatus.submitInquiry({}, 'mock'), /웹 접수를 사용할 수 없습니다/)
   const malformed = browserService(new Response('internal details'))
   await assert.rejects(malformed.submitInquiry({}, 'mock'), /접수 응답을 확인하지 못했습니다/)
   await assert.rejects(browserService(null, false).submitInquiry({}, 'mock'), /확정 전에는/)
+  for (const status of [429, 503]) {
+    const limited = browserService(Response.json({ success: false }, { status }))
+    await assert.rejects(limited.submitInquiry({}, 'mock'), /공식 이메일 jngdy@baikalsys\.kr/)
+  }
 })
 
 test('isolated PostgreSQL + Edge inquiry contract', async t => {
@@ -87,6 +91,7 @@ test('isolated PostgreSQL + Edge inquiry contract', async t => {
     GRANT SELECT ON private.existing_fixture TO authenticated;
   `)
   await db.exec(readFileSync(new URL('../supabase/migrations/20261029000001_contact_inquiries.sql', import.meta.url), 'utf8'))
+  await db.exec(readFileSync(new URL('../supabase/migrations/20261029000002_ip_independent_inquiry_limits.sql', import.meta.url), 'utf8'))
   const asRole = (role, claims, sql, args = []) => db.transaction(async tx => {
     await tx.exec(`SET LOCAL ROLE ${role}`)
     await tx.query("SELECT set_config('request.jwt.claims',$1,true)", [JSON.stringify(claims)])
@@ -100,6 +105,7 @@ test('isolated PostgreSQL + Edge inquiry contract', async t => {
       return (await asRole('service_role', {}, `SELECT public.${name}(${Object.keys(args).map((_, i) => `$${i + 1}`).join(',')}) AS value`, Object.values(args))).rows[0].value
     } catch (error) {
       if (error.message === 'IDEMPOTENCY_CONFLICT') throw new InquiryError('IDEMPOTENCY_CONFLICT', 409)
+      if (error.message === 'RATE_LIMITED') throw new InquiryError('RATE_LIMITED', 429)
       throw error
     }
   }
@@ -107,6 +113,7 @@ test('isolated PostgreSQL + Edge inquiry contract', async t => {
     p_key: key, p_hmac: hmac, p_name: 'Local test', p_email: 'test@example.com', p_company: null,
     p_message: 'Local isolated test message.', p_project_slug: 'local-project', p_type: null, p_solution: null,
     p_consent_version: 'local', p_retention_version: 'local', p_retention_days: 2,
+    p_email_hmac: 'b'.repeat(64),
   })
   const reset = () => db.exec('TRUNCATE public.contact_inquiries CASCADE; TRUNCATE private.contact_request_windows;')
   const tokens = new Set()
@@ -125,7 +132,7 @@ test('isolated PostgreSQL + Edge inquiry contract', async t => {
     })
     await t.test('policy missing/disabled: 503 before DB, no provisional consent', async () => {
       for (const change of [{ CONTACT_INTAKE_ENABLED: 'false' }, { INQUIRY_POLICY_JSON: '{}' },
-        { INQUIRY_POLICY_JSON: JSON.stringify({ ...policy, privacyText: '' }) }, { INQUIRY_IP_HEADER_VERIFIED: 'false' }]) {
+        { INQUIRY_POLICY_JSON: JSON.stringify({ ...policy, privacyText: '' }) }, { INQUIRY_HMAC_KEY: '' }]) {
         const config = key => ({ ...settings, ...change })[key]
         assert.equal(configuration(config).enabled, false)
         const response = await createSubmitHandler(config, () => { throw Error('Must not call DB') }, captcha)(request(input()))
@@ -190,8 +197,133 @@ test('isolated PostgreSQL + Edge inquiry contract', async t => {
       const receipts = await Promise.all(Array.from({ length: 10 }, () => direct(key)))
       assert.equal(new Set(receipts.map(r => r.receipt_number)).size, 1)
       assert.equal(receipts.filter(r => !r.replayed).length, 1)
-      const limits = await Promise.all(Array.from({ length: 10 }, () => rpc('consume_contact_rate', { p_ip_key: 'a'.repeat(64) })))
-      assert.equal(limits.filter(Boolean).length, 5)
+      const limits = await Promise.all(Array.from({ length: 40 }, () => rpc('consume_contact_challenge_budget', {})))
+      assert.equal(limits.filter(Boolean).length, 30)
+      const count = (await db.query("SELECT request_count FROM private.contact_request_windows WHERE bucket_key='accepted'")).rows[0]
+      assert.equal(count.request_count, 1)
+    })
+    await t.test('IP headers and legacy verification flags are ignored, including missing and forged values', async () => {
+      await reset()
+      assert.doesNotMatch(source, /INQUIRY_IP_HEADER_VERIFIED|INQUIRY_TRUSTED_IP_HEADER|x-real-ip|cf-connecting-ip|x-forwarded-for|p_ip_key/)
+      const seen = []
+      const guardedEnv = key => {
+        assert.ok(!['INQUIRY_IP_HEADER_VERIFIED', 'INQUIRY_TRUSTED_IP_HEADER'].includes(key))
+        return env(key)
+      }
+      const isolated = createSubmitHandler(guardedEnv, async (name, args) => {
+        seen.push({ name, args })
+        return rpc(name, args)
+      }, captcha)
+      for (const value of [null, '198.51.100.55', '198.51.100.55, 203.0.113.99']) {
+        const req = request(input())
+        req.headers.delete('x-real-ip')
+        if (value) {
+          req.headers.set('x-real-ip', value)
+          req.headers.set('cf-connecting-ip', value)
+          req.headers.set('x-forwarded-for', value)
+        }
+        assert.equal((await isolated(req)).status, 201)
+      }
+      assert.equal(JSON.stringify(seen).includes('198.51.100.55'), false)
+      assert.equal(JSON.stringify(seen).includes('p_ip_key'), false)
+      const counters = (await db.query('SELECT bucket_key FROM private.contact_request_windows')).rows
+      assert.equal(counters.some(r => r.bucket_key.startsWith('ip/')), false)
+    })
+    await t.test('CAPTCHA provider requests cannot exceed 30 per minute, even with failed challenges and rotating inputs', async () => {
+      await reset()
+      let calls = 0
+      const isolated = createSubmitHandler(env, rpc, async (_url, init) => {
+        calls++
+        assert.deepEqual(Object.keys(JSON.parse(init.body)).sort(), ['response', 'secret'])
+        return Response.json({ success: false })
+      })
+      const responses = await Promise.all(Array.from({ length: 40 }, (_, n) =>
+        isolated(request({ ...input(), email: `test-${n}@example.com` }, crypto.randomUUID(), `192.0.2.${n}`))))
+      assert.equal(calls, 30)
+      assert.equal(responses.filter(r => r.status === 403).length, 30)
+      assert.equal(responses.filter(r => r.status === 429).length, 10)
+      assert.equal((await db.query('SELECT count(*)::int AS n FROM public.contact_inquiries')).rows[0].n, 0)
+      await db.exec("UPDATE private.contact_request_windows SET window_start=window_start-interval '2 minutes'")
+      assert.equal((await isolated(request(input()))).status, 403)
+      assert.equal(calls, 31)
+      const noBudget = createSubmitHandler(env, async () => { throw Error('LOCAL-PRIVATE-DB-FAILURE') },
+        async () => { calls++; throw Error('Provider must not be called') })
+      const unavailable = await noBudget(request(input()))
+      assert.equal(unavailable.status, 503)
+      assert.equal(calls, 31)
+      assert.equal((await unavailable.text()).includes('LOCAL-PRIVATE-DB-FAILURE'), false)
+    })
+    await t.test('CAPTCHA accepts only literal success true and the configured hostname and action', async () => {
+      await reset()
+      for (const value of [null, [], { success: 'true', hostname: 'local.example', action: 'contact' },
+        { success: true, hostname: 'evil.example', action: 'contact' },
+        { success: true, hostname: 'local.example', action: 'other' }]) {
+        const isolated = createSubmitHandler(env, rpc, async () => Response.json(value))
+        assert.equal((await isolated(request(input()))).status, 403)
+      }
+      const offline = createSubmitHandler(env, rpc, async () => { throw Error('local provider failure') })
+      assert.equal((await offline(request(input()))).status, 503)
+      assert.equal((await db.query('SELECT count(*)::int AS n FROM public.contact_inquiries')).rows[0].n, 0)
+    })
+    await t.test('email HMAC limit is atomic after CAPTCHA; replay does not spend another acceptance slot', async () => {
+      await reset()
+      const results = await Promise.allSettled(Array.from({ length: 12 }, () => direct()))
+      assert.equal(results.filter(r => r.status === 'fulfilled').length, 5)
+      assert.ok(results.filter(r => r.status === 'rejected').every(r => r.reason.code === 'RATE_LIMITED'))
+      assert.equal((await db.query('SELECT count(*)::int AS n FROM public.contact_inquiries')).rows[0].n, 5)
+      const row = (await db.query('SELECT idempotency_key FROM public.contact_inquiries LIMIT 1')).rows[0]
+      assert.equal((await direct(row.idempotency_key)).replayed, true)
+      assert.equal((await db.query("SELECT request_count FROM private.contact_request_windows WHERE bucket_key='accepted'")).rows[0].request_count, 5)
+      await reset()
+      for (let n = 0; n < 5; n++) assert.equal((await handler(request({ ...input(), email: n % 2 ? 'TEST@example.com' : 'test@EXAMPLE.com' }))).status, 201)
+      const limited = await handler(request(input()))
+      assert.equal(limited.status, 429)
+      assert.equal(limited.headers.get('retry-after'), '600')
+      assert.match((await limited.json()).error.message, /jngdy@baikalsys\.kr/)
+      const buckets = (await db.query("SELECT bucket_key,request_count FROM private.contact_request_windows WHERE bucket_key LIKE 'email/%'")).rows
+      assert.equal(buckets.length, 1)
+      assert.match(buckets[0].bucket_key, /^email\/[a-f0-9]{64}$/)
+      assert.equal(buckets[0].request_count, 5)
+    })
+    await t.test('global acceptance cap rejects rotating emails atomically with no partial inquiry or queued mail', async () => {
+      await reset()
+      const attempts = await Promise.allSettled(Array.from({ length: 40 }, (_, n) => rpc('create_contact_inquiry', {
+        p_key: crypto.randomUUID(), p_hmac: 'a'.repeat(64), p_name: 'Local test', p_email: `test-${n}@example.com`,
+        p_company: null, p_message: 'Local isolated test message.', p_project_slug: null, p_type: null, p_solution: null,
+        p_consent_version: 'local', p_retention_version: 'local', p_retention_days: 2,
+        p_email_hmac: n.toString(16).padStart(64, '0'),
+      })))
+      assert.equal(attempts.filter(r => r.status === 'fulfilled').length, 30)
+      assert.equal(attempts.filter(r => r.status === 'rejected' && r.reason.code === 'RATE_LIMITED').length, 10)
+      assert.equal((await db.query('SELECT count(*)::int AS n FROM public.contact_inquiries')).rows[0].n, 30)
+      assert.equal((await db.query("SELECT request_count FROM private.contact_request_windows WHERE bucket_key='accepted'")).rows[0].request_count, 30)
+      assert.equal((await db.query("SELECT count(*)::int AS n FROM private.contact_request_windows WHERE bucket_key LIKE 'email/%'")).rows[0].n, 30)
+    })
+    await t.test('IP-era RPC entry points are removed and new RPCs are service-role only', async () => {
+      await reset()
+      assert.equal((await db.query(`SELECT to_regprocedure('public.consume_contact_rate(text)') AS old`)).rows[0].old, null)
+      assert.equal((await db.query(`SELECT to_regprocedure('public.create_contact_inquiry(uuid,text,text,text,text,text,text,text,text,text,text,integer)') AS old`)).rows[0].old, null)
+      for (const role of ['anon', 'authenticated']) {
+        await assert.rejects(asRole(role, { sub: regularId }, 'SELECT public.consume_contact_challenge_budget()'), /permission denied/)
+        await assert.rejects(asRole(role, { sub: regularId }, `SELECT public.create_contact_inquiry(
+          gen_random_uuid(),$1,'Local','test@example.com',NULL,'Local test message.',NULL,NULL,NULL,'local','local',2,$2)`,
+        ['a'.repeat(64), 'b'.repeat(64)]), /permission denied/)
+      }
+    })
+    await t.test('failure logging contains only code and random request ID, never payload, IP, token or HMAC', async () => {
+      await reset()
+      const logs = []
+      const warn = console.warn
+      console.warn = (...args) => logs.push(args)
+      try {
+        const raw = { ...input(), email: 'private-test@example.com', message: 'PRIVATE-LOCAL-MESSAGE', turnstile_token: 'invalid' }
+        assert.equal((await handler(request(raw, crypto.randomUUID(), '198.51.100.55'))).status, 403)
+        const text = JSON.stringify(logs)
+        for (const secret of [raw.email, raw.message, '198.51.100.55', settings.INQUIRY_HMAC_KEY, raw.turnstile_token]) {
+          assert.equal(text.includes(secret), false)
+        }
+        assert.deepEqual(Object.keys(logs[0][1]).sort(), ['code', 'requestId'])
+      } finally { console.warn = warn }
     })
     await t.test('invalid challenge/origin/payload, size and rate reject without new reception', async () => {
       await reset()
@@ -199,21 +331,19 @@ test('isolated PostgreSQL + Edge inquiry contract', async t => {
       const wrongOrigin = request(input()); wrongOrigin.headers.set('origin', 'https://evil.example')
       assert.equal((await handler(wrongOrigin)).status, 403)
       assert.equal((await handler(request({ ...input(), message: 'x'.repeat(40000) }))).status, 413)
-      const noIp = request(input()); noIp.headers.delete('x-real-ip')
-      assert.equal((await handler(noIp)).status, 503)
       assert.equal((await db.query('SELECT count(*)::int AS n FROM public.contact_inquiries')).rows[0].n, 0)
       await reset()
-      for (let n = 0; n < 5; n++) await handler(request({ ...input(), turnstile_token: 'invalid' }))
+      for (let n = 0; n < 30; n++) await handler(request({ ...input(), turnstile_token: 'invalid' }))
       const limited = await handler(request(input()))
       assert.equal(limited.status, 429)
-      assert.equal(limited.headers.get('retry-after'), '600')
+      assert.equal(limited.headers.get('retry-after'), '60')
     })
     await t.test('anonymous DB access denied; ordinary/user_metadata-only admin cannot read or change', async () => {
       await reset()
       await direct()
       for (const sql of ['SELECT * FROM public.contact_inquiries', 'SELECT * FROM public.contact_inquiry_list',
         'INSERT INTO public.contact_inquiries DEFAULT VALUES', 'DELETE FROM public.contact_inquiries',
-        "SELECT public.consume_contact_rate('" + 'a'.repeat(64) + "')"]) {
+        'SELECT public.consume_contact_challenge_budget()']) {
         await assert.rejects(asRole('anon', {}, sql), /permission denied/)
       }
       const row = (await db.query('SELECT id FROM public.contact_inquiries')).rows[0]
@@ -341,6 +471,8 @@ test('isolated PostgreSQL + Edge inquiry contract', async t => {
       await assert.rejects(adapter('create_contact_inquiry', {}), e => e.code === 'IDEMPOTENCY_CONFLICT' && e.status === 409)
       const failure = databaseRpc(configured, async () => new Response('internal database details', { status: 503 }))
       await assert.rejects(failure('create_contact_inquiry', {}), e => e.code === 'DATABASE_UNAVAILABLE')
+      const limited = databaseRpc(configured, async () => Response.json({ message: 'RATE_LIMITED' }, { status: 400 }))
+      await assert.rejects(limited('create_contact_inquiry', {}), e => e.code === 'RATE_LIMITED' && e.status === 429)
     })
   } finally { await db.close() }
 })

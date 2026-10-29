@@ -2,7 +2,9 @@
 
 ## 현재 상태
 
-로컬 개발용 구현이며 운영 미적용 상태이다. 기존 이메일 안내는 유지한다.
+기존 DB와 비활성 MVP는 운영에 배포되어 있다. STEP 6-W 승인으로 IP 비의존 후속
+migration을 단독 적용했으며 서버·프런트는 접수 비활성 상태로 반영한다.
+기존 이메일 안내는 유지하며 실제 운영 활성화는 별도 승인 대상이다.
 개인정보 정책 미확정 상태에서는 프런트와 서버 모두 접수를 차단한다.
 임시 동의문·보유기간 기본값은 없다. 운영 Secret, DB 마이그레이션, 메일 전송,
 접수 활성화는 각각 별도 승인이 필요하다.
@@ -13,6 +15,8 @@
 - [서비스](../src/features/inquiries/inquiryService.ts): 공개 HTTP 및 기존 인증 기반 관리자 조회.
 - [마이그레이션](../supabase/migrations/20261029000001_contact_inquiries.sql):
   문의/상태 이력/비노출 요청 제한 테이블, RLS, 접수·선점·처리 RPC.
+- [IP 비의존 후속 migration](../supabase/migrations/20261029000002_ip_independent_inquiry_limits.sql):
+  CAPTCHA 예산과 이메일/전체 접수 제한, 기존 IP RPC 제거. 기존 적용 migration은 수정하지 않는다.
 - [서버 핵심](../supabase/functions/_shared/inquiries.ts): 요청 크기/입력/동의/Turnstile 검증,
   HMAC 기반 원자적 제한, 중복 접수 방지, Resend 알림 어댑터.
 - [접수 함수](../supabase/functions/submit-inquiry/index.ts):
@@ -43,7 +47,6 @@
 | 서버 접수 | `CONTACT_INTAKE_ENABLED=true`, `INQUIRY_POLICY_APPROVED=true` |
 | 정책 | `INQUIRY_POLICY_JSON`: version, text, privacyText, retentionVersion, retentionDays |
 | Origin | `INQUIRY_ALLOWED_ORIGIN`: 승인된 단일 HTTPS Origin |
-| 신뢰 IP | `INQUIRY_IP_HEADER_VERIFIED=true`, `INQUIRY_TRUSTED_IP_HEADER` |
 | CAPTCHA | `TURNSTILE_SECRET_KEY`, `TURNSTILE_SITE_KEY` |
 | 가명 키 | 충분히 긴 `INQUIRY_HMAC_KEY` (최소 32자, 운영 보유기간 내 무계획 교체 금지) |
 | 서버 작업 | `INQUIRY_JOB_SECRET` 최소 32자 |
@@ -55,15 +58,30 @@ Supabase URL/service-role key는 서버에서만 사용한다. CAPTCHA 공개 �
 두 Edge Function은 플랫폼 JWT 검사를 끄지만 접수는 챌린지·제한·검증,
 worker는 별도 서버 인증을 사용한다. 공개 apikey는 관리자 인증 수단이 아니다.
 
-신뢰 IP 헤더는 `x-real-ip`/`cf-connecting-ip` 중 **플랫폼이 실제로 덮어쓰는 것으로
-검증된 하나**만 승인한다. 현재 계약은 미확정이다. 이 확인 없이 단순 환경값만
-켜서 공개하면 안 된다. 헤더가 없으면 접수 거절한다. IP 원문은 저장하지 않고
-일별 HMAC/10분 창 키만 저장한다. 창 TTL은 1시간, 메일 예산 창은 2일이다.
-이 가명정보의 기간도 개인정보 정책 승인 대상이다.
+접수 경로는 IP 헤더를 읽거나 전달·저장하지 않는다. 기존 `INQUIRY_IP_HEADER_VERIFIED`,
+`INQUIRY_TRUSTED_IP_HEADER`는 더 이상 활성화 조건이 아니다. 플랫폼 자체 IP 로그는 별도다.
 
-IP당 10분 5회/전체 분당 30회, worker 1분 주기/배치10/최대5회, 발송 예산 하루90회는
-초기 구현 값이며 출시 전 운영 승인을 받아야 한다. 공유 NAT와 유입량에 따라 조정한다.
-DB 카운터로 분산 인스턴스가 같은 제한을 공유한다.
+POST는 DB 원자적 고정 1분 창 예산 30회를 먼저 소비한다. 잘못된 입력·동의·CAPTCHA도
+이 예산에 포함하므로 Turnstile Siteverify는 창당 최대 30회이다. GET/OPTIONS는 DB 접수나
+Siteverify를 호출하지 않는다. 예산 DB 실패 시 외부 검증·접수를 차단한다.
+한도 초과 응답은 429/Retry-After 60이며 공식 이메일을 안내한다.
+
+실제 신규 접수는 같은 INSERT 트랜잭션에서 전체 분당 30건 및
+이메일 HMAC당 10분 5건을 검사한다. 초과 시 문의·queued 알림·접수 카운터 증가를 모두
+롤백한다. 기존 idempotency 키의 동일 payload 재시도는 기존 접수만 반환하며 신규
+접수 한도를 소비하지 않는다. 단, 공개 재시도도 CAPTCHA 호출 예산과 새 토큰 검증은 필요하다.
+접수 한도 응답은 429/Retry-After 600이다.
+이메일 HMAC는 서버에서 `email/` 접두사와 전체 소문자 이메일로 계산하며 DB에 원문
+카운터 키를 저장하지 않는다. 대소문자 변형에 의한 우회를 보수적으로 합산하나,
+다른 주소/별칭 변경까지 같은 사람으로 판별하지는 않는다.
+
+전체/이메일/CAPTCHA 카운터 TTL은 1시간, 메일 예산 창은 2일이며 매일 cleanup으로 정리한다.
+worker 1분 주기/배치10/최대5회, 발송 예산 하루90회는 그대로다.
+고정 창 경계에서는 짧은 시간에 연속 두 창의 한도를 쓸 수 있으며 일일 접수/총 DB 용량
+상한은 아니다. 분산 공격의 전체 예산 소진 및 정상 사용자 거절 위험을 없애지는 못한다.
+IP·이메일은 신원 인증 수단이 아니며 Origin 검사도 HTTP 클라이언트 인증을 대신하지 않는다.
+DB 카운터가 분산 인스턴스의 예산을 공유하지만 게이트웨이 진입량·DB 예산 RPC 호출량까지
+막지는 않으므로 제공자 쿼터/관측과 필요 시 별도 게이트웨이 방어를 검토한다.
 
 ## 알림과 장애 처리
 
@@ -88,7 +106,7 @@ Supabase cron/함수 운영 로그로 worker 실행 자체의 장애를 확인�
 - 가명 요청 제한 정보 TTL, 백업 잔존 및 복구 후 재삭제 절차.
 - Resend/Turnstile/Supabase 위탁·국외 처리 검토, 실제 계약/도메인 소유권.
 - 수신 담당자·응대 절차·발신 도메인 SPF/DKIM/DMARC·쿼터.
-- 운영 scheduler/Vault와 신뢰 헤더 계약 확인.
+- 운영 scheduler/Vault와 IP 비의존 제한값·정상 유입 거절 대응 승인.
 
 만료 삭제는 상태와 무관하게 expires_at을 기준으로 수행하고 상태 변경으로 기간을
 연장하지 않는다. 알림 활성화를 끄더라도 승인된 정리 작업까지 무조건 중지하지 않는다.
@@ -130,14 +148,22 @@ PGlite는 단일 엔진 큐이므로 병렬 Promise 요청의 고유 제약/원�
 운영 승인 전 Docker Supabase/스테이징에서 다중 연결, JWT/RLS, 실제 CAPTCHA의
 hostname·만료, 인증된 샌드박스 수신 테스트를 별도 수행한다.
 
-## 운영 반영과 복구 (이번 단계 실행 금지)
+## 운영 반영과 복구 (별도 승인 필요)
 
 1. 정책·환경·마이그레이션·메일 발송·배포를 명시 승인받는다.
 2. 스테이징 권한·양식·실패/재시도·정리·다중 연결 테스트.
 3. 현재 데이터 44건/대표9건·기존 파일 해시·배포 SHA 백업.
-4. 신규 migration 적용 후 익명/일반 사용자의 접근 거절 확인.
+4. 접수 false 상태에서 후속 migration 한 개만 별도 승인 적용하고 새 RPC 권한 확인.
+   기존 IP RPC 및 12인자 접수 RPC는 제거되고 13인자 접수 RPC가 생성된다.
+   서버를 새 RPC 호출 버전으로 배포할 때까지 활성화하지 않는다. 과거 migration 일괄 실행 금지.
 5. 정책/서버 설정·도메인·worker·Vault·스케줄 설정, 양식은 아직 닫음.
 6. 별도 승인된 가상 데이터로 수신 검증 후 마지막으로 UI 활성화.
 7. 장애 시 서버 접수/UI 플래그를 닫고 이메일 안내 유지.
    이미 받은 문의는 보존하며 테이블 drop이나 전체 DB 복원은 하지 않는다.
 8. 기존 프로젝트/RLS/helper/cron/Storage/미커밋 파일은 무관 변경 금지.
+
+관리자 조회·상태 변경·365일 만료/일일 cleanup·이력 CASCADE는 변경하지 않는다.
+관리자 UI에는 삭제 버튼이 없으며 권리행사 삭제는 별도 승인된 운영자 절차로 수행한다.
+기존 IP 카운터가 있더라도 후속 migration에서 운영 데이터를 일괄 삭제하지 않고
+기존 만료 cleanup에 맡긴다. STEP 6-W에서는 후속 migration만 적용하고
+cleanup 활성화·Secret·Vault·cron은 변경하지 않는다.
