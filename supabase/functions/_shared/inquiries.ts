@@ -23,12 +23,12 @@ export function configuration(env: Env) {
     }
   } catch { /* Invalid policy must leave intake closed. */ }
   const origin = env('INQUIRY_ALLOWED_ORIGIN') || ''
-  const enabled = env('CONTACT_INTAKE_ENABLED') === 'true' &&
-    env('INQUIRY_POLICY_APPROVED') === 'true' && Boolean(policy) &&
-    /^https:\/\/[^/]+$/.test(origin) &&
+  const policyPublished = env('INQUIRY_POLICY_APPROVED') === 'true' && Boolean(policy) &&
+    /^https:\/\/[^/]+$/.test(origin)
+  const enabled = env('CONTACT_INTAKE_ENABLED') === 'true' && policyPublished &&
     Boolean(env('TURNSTILE_SECRET_KEY')) && Boolean(env('TURNSTILE_SITE_KEY')) &&
     (env('INQUIRY_HMAC_KEY')?.length ?? 0) >= 32
-  return { enabled, policy, origin }
+  return { enabled, policyPublished, policy, origin }
 }
 
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
@@ -113,11 +113,14 @@ export function createSubmitHandler(env: Env, rpc: Rpc, send: Fetch = fetch) {
       headers['Access-Control-Allow-Origin'] = config.origin
       if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers })
       if (!['GET', 'POST'].includes(req.method)) throw new InquiryError('METHOD_NOT_ALLOWED', 405)
+      if (req.method === 'GET') {
+        if (!config.policyPublished || !config.policy) throw new InquiryError('POLICY_NOT_PUBLISHED', 503)
+        return response({ success: true, data: {
+          version: config.policy.version, text: config.policy.text, privacyText: config.policy.privacyText,
+          siteKey: env('TURNSTILE_SITE_KEY') || '',
+        } }, 200)
+      }
       if (!config.enabled || !config.policy) throw new InquiryError('INTAKE_DISABLED', 503)
-      if (req.method === 'GET') return response({ success: true, data: {
-        version: config.policy.version, text: config.policy.text, privacyText: config.policy.privacyText,
-        siteKey: env('TURNSTILE_SITE_KEY'),
-      } }, 200)
       if (!await rpc<boolean>('consume_contact_challenge_budget', {})) {
         headers['Retry-After'] = '60'
         throw new InquiryError('RATE_LIMITED', 429)

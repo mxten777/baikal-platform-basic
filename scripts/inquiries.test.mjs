@@ -59,6 +59,14 @@ test('browser API validates policy and receipt shapes, HTTP status, and disabled
   const malformed = browserService(new Response('internal details'))
   await assert.rejects(malformed.submitInquiry({}, 'mock'), /접수 응답을 확인하지 못했습니다/)
   await assert.rejects(browserService(null, false).submitInquiry({}, 'mock'), /확정 전에는/)
+  const publishedOnly = browserService(Response.json({ success: true, data: {
+    version: 'approved-local', text: 'Approved local consent', privacyText: 'Approved local privacy',
+  } }), false)
+  assert.equal((await publishedOnly.fetchPrivacyPolicy()).privacyText, 'Approved local privacy')
+  const noCaptcha = browserService(Response.json({ success: true, data: {
+    version: 'approved-local', text: 'Approved local consent', privacyText: 'Approved local privacy',
+  } }))
+  await assert.rejects(noCaptcha.fetchInquiryPolicy(), /정책을 불러오지 못했습니다/)
   for (const status of [429, 503]) {
     const limited = browserService(Response.json({ success: false }, { status }))
     await assert.rejects(limited.submitInquiry({}, 'mock'), /공식 이메일 jngdy@baikalsys\.kr/)
@@ -125,6 +133,36 @@ test('isolated PostgreSQL + Edge inquiry contract', async t => {
   }
   const handler = createSubmitHandler(env, rpc, captcha)
   try {
+    await t.test('approved policy publishes before intake without CAPTCHA, HMAC, DB or provider calls', async () => {
+      const config = key => ({
+        ...settings, CONTACT_INTAKE_ENABLED: 'false', TURNSTILE_SECRET_KEY: '',
+        TURNSTILE_SITE_KEY: '', INQUIRY_HMAC_KEY: '',
+      })[key]
+      const closed = createSubmitHandler(config, () => { throw Error('Must not call DB') },
+        () => { throw Error('Must not call provider') })
+      assert.equal(configuration(config).enabled, false)
+      const get = () => new Request('https://local.example/submit', { headers: { origin: 'https://local.example' } })
+      const result = await closed(get())
+      assert.equal(result.status, 200)
+      assert.deepEqual((await result.json()).data, {
+        version: policy.version, text: policy.text, privacyText: policy.privacyText, siteKey: '',
+      })
+      const post = await closed(request(input()))
+      assert.equal(post.status, 503)
+      assert.equal((await post.json()).error.code, 'INTAKE_DISABLED')
+      for (const change of [{ INQUIRY_POLICY_APPROVED: 'false' }, { INQUIRY_POLICY_JSON: '{}' },
+        { INQUIRY_POLICY_JSON: JSON.stringify({ ...policy, privacyText: '' }) }]) {
+        const unpublished = createSubmitHandler(key => change[key] ?? config(key),
+          () => { throw Error('Must not call DB') })
+        const response = await unpublished(get())
+        assert.equal(response.status, 503)
+        const body = await response.text()
+        assert.ok(body.includes('POLICY_NOT_PUBLISHED'))
+        assert.equal(body.includes(policy.privacyText), false)
+      }
+      const foreign = get(); foreign.headers.set('origin', 'https://evil.example')
+      assert.equal((await closed(foreign)).status, 403)
+    })
     await t.test('migration preserves existing private schema permissions and data', async () => {
       const fixture = await asRole('authenticated', { sub: regularId }, 'SELECT * FROM private.existing_fixture')
       assert.equal(fixture.rows[0].id, 1)

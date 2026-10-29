@@ -9,6 +9,13 @@ migration을 단독 적용했으며 서버·프런트는 접수 비활성 상태
 임시 동의문·보유기간 기본값은 없다. 운영 Secret, DB 마이그레이션, 메일 전송,
 접수 활성화는 각각 별도 승인이 필요하다.
 
+STEP 7-C 정책 선게시 준비는 로컬 변경이며 운영 미배포다.
+`/privacy`는 프런트 접수 false에서도 정책을 조회하되, 서버는 유효한 정책 JSON과
+`INQUIRY_POLICY_APPROVED=true` 및 승인된 HTTPS Origin이 있어야 GET을 공개한다.
+미승인은 503 `POLICY_NOT_PUBLISHED`이고, POST는 여전히 접수 false에서 503
+`INTAKE_DISABLED`다. 정책 조회는 CAPTCHA·HMAC·DB/RPC·메일을 호출하지 않는다.
+보호책임자 정동열/대표이사/공식 이메일 지정만 승인되었고 정책 전문 승인은 대기다.
+
 ## 파일과 동작
 
 - [공개 양식](../src/features/inquiries/InquiryForm.tsx): 기본 비활성, 승인 정책을 서버에서 읽은 뒤 동의와 CAPTCHA를 제공한다.
@@ -24,7 +31,8 @@ migration을 단독 적용했으며 서버·프런트는 접수 비활성 상태
 - [worker](../supabase/functions/inquiry-maintenance/index.ts):
   서버 Secret 필수. notifications/cleanup 액션만 허용한다.
 - [작업 등록안](../supabase/inquiry_cron_setup.sql): 신규 두 작업만 등록한다.
-  실행하지 않았으며 기존 작업을 삭제하거나 덮어쓰지 않는다.
+  STEP 6-X에서 문의 두 작업을 등록했으며 기존 RSS 작업을 보존했다.
+  cleanup 실호출 HTTP 200·삭제 0건 시험 후 cleanup=false로 복원했다.
 
 신규 테이블은 기존 `is_admin()`을 사용하지 않는다. 관리자 권한은
 `auth.uid()`와 `app_metadata.role=admin`으로 검사한다. user_metadata만 admin이면
@@ -46,6 +54,7 @@ migration을 단독 적용했으며 서버·프런트는 접수 비활성 상태
 | 프런트 | `VITE_CONTACT_INTAKE_ENABLED` (기본 false) |
 | 서버 접수 | `CONTACT_INTAKE_ENABLED=true`, `INQUIRY_POLICY_APPROVED=true` |
 | 정책 | `INQUIRY_POLICY_JSON`: version, text, privacyText, retentionVersion, retentionDays |
+| 정책 선게시 | 전문 승인 후에만 `INQUIRY_POLICY_APPROVED=true`. 서버·프런트 접수·알림·cleanup은 별도 승인 전 false 유지 |
 | Origin | `INQUIRY_ALLOWED_ORIGIN`: 승인된 단일 HTTPS Origin |
 | CAPTCHA | `TURNSTILE_SECRET_KEY`, `TURNSTILE_SITE_KEY` |
 | 가명 키 | 충분히 긴 `INQUIRY_HMAC_KEY` (최소 32자, 운영 보유기간 내 무계획 교체 금지) |

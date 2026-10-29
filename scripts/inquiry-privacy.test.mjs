@@ -63,7 +63,8 @@ test('privacy page and form use a single server policy, without an unapproved 36
   const read = p => readFileSync(new URL(p, import.meta.url), 'utf8')
   const page = read('../src/pages/privacy/PrivacyPage.tsx')
   const form = read('../src/features/inquiries/InquiryForm.tsx')
-  assert.match(page, /fetchInquiryPolicy\(\)/)
+  assert.match(page, /fetchPrivacyPolicy\(\)/)
+  assert.doesNotMatch(page, /intakeEnabled/)
   assert.match(page, /policy\.privacyText/)
   assert.match(page, /운영 승인 준비 중/)
   assert.match(form, /to="\/privacy"/)
@@ -73,5 +74,44 @@ test('privacy page and form use a single server policy, without an unapproved 36
   for (const p of ['../src/features/inquiries/inquiryService.ts', '../supabase/functions/_shared/inquiries.ts']) {
     assert.match(read(p), /privacyText/)
     assert.doesNotMatch(read(p), /retentionDays:\s*365/)
+  }
+})
+
+test('privacy page renders approved text before intake and retains responsible officer on failure', async () => {
+  const source = readFileSync(new URL('../src/pages/privacy/PrivacyPage.tsx', import.meta.url), 'utf8')
+  const compiled = ts.transpileModule(source, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX },
+  }).outputText
+  for (const fails of [false, true]) {
+    const state = []
+    let index = 0
+    let effect
+    let requested = 0
+    const jsx = (type, props) => ({ type, props })
+    const exports = {}
+    vm.runInNewContext(compiled, { exports, require(name) {
+      if (name === 'react') return {
+        useState(initial) { const i = index++; if (!(i in state)) state[i] = initial; return [state[i], value => { state[i] = value }] },
+        useEffect(fn) { effect = fn },
+      }
+      if (name === 'react/jsx-runtime') return { jsx, jsxs: jsx, Fragment: 'fragment' }
+      if (name === 'react-router-dom') return { Link: 'link' }
+      if (name === '@/components/seo/SEOHead') return { default: 'seo' }
+      if (name === '@/features/inquiries/inquiryService') return { fetchPrivacyPolicy: async () => {
+        requested++
+        if (fails) throw Error('Unavailable')
+        return { version: 'approved-test', privacyText: 'APPROVED-LOCAL-PRIVACY' }
+      } }
+      throw Error(`Unexpected import: ${name}`)
+    } })
+    exports.default()
+    effect()
+    await new Promise(resolve => setImmediate(resolve))
+    index = 0
+    const tree = JSON.stringify(exports.default())
+    assert.equal(requested, 1)
+    assert.ok(tree.includes('정동열') && tree.includes('대표이사') && tree.includes('jngdy@baikalsys.kr'))
+    assert.equal(tree.includes('APPROVED-LOCAL-PRIVACY'), !fails)
+    assert.equal(tree.includes('조회에 실패했습니다'), fails)
   }
 })

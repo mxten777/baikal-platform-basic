@@ -18,6 +18,7 @@ export interface InquiryDetail extends InquirySummary {
 }
 export interface InquiryEvent { id: string; from_status: InquiryStatus; to_status: InquiryStatus; happened_at: string }
 export interface InquiryPolicy { version: string; text: string; privacyText: string; siteKey: string }
+export type PrivacyPolicy = Pick<InquiryPolicy, 'version' | 'privacyText'>
 export interface InquiryReceipt { receipt_number: string; received_at: string }
 export interface InquiryInput {
   name: string; email: string; company: string; message: string
@@ -34,7 +35,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
 async function publicRequest(init: RequestInit): Promise<unknown> {
-  if (!intakeEnabled) throw new Error('개인정보 정책·접수 설정 확정 전에는 웹 접수를 사용할 수 없습니다.')
+  if (init.method !== 'GET' && !intakeEnabled) throw new Error('개인정보 정책·접수 설정 확정 전에는 웹 접수를 사용할 수 없습니다.')
   let r: Response
   try { r = await fetch(endpoint, { ...init, credentials: 'omit', signal: AbortSignal.timeout(15000) }) }
   catch { throw new Error('접수 여부를 확인하지 못했습니다. 입력을 바꾸지 않고 같은 접수를 재시도하거나 이메일로 문의해 주세요.') }
@@ -49,15 +50,24 @@ async function publicRequest(init: RequestInit): Promise<unknown> {
   }
   return body.data
 }
-export async function fetchInquiryPolicy(): Promise<InquiryPolicy> {
+async function fetchPublishedPolicy(): Promise<InquiryPolicy> {
   const policy = await publicRequest({ method: 'GET' })
   if (!isRecord(policy) || typeof policy.version !== 'string' || !policy.version.trim() ||
     typeof policy.text !== 'string' || !policy.text.trim() ||
-    typeof policy.privacyText !== 'string' || !policy.privacyText.trim() ||
-    typeof policy.siteKey !== 'string' || !policy.siteKey.trim()) {
+    typeof policy.privacyText !== 'string' || !policy.privacyText.trim()) {
     throw new Error('승인된 개인정보 정책을 불러오지 못했습니다.')
   }
-  return { version: policy.version, text: policy.text, privacyText: policy.privacyText, siteKey: policy.siteKey }
+  return { version: policy.version, text: policy.text, privacyText: policy.privacyText,
+    siteKey: typeof policy.siteKey === 'string' ? policy.siteKey : '' }
+}
+export async function fetchPrivacyPolicy(): Promise<PrivacyPolicy> {
+  const { version, privacyText } = await fetchPublishedPolicy()
+  return { version, privacyText }
+}
+export async function fetchInquiryPolicy(): Promise<InquiryPolicy> {
+  const policy = await fetchPublishedPolicy()
+  if (!policy.siteKey.trim()) throw new Error('승인된 개인정보 정책을 불러오지 못했습니다.')
+  return policy
 }
 export async function submitInquiry(input: InquiryInput, key: string): Promise<InquiryReceipt> {
   const data = await publicRequest({
