@@ -1,5 +1,18 @@
 import * as Sentry from '@sentry/react'
 
+let inquirySession = false
+function isInquirySession() {
+  if (typeof window !== 'undefined' && /^\/(contact|admin\/inquiries)(\/|$)/.test(window.location.pathname)) {
+    inquirySession = true
+  }
+  return inquirySession
+}
+export function protectInquiryTelemetry() {
+  if (!isInquirySession()) return
+  Sentry.getCurrentScope().clearBreadcrumbs()
+  void Sentry.getReplay()?.stop()
+}
+
 /**
  * Sentry 초기화
  *
@@ -41,6 +54,16 @@ export function initSentry() {
     ],
 
     sendDefaultPii: false,
+    transport(options) {
+      const transport = Sentry.makeFetchTransport(options)
+      return {
+        ...transport,
+        // Keep all envelopes blocked after visiting an inquiry route, including later navigation.
+        send: envelope => isInquirySession() ? Promise.resolve({}) : transport.send(envelope),
+      }
+    },
+    beforeBreadcrumb: breadcrumb => isInquirySession() ? null : breadcrumb,
+    beforeSendTransaction: event => isInquirySession() ? null : event,
 
     // 의미 없는 노이즈 필터링
     ignoreErrors: [
@@ -50,6 +73,7 @@ export function initSentry() {
     ],
 
     beforeSend(event) {
+      if (isInquirySession()) return null
       // 로컬 개발 노이즈 차단
       if (event.request?.url?.includes('localhost')) {
         return null

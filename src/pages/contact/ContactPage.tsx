@@ -1,5 +1,6 @@
 import { useSearchParams } from 'react-router-dom'
 import SEOHead from '@/components/seo/SEOHead'
+import InquiryForm from '@/features/inquiries/InquiryForm'
 
 const CONTACT_ITEMS = [
   { icon: '📧', label: '업무 이메일', value: 'jngdy@baikalsys.kr', href: 'mailto:jngdy@baikalsys.kr' },
@@ -109,6 +110,8 @@ export default function ContactPage() {
               </a>
             ))}
           </div>
+
+          <InquiryForm />
 
           {/* Message prompt */}
           <div className="mt-10 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-8">

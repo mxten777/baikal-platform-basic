@@ -1,5 +1,6 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { Suspense, lazy, useEffect } from 'react'
+import { Suspense, lazy, useEffect, useLayoutEffect } from 'react'
+import { protectInquiryTelemetry } from '@/lib/sentry'
 import PublicLayout from '@/layouts/PublicLayout'
 import AdminLayout from '@/layouts/AdminLayout'
 import ProtectedRoute from '@/routes/ProtectedRoute'
@@ -10,6 +11,7 @@ const HomePage             = lazy(() => import('@/pages/home/HomePage'))
 const AboutPage            = lazy(() => import('@/pages/about/AboutPage'))
 const ServicesPage         = lazy(() => import('@/pages/services/ServicesPage'))
 const ContactPage          = lazy(() => import('@/pages/contact/ContactPage'))
+const PrivacyPage          = lazy(() => import('@/pages/privacy/PrivacyPage'))
 
 // Projects
 const ProjectListPage      = lazy(() => import('@/pages/projects/ProjectListPage'))
@@ -49,9 +51,12 @@ const AdminMedia           = lazy(() => import('@/pages/admin/AdminMedia'))
 const AdminTags            = lazy(() => import('@/pages/admin/AdminTags'))
 const AdminExternal        = lazy(() => import('@/pages/admin/AdminExternal'))
 const AdminAIContent       = lazy(() => import('@/pages/admin/AdminAIContent'))
+const AdminInquiries       = lazy(() => import('@/pages/admin/AdminInquiries'))
+const AdminInquiryDetail   = lazy(() => import('@/pages/admin/AdminInquiryDetail'))
 
 function ScrollToTop() {
   const { pathname } = useLocation()
+  useLayoutEffect(() => { protectInquiryTelemetry() }, [pathname])
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }) }, [pathname])
   return null
 }
@@ -89,6 +94,8 @@ export default function App() {
         <Route path="tags" element={<AdminTags />} />
         <Route path="external" element={<AdminExternal />} />
         <Route path="ai-content" element={<AdminAIContent />} />
+        <Route path="inquiries" element={<AdminInquiries />} />
+        <Route path="inquiries/:id" element={<AdminInquiryDetail />} />
       </Route>
 
       {/* Public */}
@@ -97,6 +104,7 @@ export default function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
 
         {/* Projects */}
         <Route path="/projects" element={<ProjectListPage />} />

@@ -77,6 +77,7 @@ export default function Footer() {
                   { to: '/about',    label: '회사 소개' },
                   { to: '/content',  label: '콘텐츠' },
                   { to: '/contact',  label: '도입 문의' },
+                  { to: '/privacy',  label: '개인정보 처리방침' },
                 ].map(l => (
                   <li key={l.to}>
                     <Link to={l.to} className="text-sm text-white/35 transition-colors duration-200 hover:text-white/80">
