@@ -119,14 +119,21 @@ function ProjectFormModal({
 
           {/* 설명 */}
           <div>
-            <label className="block text-xs text-white/40 mb-1.5">상세 설명 (Markdown)</label>
+            <label htmlFor="project-description" className="block text-xs text-white/40 mb-1.5">상세 설명 (Markdown)</label>
             <textarea
+              id="project-description"
+              aria-describedby="project-description-guide"
               rows={5}
               value={form.description ?? ''}
               onChange={e => set('description', e.target.value)}
               className="admin-input w-full font-mono"
               placeholder="마크다운 지원"
             />
+            <div id="project-description-guide" className="mt-2 space-y-1 text-xs leading-relaxed text-white/40">
+              <p>권장 순서: 프로젝트 개요 → 해결 과제 → 핵심 기능 → 실제 화면 → 기술 아키텍처 → 구축 성과</p>
+              <p>각 항목을 Markdown 소제목(##)으로 작성하세요. 공개 승인된 설명·이미지·링크만 입력하고, 자료가 없는 항목은 생략하세요.</p>
+              <p>확인되지 않은 기능·성과 수치·운영 상태는 작성하지 마세요. 안내 문구는 본문에 자동 입력되거나 저장되지 않습니다.</p>
+            </div>
           </div>
 
           {/* 상태 + 카테고리 + 정렬 */}

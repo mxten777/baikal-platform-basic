@@ -55,6 +55,7 @@ export default function ProjectDetailPage() {
   const relatedContents = project.content_project_map
     ?.map((m) => m.content)
     .filter(Boolean) ?? []
+  const hasDescription = Boolean(project.description?.trim())
 
   return (
     <>
@@ -78,7 +79,7 @@ export default function ProjectDetailPage() {
         </nav>
 
         {/* Header */}
-        <header className="mb-10">
+        <header className="mb-6">
           {project.category && (
             <span className="inline-block rounded-full border border-blue-500/20 bg-blue-500/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-blue-400/70">
               {project.category}
@@ -92,33 +93,35 @@ export default function ProjectDetailPage() {
           )}
 
           {/* Links */}
-          <div className="mt-6 flex flex-wrap gap-3">
-            {project.demo_url && (
-              <a
-                href={project.demo_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition-all hover:bg-blue-50"
-              >
-                데모 보기 <span className="transition-transform group-hover:translate-x-0.5">↗</span>
-              </a>
-            )}
-            {project.repo_url && (
-              <a
-                href={project.repo_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-white/10 px-5 py-2.5 text-sm font-semibold text-white/50 transition-all hover:border-white/20 hover:text-white"
-              >
-                GitHub ↗
-              </a>
-            )}
-          </div>
+          {(project.demo_url || project.repo_url) && (
+            <div className="mt-6 flex flex-wrap gap-3">
+              {project.demo_url && (
+                <a
+                  href={project.demo_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition-all hover:bg-blue-50"
+                >
+                  데모 보기 <span className="transition-transform group-hover:translate-x-0.5">↗</span>
+                </a>
+              )}
+              {project.repo_url && (
+                <a
+                  href={project.repo_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 px-5 py-2.5 text-sm font-semibold text-white/50 transition-all hover:border-white/20 hover:text-white"
+                >
+                  GitHub ↗
+                </a>
+              )}
+            </div>
+          )}
         </header>
 
         {/* Thumbnail */}
         {project.thumbnail_url && (
-          <div className="mb-12 overflow-hidden rounded-2xl">
+          <div className="mb-8 overflow-hidden rounded-2xl">
             <img
               src={project.thumbnail_url}
               alt={project.title}
@@ -127,23 +130,21 @@ export default function ProjectDetailPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
+        <div className="space-y-8">
           {/* Main content */}
-          <div className="lg:col-span-2">
-            {project.description && (
-              <div className="prose-content">
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[[rehypeSanitize, markdownSanitizeSchema]]}
-                >
-                  {project.description}
-                </ReactMarkdown>
-              </div>
-            )}
-          </div>
+          {hasDescription && (
+            <div className="prose-content">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[[rehypeSanitize, markdownSanitizeSchema]]}
+              >
+                {project.description}
+              </ReactMarkdown>
+            </div>
+          )}
 
           {/* Sidebar */}
-          <aside className="space-y-4">
+          <aside className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
             {/* Tech Stack */}
             {project.tech_stack.length > 0 && (
               <div className="glass-card rounded-2xl p-5">
@@ -179,7 +180,7 @@ export default function ProjectDetailPage() {
                         ? 'bg-green-500/10 text-green-400 border border-green-500/20'
                         : 'bg-white/5 text-white/30 border border-white/10'
                     }`}>
-                      {project.status === 'active' ? '운영 중' : project.status}
+                      {project.status === 'active' ? '공개' : project.status}
                     </span>
                   </dd>
                 </div>
@@ -190,7 +191,7 @@ export default function ProjectDetailPage() {
 
         {/* Related Contents */}
         {relatedContents.length > 0 && (
-          <section className="mt-20 border-t border-white/[0.06] pt-16">
+          <section className="mt-10 border-t border-white/[0.06] pt-8">
             <div className="flex items-center gap-3 mb-8">
               <div className="h-px w-8 bg-blue-500/60" />
               <span className="section-label">RELATED CONTENTS</span>
@@ -204,7 +205,7 @@ export default function ProjectDetailPage() {
         )}
 
         {/* Contact CTA */}
-        <div className="mt-20 border-t border-white/[0.06] pt-14">
+        <div className="mt-10 border-t border-white/[0.06] pt-8">
           <div className="glass-card rounded-2xl p-8 sm:p-10 text-center">
             <h2 className="text-xl sm:text-2xl font-black text-white leading-tight">
               홈페이지를 넘어,{' '}
@@ -221,16 +222,6 @@ export default function ProjectDetailPage() {
                 BAIKAL에 프로젝트 문의하기
                 <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
               </Link>
-              {project.demo_url && (
-                <a
-                  href={project.demo_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full border border-white/10 px-6 py-3 text-sm font-semibold text-white/50 transition-all hover:border-white/20 hover:text-white"
-                >
-                  공식 사이트 방문 ↗
-                </a>
-              )}
             </div>
           </div>
         </div>
