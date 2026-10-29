@@ -31,8 +31,8 @@ const PRODUCTS = [
   },
   {
     title: 'THE LIT',
-    desc: '공연·전시·강좌·공간 예약을 통합 운영하는 복합문화공간 플랫폼.',
-    tags: ['문화공간', '지자체', '예약·결제'],
+    desc: '브랜드·공간 정보를 제공하는 복합문화공간 홈페이지. 예약은 신청 화면·관련 코드 구현 범위입니다.',
+    tags: ['문화공간', '지자체', '예약 신청 화면'],
     href: '/solutions',
   },
 ]
@@ -211,7 +211,7 @@ export default function HomePage() {
               {/* 콘텐츠 */}
               <div className="p-8 sm:p-10 lg:p-12 flex flex-col justify-center">
                 <p className="text-xs font-semibold tracking-[0.18em] uppercase text-blue-400">
-                  Powered by BAIKAL AI Platform
+                  Website Renewal by BAIKAL
                 </p>
 
                 <h3 className="mt-4 text-3xl sm:text-4xl font-bold tracking-[-0.01em] leading-tight text-white">
@@ -224,16 +224,16 @@ export default function HomePage() {
                 <dl className="mt-8 divide-y divide-white/10 border-y border-white/10 text-sm">
                   <div className="flex gap-6 py-3">
                     <dt className="w-24 shrink-0 text-slate-400">구축 범위</dt>
-                    <dd className="text-slate-100">Website · AI Marketing Engine · Admin Framework · SEO</dd>
+                    <dd className="text-slate-100">브랜드 홈페이지 리뉴얼 · 반응형 UI · Supabase 기반 CMS 구현</dd>
                   </div>
                   <div className="flex gap-6 py-3">
                     <dt className="w-24 shrink-0 text-slate-400">상태</dt>
-                    <dd className="text-slate-100">운영 중</dd>
+                    <dd className="text-slate-100">브랜드 홈페이지 운영 배포</dd>
                   </div>
                 </dl>
 
                 <p className="mt-7 text-sm leading-relaxed text-slate-300 max-w-md break-keep">
-                  BAIKAL이 THE LIT을 AI 기반 디지털 플랫폼으로 구축한 과정을 소개합니다.
+                  THE LIT 브랜드 홈페이지 리뉴얼과 CMS 구현 과정을 소개합니다. 예약은 신청 화면·관련 코드 구현 범위이며, CMS CRUD·예약 접수 운영은 별도 검증 대상입니다.
                 </p>
 
                 <div className="mt-8">
