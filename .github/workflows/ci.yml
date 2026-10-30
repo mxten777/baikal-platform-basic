@@ -3,17 +3,15 @@
 # .github/workflows/ci.yml
 #
 # 트리거:
-#   - main 브랜치 push → 타입 체크 + 빌드 + Vercel 프로덕션 배포
-#   - develop 브랜치 push → 타입 체크 + 빌드 (Preview 배포)
-#   - PR → 타입 체크 + 빌드
+#   - main 브랜치 push → 타입 체크 + 린트 + 빌드 + 변경된 Supabase 작업
+#   - develop 브랜치 push 또는 PR → 타입 체크 + 린트 + 빌드
+#
+# Vercel 배포는 별도 Git 연동이 담당한다. 이 CI 실패는 Vercel 배포를 차단하지 않는다.
 #
 # 필요한 GitHub Secrets:
 #   SUPABASE_ACCESS_TOKEN   - Supabase CLI 인증 토큰
 #   SUPABASE_PROJECT_ID     - 프로젝트 ID (supabase link 시 사용)
 #   SUPABASE_DB_PASSWORD    - DB 비밀번호 (migrations push 시 사용)
-#   VERCEL_TOKEN            - Vercel 배포 토큰
-#   VERCEL_ORG_ID           - Vercel 조직 ID
-#   VERCEL_PROJECT_ID       - Vercel 프로젝트 ID
 #   VITE_SUPABASE_URL       - Supabase 프로젝트 URL (빌드 시 필요)
 #   VITE_SUPABASE_ANON_KEY  - Supabase anon key (빌드 시 필요)
 # =============================================================================
@@ -180,92 +178,3 @@ jobs:
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
-
-  # ===========================================================================
-  # 3. Vercel 프로덕션 배포 (main 브랜치 push 시만 실행)
-  # ===========================================================================
-  deploy-production:
-    name: Deploy to Vercel (Production)
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs: [build, changes, supabase-migrate, supabase-functions]
-    if: |
-      always() && !cancelled() &&
-      github.event_name == 'push' && github.ref == 'refs/heads/main' &&
-      needs.build.result == 'success' && needs.changes.result == 'success' &&
-      ((needs.changes.outputs.migrations == 'true' && needs.supabase-migrate.result == 'success') ||
-       (needs.changes.outputs.migrations == 'false' && needs.supabase-migrate.result == 'skipped')) &&
-      ((needs.changes.outputs.functions == 'true' && needs.supabase-functions.result == 'success') ||
-       (needs.changes.outputs.functions == 'false' && needs.supabase-functions.result == 'skipped'))
-
-    environment:
-      name: production
-      url: https://www.baikalsys.kr
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist/
-
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-          working-directory: ./
-
-  # ===========================================================================
-  # 4. Vercel Preview 배포 (develop 브랜치 또는 PR)
-  # ===========================================================================
-  deploy-preview:
-    name: Deploy to Vercel (Preview)
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs: build
-    if: |
-      (github.event_name == 'push' && github.ref == 'refs/heads/develop') ||
-      github.event_name == 'pull_request'
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Deploy Preview to Vercel
-        uses: amondnet/vercel-action@v25
-        id: vercel-deploy
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-
-      - name: Comment Preview URL on PR
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `🚀 **Preview 배포 완료**: ${{ steps.vercel-deploy.outputs.preview-url }}`
-            })
